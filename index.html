@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thrill Wave — Intelligence first. Camera second.</title>
+<meta name="description" content="Research-driven marketing agency. We turn audience, competitor, and category intelligence into high impact content built to move people.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" crossorigin="anonymous"></script>
+</head>
+<body class="booting">
+
+<!-- ============================================================
+     BOOT INTRO OVERLAY (removed from DOM after intro completes)
+     ============================================================ -->
+<div id="boot-root">
+<!-- WELCOME GATE — typed-out intro, click-to-start unlocks audio -->
+  <div class="welcome-gate" id="welcome-gate">
+    <div class="welcome-inner">
+      <div class="welcome-text">
+        <div class="welcome-line" id="welcome-line-1"><span class="line-text"></span></div>
+        <div class="welcome-line" id="welcome-line-2"><span class="line-text"></span></div>
+      </div>
+      <button class="welcome-btn" id="welcome-btn">click to start</button>
+    </div>
+  </div>
+
+  <!-- CRT power-on flash -->
+  <div class="crt-power" id="crt-power"></div>
+
+  <!-- Page frame (dot → expand) -->
+  <div class="boot-frame" id="boot-frame"></div>
+
+  <!-- Boot log -->
+  <div class="boot-log" id="boot-log"></div>
+
+  <!-- Desktop -->
+  <div class="desktop" id="desktop">
+    <div class="desktop-brand">thrill_wave</div>
+    <div class="desktop-icon" id="desktop-icon">
+      <div class="icon-glyph">&gt;_</div>
+      <div class="icon-label">thrill_wave.elf</div>
+    </div>
+    <div class="desktop-clock" id="desktop-clock">--:--:--</div>
+    <div class="desktop-page" id="desktop-page">HOME &nbsp;&middot;&nbsp; 001 / 006</div>
+  </div>
+
+  <!-- Fake mouse pointer -->
+  <div class="pointer" id="pointer"></div>
+
+  <!-- Terminal window opening -->
+  <div class="boot-term-window" id="boot-term-window">
+    <div class="boot-term-inner">
+      <div class="boot-term-title">
+        <span>thrill_wave — home</span>
+        <span class="sep">[ ⏵ ⏸ ⏹ ]</span>
+      </div>
+      <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>hi.</div>
+      <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>welcome to thrill wave.</div>
+      <div class="boot-term-line">&nbsp;</div>
+      <div class="boot-term-line"><span class="boot-cursor-block"></span></div>
+    </div>
+  </div>
+
+  <!-- Glitch flash overlay (fires at transitions) -->
+  <div class="glitch-flash" id="glitch-flash"></div>
+
+  <!-- Tracker line overlay (sweeps occasionally) -->
+  <div class="tracker" id="tracker"></div>
+
+  <!-- CRT overlays (always present) -->
+  <div class="crt-vignette"></div>
+  <div class="crt-roll"></div>
+  <div class="crt-scanlines"></div>
+
+  <!-- Controls -->
+  <div class="controls">
+    <button id="skip-btn">skip →</button>
+  </div>
+</div>
+
+
+<div class="frame" aria-hidden="true">
+  <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
+  <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
+  <div class="frame-label frame-label--br" id="page-indicator">HOME &nbsp;&middot;&nbsp; 001 / 006</div>
+</div>
+
+<audio id="bg-audio" loop preload="auto">
+  <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
+</audio>
+
+<main class="content">
+  <div class="stage-wrap">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause music"><span class="audio-glyph">▶</span> music</button>
+        <div class="audio-viz" id="audio-viz">
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" id="menu-btn" aria-expanded="false" aria-controls="side-menu">menu</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="terminal main">
+        <div class="terminal-bar">
+          <span class="title"><a href="index.html" class="title-brand" id="title-brand">thrill_wave</a><span class="title-sep"> &mdash; </span><a href="#" class="title-page" id="title-page">home</a></span>
+          <div class="terminal-dots">
+            <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+          </div>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+
+          <section id="hero" class="page">
+            <div class="page-content"><span id="intro-pre"></span></div>
+
+            <div class="cascade intro-cascade" id="intro-cascade" data-expanded="false">
+              <span class="cascade-toggle" id="intro-cascade-toggle" role="button" tabindex="0" aria-expanded="false"></span>
+              <div class="cascade-content">
+                <div class="cascade-video">
+                  <div class="vid-frame">
+                    <iframe id="intro-video-iframe" src="about:blank" data-src="https://player.vimeo.com/video/1170100005?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="page-content"><span id="intro-post"></span></div>
+          </section>
+
+          <section id="what_we_do" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">01</span><span class="hdr-slash"> // </span><span class="hdr-name">what_we_do</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; we make content from beginning to end, and every
+&gt; project begins with a <a href="sitrep.html" class="cta-link">sitrep &rarr;</a> so we know exactly
+&gt; what story to tell before a camera ever turns on.
+&gt;
+&gt; ▸ <span class="accent">strategy &amp; intelligence</span> <span class="dim">────────────────────</span>
+&gt;   sitrep · audience research · messaging
+&gt;   campaign planning · positioning
+&gt;
+&gt; ▸ <span class="accent">pre-production</span>          <span class="dim">────────────────────</span>
+&gt;   scripts · casting · locations · scheduling
+&gt;
+&gt; ▸ <span class="accent">production</span>              <span class="dim">────────────────────</span>
+&gt;   multi-cam shoots · directing · live capture
+&gt;
+&gt; ▸ <span class="accent">post-production</span>         <span class="dim">────────────────────</span>
+&gt;   editing · motion · sound · color · finishing</div>
+          </section>
+
+          <section id="sitrep" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02</span><span class="hdr-slash"> // </span><span class="hdr-name">sitrep</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; sitrep is our in-house intelligence and research
+&gt; platform. it studies your brand, your competitors,
+&gt; and your category at depth &mdash; pulling signal from
+&gt; millions of insights, not a handful of opinions &mdash;
+&gt; so we know the best possible story to tell, and why.</div>
+
+            <div class="triptych">
+              <div class="tile">
+                <div class="tile-corner-num">01</div>
+                <div class="tile-graphic ingest-graphic">
+                  <span class="glyph">▼</span><span class="glyph">▼</span><span class="glyph">▼</span>
+                </div>
+                <div class="tile-title">INGEST</div>
+                <ul class="tile-list">
+                  <li>audience</li>
+                  <li>competitor</li>
+                  <li>category</li>
+                </ul>
+              </div>
+
+              <div class="tile">
+                <div class="tile-corner-num">02</div>
+                <div class="tile-graphic synth-graphic">
+                  <span class="glyph">◇</span><span class="glyph">◆</span><span class="glyph">◇</span>
+                </div>
+                <div class="tile-title">SYNTHESIZE</div>
+                <ul class="tile-list">
+                  <li>patterns</li>
+                  <li>trust gaps</li>
+                  <li>blind spots</li>
+                </ul>
+              </div>
+
+              <div class="tile">
+                <div class="tile-corner-num">03</div>
+                <div class="tile-graphic exec-graphic">
+                  <span class="glyph">⚡</span><span class="glyph">⚡</span><span class="glyph">⚡</span>
+                </div>
+                <div class="tile-title">EXECUTE</div>
+                <ul class="tile-list">
+                  <li>best story</li>
+                  <li>production plan</li>
+                  <li>ground truth</li>
+                </ul>
+              </div>
+            </div>
+
+            <div class="page-content">&gt; ▸ <span class="accent">what you get</span> <span class="dim">─────────────────────────────────</span>
+&gt;   a clear read on your audience and the gaps
+&gt;   standing between you and them.
+&gt;   the one story most worth telling right now.
+&gt;
+&gt; ▸ <a href="sitrep.html" class="cta-link">request a sitrep &rarr;</a></div>
+          </section>
+
+          <section id="our_work" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03</span><span class="hdr-slash"> // </span><span class="hdr-name">our_work</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; every project started with a sitrep. research
+&gt; first. story second. camera third. here's what
+&gt; came out the other side.
+&gt;</div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_01</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_02</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://player.vimeo.com/video/1169820728?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_03</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://www.youtube.com/embed/pDk121-TCto?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_04</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://www.youtube.com/embed/QlP7wPaFcVU?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_05</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://www.youtube.com/embed/bKcCTsmtqP8?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_06</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://www.youtube.com/embed/2g7dOnDKYZo?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+
+            <div class="cascade work-cascade" data-expanded="false">
+              <span class="cascade-toggle" role="button" tabindex="0" aria-expanded="false"><span class="prompt">&gt;</span> show <span class="cmd-name">film_07</span><span class="toggle-mark"></span></span>
+              <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
+                <iframe src="about:blank" data-src="https://www.youtube.com/embed/N3yfL_gk_vE?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+              </div></div></div>
+            </div>
+          </section>
+
+          <section id="who_we_work_with" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04</span><span class="hdr-slash"> // </span><span class="hdr-name">who_we_work_with</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; we work with the people building what comes next.
+&gt; 80+ organizations across 6 industries and 41 verticals.
+&gt;
+&gt; ▸ <span class="accent">defense</span>          <span class="dim">────────────────────────────────</span>
+&gt;   <a href="https://anduril.com" target="_blank" rel="noopener">anduril</a> · <a href="https://lockheedmartin.com" target="_blank" rel="noopener">lockheed</a> · <a href="https://rtx.com" target="_blank" rel="noopener">raytheon</a>
+&gt;   <a href="https://northropgrumman.com" target="_blank" rel="noopener">northrop_grumman</a> · <a href="https://boeing.com" target="_blank" rel="noopener">boeing</a> · <a href="https://defense.gov" target="_blank" rel="noopener">DoD</a>
+&gt;
+&gt; ▸ <span class="accent">healthcare</span>       <span class="dim">────────────────────────────────</span>
+&gt;   <a href="https://mayoclinic.org" target="_blank" rel="noopener">mayo_clinic</a> · <a href="https://kaiserpermanente.org" target="_blank" rel="noopener">kaiser</a>
+&gt;   <a href="https://clevelandclinic.org" target="_blank" rel="noopener">cleveland_clinic</a> · <a href="https://stanfordhealthcare.org" target="_blank" rel="noopener">stanford_health</a>
+&gt;
+&gt; ▸ <span class="accent">gov + research</span>   <span class="dim">────────────────────────────────</span>
+&gt;   <a href="https://darpa.mil" target="_blank" rel="noopener">DARPA</a> · <a href="https://nasa.gov" target="_blank" rel="noopener">NASA</a> · <a href="https://nih.gov" target="_blank" rel="noopener">NIH</a> · <a href="https://stanford.edu" target="_blank" rel="noopener">stanford</a>
+&gt;
+&gt; ▸ <span class="accent">tech + corporate</span> <span class="dim">────────────────────────────────</span>
+&gt;   <a href="https://cisco.com" target="_blank" rel="noopener">cisco</a> · <a href="https://honeywell.com" target="_blank" rel="noopener">honeywell</a> · <a href="https://sequoiacap.com" target="_blank" rel="noopener">sequoia</a></div>
+          </section>
+
+          <section id="the_team" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05</span><span class="hdr-slash"> // </span><span class="hdr-name">the_team</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; three co-founders. one studio.</div>
+
+            <div class="team-grid">
+              <figure class="team-card">
+                <div class="photo"><img src="assets/team/chris.avif" alt="chris"></div>
+                <div class="team-name">chris</div>
+                <div class="team-role">co-founder · director</div>
+              </figure>
+              <figure class="team-card">
+                <div class="photo"><img src="assets/team/ari.avif" alt="ari"></div>
+                <div class="team-name">ari</div>
+                <div class="team-role">co-founder · strategy</div>
+              </figure>
+              <figure class="team-card">
+                <div class="photo"><img src="assets/team/tony.avif" alt="tony"></div>
+                <div class="team-name">tony</div>
+                <div class="team-role">co-founder · production</div>
+              </figure>
+            </div>
+
+            <div class="page-content">&gt; we're leaders, creatives, and technologists who
+&gt; believe stories shape human interaction. ours
+&gt; exist to move people, deepen connection, and
+&gt; help the audience on the other end live a
+&gt; little better for having watched.
+&gt;
+&gt; ▸ <a href="about.html" class="cta-link">about us &rarr;</a></div>
+          </section>
+
+          <section id="talk_to_us" class="page reveal">
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06</span><span class="hdr-slash"> // </span><span class="hdr-name">talk_to_us</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; 30-min intro. no pitch deck.
+&gt;
+&gt; we arrive with intel already pulled on your
+&gt; sector. tell you what we're seeing. then we
+&gt; decide together if there's a story worth making.
+&gt;
+&gt; ▸ <a href="contact.html" class="cta-link">start a project &rarr;</a>
+&gt; ▸ <a href="https://calendly.com/christhrillwave/30-minute-meeting-clone" target="_blank" rel="noopener" class="cta-link">book a call &rarr;</a>
+&gt;
+&gt; <span class="muted">hi@thrillwave.com  ·  480.766.9585</span>
+&gt;
+<span class="section-rule">─────────────────────────────────────────────────────────</span>
+&gt;
+&gt; next page &rarr; <a href="about.html">about</a></div>
+          </section>
+
+        </div>
+      </div>
+
+      <aside class="terminal side" id="side-menu" aria-hidden="true">
+        <div class="terminal-bar">
+          <span class="title">menu</span>
+          <div class="terminal-dots">
+            <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+          </div>
+        </div>
+        <div class="terminal-body">
+          <div class="menu-list">
+            <a href="index.html" class="menu-item current"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="below-bar">
+      <a href="mailto:hi@thrillwave.com">hi@thrillwave.com</a>
+      <span class="sep">&middot;</span>
+      <a href="tel:+14807669585">480.766.9585</a>
+      <span class="sep social-sep">&middot;</span><span class="mobile-break" aria-hidden="true"></span>
+      <a href="https://www.instagram.com/thrillwave_" target="_blank" rel="noopener">insta</a>
+      <span class="sep">&middot;</span>
+      <a href="https://vimeo.com/thrillwave" target="_blank" rel="noopener">vimeo</a>
+      <span class="sep">&middot;</span>
+      <a href="https://x.com/thrillwave_" target="_blank" rel="noopener">x</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.tiktok.com/@thrillwave_" target="_blank" rel="noopener">tiktok</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.linkedin.com/company/thrillwave" target="_blank" rel="noopener">linkedin</a>
+      <span class="sep">&middot;</span>
+      <a href="#" target="_blank" rel="noopener">fb</a>
+    
+    </div>
+
+  </div>
+</main>
+
+<script>
+// ============================================================
+// THRILL_WAVE BOOT INTRO
+// First-visit-only animated boot sequence. Plays on the home page once
+// per browser session. Other pages and reloads skip it.
+// ============================================================
+(function bootIntro() {
+  'use strict';
+
+  const path = location.pathname;
+  const isHome = path === '/' || path.endsWith('/') || path.endsWith('/index.html') || path === '/index.html';
+
+  // Detect a browser refresh — when the user hits reload, wipe the session
+  // flags so the full boot sequence + typing animation play again. Regular
+  // navigation (link click, back/forward) preserves the flags so the boot
+  // doesn't re-trigger on every visit.
+  try {
+    const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+    if (nav && nav.type === 'reload') {
+      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.removeItem('tw_typing_done');
+    }
+  } catch (e) { /* older browsers — best effort */ }
+
+  const introPlayed = sessionStorage.getItem('tw_intro_played') === '1';
+
+  if (!isHome || introPlayed) {
+    // Skip boot — strip the overlay and the booting class so the site shows normally
+    document.body.classList.remove('booting');
+    const root = document.getElementById('boot-root');
+    if (root) root.remove();
+    return;
+  }
+
+  // Signal to the site script that it should NOT auto-start runHomeIntro;
+  // the boot will call it at the end of the sequence instead.
+  window.bootIntroActive = true;
+  // Fresh boot owns music startup: do not restore old page music before .elf launches.
+  sessionStorage.removeItem('tw_music_on');
+  sessionStorage.removeItem('tw_music_t');
+  sessionStorage.removeItem('tw_music_ts');
+
+
+// ============================================================
+// BOOT SEQUENCE — audio + sequencer
+// ============================================================
+
+// ------------------------------------------------------------
+// AUDIO MODULE (Tone.js) — minimal, fault-tolerant
+// Every Tone API call is in a try/catch so a single failure
+// doesn't abort the boot sequence.
+// ------------------------------------------------------------
+let audioReady = false;
+let SND = {};
+
+async function initAudio() {
+  if (audioReady) return;
+  if (typeof Tone === 'undefined') {
+    console.warn('Tone.js not loaded; running silent');
+    return;
+  }
+  try {
+    await Tone.start();
+
+    // 1) Boot beep — short CRT-power tone
+    SND.beep = new Tone.Oscillator({
+      frequency: 880, type: 'square', volume: -14
+    }).toDestination();
+
+    // 2) Type click — fast noise burst
+    SND.click = new Tone.NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.012, sustain: 0, release: 0.01 },
+      volume: -32
+    }).toDestination();
+
+    // 3) Synth pad — single AMSynth voice (no PolySynth complexity)
+    SND.pad = new Tone.AMSynth({
+      harmonicity: 1.5,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 1.4, decay: 0.5, sustain: 0.7, release: 1.6 },
+      volume: -16
+    }).toDestination();
+
+    // 4) Launch sound — bright UI click for the thrill_wave.elf launch
+    //   Two quick ascending blips: clean "click + launch" feel.
+    SND.launch = new Tone.Synth({
+      oscillator: { type: 'square' },
+      envelope: { attack: 0.002, decay: 0.05, sustain: 0, release: 0.04 },
+      volume: -14
+    }).toDestination();
+
+    // 5) Type click — louder, slightly fuller click for the home page
+    //    typing animation. Subtle but audible per keystroke.
+    SND.typeClick = new Tone.NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.02, sustain: 0, release: 0.012 },
+      volume: -24
+    }).toDestination();
+
+    audioReady = true;
+  } catch (e) {
+    console.warn('audio init error:', e);
+  }
+}
+
+// --- play helpers — every one is wrapped so a bad call doesn't break the boot ---
+function safe(fn) { try { fn(); } catch (e) { console.warn('audio play error:', e); } }
+
+function sndBeep() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.beep.start(now).stop(now + 0.07);
+  });
+}
+
+function sndClick() {
+  if (!audioReady) return;
+  safe(() => SND.click.triggerAttackRelease(0.01 + Math.random() * 0.01, Tone.now()));
+}
+
+// secondary click — re-uses the regular click at a slightly different decay
+function sndClickHi() {
+  if (!audioReady) return;
+  safe(() => SND.click.triggerAttackRelease(0.03, Tone.now()));
+}
+
+// Home page typing click — exposed on window for the site script to call
+// per keystroke during the typing animation.
+function sndTypeClick() {
+  if (!audioReady) return;
+  safe(() => SND.typeClick.triggerAttackRelease(0.018, Tone.now()));
+}
+window.twTypeClick = sndTypeClick;
+
+let padHolding = false;
+function sndPadOn() {
+  if (!audioReady || padHolding) return;
+  padHolding = true;
+  safe(() => SND.pad.triggerAttack('A2', Tone.now()));
+}
+
+function sndPadOff() {
+  if (!audioReady || !padHolding) return;
+  padHolding = false;
+  safe(() => SND.pad.triggerRelease(Tone.now()));
+}
+
+function sndLaunch() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    // crisp two-note ascending blip — sounds like "click + go"
+    SND.launch.triggerAttackRelease('E5', 0.04, now);
+    SND.launch.triggerAttackRelease('A5', 0.05, now + 0.055);
+  });
+}
+
+// ============================================================
+// SEQUENCER
+// ============================================================
+
+// --- timing config (tweak here to tune) ---
+const T = {
+  powerOn:      0,     // CRT power-on flash (~150ms now)
+  frameDot:     200,   // dot appears in center
+  frameExpand:  480,   // frame snap-expands to edges
+  bootLogStart: 980,   // first boot line
+  bootLogEnd:   6600,  // BIOS log hard-cuts off, frame collapses
+  frameRedot:   6720,  // dot re-appears at center for desktop reveal
+  frameRexpand: 7040,  // dot blows out to edges (desktop frame ignites)
+  desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
+  pointerMove:  7900,  // pointer appears and moves to icon
+  iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
+  termOpen:     8950,  // terminal window opens
+  done:         9700   // sequence complete
+};
+
+// --- references ---
+const welcomeGate = document.getElementById('welcome-gate');
+const welcomeBtn  = document.getElementById('welcome-btn');
+const crtPower    = document.getElementById('crt-power');
+const frame       = document.getElementById('boot-frame');
+const bootLog     = document.getElementById('boot-log');
+const desktop     = document.getElementById('desktop');
+const desktopIcon = document.getElementById('desktop-icon');
+const desktopClock= document.getElementById('desktop-clock');
+const pointer     = document.getElementById('pointer');
+const termWindow  = document.getElementById('boot-term-window');
+const glitch      = document.getElementById('glitch-flash');
+const tracker     = document.getElementById('tracker');
+const robotRock   = document.getElementById('bg-audio');
+
+// --- boot log lines ---
+// each line can be: [type, content, delayAfter (ms)]
+// types: 'instant' | 'progress' | 'plain'
+// progress lines animate dots then snap to [ OK ]
+const bootLines = [
+  { type: 'plain',    text: 'thrill_wave bios <span class="dim">v2.7.1 — 2026.05.16</span>', delay: 80 },
+  { type: 'plain',    text: '<span class="dim">copyright (c) thrill wave studios. all rights reserved.</span>', delay: 280 },
+  { type: 'plain',    text: '&nbsp;', delay: 60 },
+  { type: 'plain',    text: 'memory check..... <span class="hex">524288K</span> <span class="ok">OK</span>', delay: 90 },
+  { type: 'plain',    text: 'cpu: <span class="hex">8x</span> narrative_core <span class="dim">@ 4.20 GHz</span>', delay: 90 },
+  { type: 'plain',    text: 'gpu: render-pipeline <span class="dim">/ 24GB vram</span>', delay: 90 },
+  { type: 'plain',    text: 'pci: <span class="hex">14</span> devices detected', delay: 180 },
+  { type: 'plain',    text: '&nbsp;', delay: 60 },
+  { type: 'plain',    text: '<span class="grn">[ boot ]</span> initializing thrill_wave os...', delay: 220 },
+  { type: 'progress', text: 'loading kernel modules', delay: 30 },
+  { type: 'progress', text: 'mounting /sitrep', delay: 30 },
+  { type: 'progress', text: 'mounting /work', delay: 30 },
+  { type: 'progress', text: 'mounting /intel', delay: 30 },
+  { type: 'progress', text: 'spooling research daemons', delay: 30 },
+  { type: 'progress', text: 'calibrating narrative compiler', delay: 30 },
+  { type: 'progress', text: 'connecting to intel feed <span class="dim">(encrypted)</span>', delay: 30 },
+  { type: 'progress', text: 'bootstrapping observation engine', delay: 30 },
+  { type: 'plain',    text: '&nbsp;', delay: 100 },
+  { type: 'plain',    text: '<span class="dim">[info] 220 films indexed across 41 verticals</span>', delay: 110 },
+  { type: 'plain',    text: '<span class="dim">[info] last sitrep: 14:32:08 utc · session 0x7af3</span>', delay: 220 },
+  { type: 'plain',    text: '&nbsp;', delay: 80 },
+  { type: 'plain',    text: '<span class="acc">all systems nominal.</span>', delay: 280 },
+  { type: 'plain',    text: 'launching shell<span class="cursor-block"></span>', delay: 120 }
+];
+
+// --- helpers ---
+function makeLine(html) {
+  const div = document.createElement('div');
+  div.className = 'boot-line';
+  div.innerHTML = html;
+  bootLog.appendChild(div);
+  return div;
+}
+
+function progressLine(label) {
+  const div = makeLine(label + '<span class="dots"></span>');
+  const dots = div.querySelector('.dots');
+  let dotCount = 0;
+  const target = 18 + Math.floor(Math.random() * 6);
+  return new Promise(resolve => {
+    const interval = setInterval(() => {
+      dots.textContent += '.';
+      dotCount++;
+      if (dotCount >= target) {
+        clearInterval(interval);
+        // tiny pause then [ OK ]
+        setTimeout(() => {
+          div.innerHTML = label + ' <span class="dim">' + '.'.repeat(target) + '</span> <span class="ok">[ OK ]</span>';
+          resolve();
+        }, 60);
+      }
+    }, 14);
+  });
+}
+
+function fireGlitch() {
+  glitch.classList.remove('fire');
+  void glitch.offsetWidth;
+  glitch.classList.add('fire');
+}
+
+function fireTracker() {
+  tracker.classList.remove('active');
+  void tracker.offsetWidth;
+  tracker.classList.add('active');
+}
+
+function sleep(ms) {
+  return new Promise(r => setTimeout(r, ms));
+}
+
+// --- main sequencer ---
+let activeTimeouts = [];
+let aborted = false;
+
+function abortSequence() {
+  aborted = true;
+  activeTimeouts.forEach(t => clearTimeout(t));
+  activeTimeouts = [];
+}
+
+function schedule(fn, ms) {
+  const id = setTimeout(() => {
+    if (!aborted) fn();
+  }, ms);
+  activeTimeouts.push(id);
+  return id;
+}
+
+async function runBootLog() {
+  bootLog.classList.add('visible');
+  for (let i = 0; i < bootLines.length; i++) {
+    if (aborted) return;
+    const line = bootLines[i];
+    if (line.type === 'progress') {
+      const labelDiv = makeLine(line.text + '<span class="dots"></span>');
+      const dots = labelDiv.querySelector('.dots');
+      let count = 0;
+      const target = 14 + Math.floor(Math.random() * 8);
+      // animate dots — click on each
+      await new Promise(resolve => {
+        const interval = setInterval(() => {
+          if (aborted) { clearInterval(interval); resolve(); return; }
+          dots.textContent += '.';
+          sndClick();
+          count++;
+          if (count >= target) {
+            clearInterval(interval);
+            setTimeout(() => {
+              labelDiv.innerHTML = line.text + ' <span class="dim">' + '.'.repeat(target) + '</span> <span class="ok">[ OK ]</span>';
+              sndClickHi();  // [ OK ] confirmation chime
+              resolve();
+            }, 40);
+          }
+        }, 9);
+      });
+    } else {
+      makeLine(line.text);
+      // a quick burst of clicks for each plain line — gives the "instant print" sound
+      if (line.text !== '&nbsp;') {
+        for (let k = 0; k < 3; k++) {
+          setTimeout(() => sndClick(), k * 18);
+        }
+      }
+    }
+    await sleep(line.delay);
+    // randomly fire a tracker once in a while
+    if (Math.random() < 0.12) fireTracker();
+  }
+}
+
+// ------------------------------------------------------------
+async function runSequence() {
+  aborted = false;
+
+  // PHASE 1: CRT power-on — class triggers the flash animation, beep fires in sync
+  crtPower.classList.add('run');
+  sndBeep();
+  schedule(() => { crtPower.classList.add('done'); }, 100);
+
+  // PHASE 2: frame dot
+  schedule(() => {
+    frame.classList.add('dot');
+    fireTracker();
+  }, T.frameDot);
+
+  // PHASE 2b: frame expands
+  schedule(() => {
+    frame.classList.remove('dot');
+    frame.classList.add('expanded');
+    setTimeout(() => frame.classList.add('cool'), 700);
+  }, T.frameExpand);
+
+  // PHASE 3-4: boot log starts
+  schedule(() => { runBootLog(); }, T.bootLogStart);
+
+  // PHASE 5: BIOS log hard-cuts off + frame collapses back to nothing
+  schedule(() => {
+    bootLog.style.transition = 'none';
+    bootLog.style.opacity = '0';
+    bootLog.classList.remove('visible');
+    // Once BIOS is done, drop the gritty CRT treatment so the desktop
+    // matches the finished homepage frame as closely as possible.
+    document.getElementById('boot-root')?.classList.add('clean-desktop');
+    // collapse the frame so we can re-animate it for the desktop reveal
+    frame.classList.remove('expanded', 'cool');
+  }, T.bootLogEnd);
+
+  // PHASE 5b: dot reappears at center (the desktop screen igniting)
+  schedule(() => {
+    frame.classList.add('dot');
+  }, T.frameRedot);
+
+  // PHASE 5c: dot blows up to the screen edges (border = desktop frame)
+  schedule(() => {
+    frame.classList.remove('dot');
+    frame.classList.add('expanded');
+    // cool the border back to gray after expansion settles
+    setTimeout(() => frame.classList.add('cool'), 600);
+  }, T.frameRexpand);
+
+  // PHASE 6: desktop UI appears (hard cut, no fade) once the frame is set
+  schedule(() => {
+    desktop.style.transition = 'none';
+    desktop.style.opacity = '1';
+    desktop.classList.add('visible');
+  }, T.desktopShow);
+
+  // PHASE 6b: pointer appears, glides to icon
+  schedule(() => {
+    const r = desktopIcon.getBoundingClientRect();
+    pointer.style.left = '60%';
+    pointer.style.top = '70%';
+    pointer.classList.add('visible');
+    setTimeout(() => {
+      const targetX = r.left + r.width * 0.5 - 6;
+      const targetY = r.top + r.height * 0.4 - 6;
+      pointer.style.left = targetX + 'px';
+      pointer.style.top = targetY + 'px';
+    }, 80);
+  }, T.pointerMove);
+
+  // PHASE 7: click animation + Robot Rock starts
+  schedule(() => {
+    desktopIcon.classList.add('clicked');
+    setTimeout(() => desktopIcon.classList.remove('clicked'), 140);
+    sndLaunch();
+    // start Robot Rock — the music kicks in as the terminal app opens.
+    // If music was already restored from a previous page navigation
+    // (it's playing or about to play), don't reset it.
+    if (robotRock) {
+      robotRock.volume = 0.4;
+      robotRock.muted = false;
+      // Commit to music-on state only at the .elf launch. This keeps the
+      // welcome gate silent and makes the music feel tied to the OS opening.
+      sessionStorage.setItem('tw_music_on', '1');
+      if (robotRock.paused) {
+        if (sessionStorage.getItem('tw_music_t') === null) {
+          try { robotRock.currentTime = 0; } catch (e) {}
+        }
+        robotRock.play().catch(e => console.warn('robot rock play blocked:', e));
+      }
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    }
+  }, T.iconClick);
+
+  // PHASE 7b: terminal opens (the terminal-open animation itself is fine —
+  // it's a window-open effect, like a real OS. Desktop stays visible behind it.)
+  schedule(() => {
+    termWindow.classList.add('opening');
+    pointer.classList.remove('visible');
+  }, T.termOpen);
+
+  // PHASE 8: boot is done — swap from boot overlay to live site.
+  // The boot term-window is now at full size (560x700) matching the site's
+  // terminal. We drop the .booting class so the real site renders behind/over
+  // the boot overlay, then remove the boot overlay entirely.
+  schedule(() => {
+    bootEnded = true;
+    sessionStorage.setItem('tw_intro_played', '1');
+    document.body.classList.remove('booting');
+    const root = document.getElementById('boot-root');
+    if (root) root.remove();
+    // hand off to the site's own typing intro
+    if (typeof window.runHomeIntro === 'function') window.runHomeIntro();
+  }, T.termOpen + 700);
+}
+
+function resetSequence() {
+  sessionStorage.removeItem('tw_intro_played');
+  abortSequence();
+  // reset all elements to initial state
+  crtPower.classList.remove('done');
+  crtPower.style.cssText = '';
+  // force a reflow to restart animations
+  void crtPower.offsetWidth;
+
+  frame.classList.remove('dot', 'expanded', 'cool');
+  frame.style.cssText = '';
+  void frame.offsetWidth;
+
+  bootLog.innerHTML = '';
+  bootLog.classList.remove('visible');
+  bootLog.style.cssText = '';
+
+  desktop.classList.remove('visible');
+  desktop.style.cssText = '';
+  desktopIcon.classList.remove('clicked');
+  pointer.classList.remove('visible');
+  pointer.style.cssText = '';
+  termWindow.classList.remove('opening');
+  termWindow.style.cssText = '';
+
+  // re-trigger the CSS animation for power-on
+  const newPower = crtPower.cloneNode(true);
+  crtPower.parentNode.replaceChild(newPower, crtPower);
+
+  setTimeout(() => location.reload(), 50);
+}
+
+function skipSequence() {
+  abortSequence();
+  sndPadOff();
+  bootEnded = true;
+  // hand straight off to the live site — no partial boot state
+  sessionStorage.setItem('tw_intro_played', '1');
+  document.body.classList.remove('booting');
+  const root = document.getElementById('boot-root');
+  if (root) root.remove();
+  if (typeof window.runHomeIntro === 'function') window.runHomeIntro();
+}
+
+// ----------------------------------------------------------
+// WELCOME GATE — typing animation + click-to-start
+// User click on the button unlocks audio + starts boot sequence.
+// ----------------------------------------------------------
+
+// Live clock displayed on the desktop. Mirrors the homepage frame clock.
+function updateClock() {
+  if (!desktopClock) return;
+  const d = new Date();
+  const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  let tz = '';
+  try {
+    const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
+    const p = parts.find(x => x.type === 'timeZoneName');
+    if (p) tz = p.value;
+  } catch (e) {}
+  desktopClock.textContent = time + (tz ? ' ' + tz : '');
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// Type characters one-at-a-time into an element
+async function typeOut(el, text, charDelay) {
+  for (let i = 0; i < text.length; i++) {
+    if (welcomeTypingAborted) return;
+    el.textContent += text[i];
+    // tiny random jitter so it doesn't feel robotic
+    const d = charDelay + (Math.random() * 20 - 10);
+    await new Promise(r => setTimeout(r, Math.max(15, d)));
+  }
+}
+
+let welcomeTypingAborted = false;
+async function runWelcomeTyping() {
+  const l1     = document.getElementById('welcome-line-1');
+  const l2     = document.getElementById('welcome-line-2');
+  const l1text = l1.querySelector('.line-text');
+  const l2text = l2.querySelector('.line-text');
+  if (!l1 || !l2) return;
+
+  // Create the cursor once and place it in line 1.
+  // It naturally sits at the end of whatever text is in .line-text,
+  // moving along as characters get typed in.
+  const cursor = document.createElement('span');
+  cursor.className = 'welcome-cursor';
+  l1.appendChild(cursor);
+
+  // small initial beat so the cursor is visibly blinking before typing
+  await new Promise(r => setTimeout(r, 320));
+
+  await typeOut(l1text, '> hi.', 80);
+  await new Promise(r => setTimeout(r, 380));
+
+  // Move the cursor down to line 2 (single DOM node — moves on append)
+  l2.appendChild(cursor);
+  await new Promise(r => setTimeout(r, 160));
+
+  await typeOut(l2text, '> welcome to thrill wave.', 55);
+  if (welcomeTypingAborted) return;
+
+  // Hold the finished typing moment a touch longer before revealing the start button.
+  await new Promise(r => setTimeout(r, 1000));
+  if (welcomeTypingAborted) return;
+
+  // Reveal the click-to-start button — hard cut, no fade
+  welcomeBtn.classList.add('ready');
+}
+
+// typing is kicked off below, after sessionStorage check
+
+function primeRobotRockForMobile() {
+  if (!robotRock) return;
+  try {
+    // iOS/Safari needs the media element started directly inside the user's tap.
+    // Keep it silent until the animated .elf click, then unmute there.
+    robotRock.currentTime = 0;
+    robotRock.volume = 0.4;
+    robotRock.muted = true;
+    const p = robotRock.play();
+    if (p && typeof p.catch === 'function') p.catch(e => console.warn('robot rock prime blocked:', e));
+  } catch (e) {
+    console.warn('robot rock prime error:', e);
+  }
+}
+
+async function startEverything() {
+  welcomeTypingAborted = true;
+  welcomeGate.classList.add('gone');
+  // Prime the real soundtrack during the user's tap so mobile Safari allows it.
+  // It stays muted until the desktop launches thrill_wave.elf.
+  primeRobotRockForMobile();
+  // The welcome click unlocks boot sound only. Background music becomes audible later,
+  // exactly when the desktop launches thrill_wave.elf.
+  // unlock audio (may fail silently if blocked)
+  try { await initAudio(); } catch (e) { console.warn('audio init failed:', e); }
+  // wait for the gate to fade out before kicking off the boot
+  setTimeout(() => runSequence(), 600);
+  setTimeout(() => welcomeGate.remove(), 1000);
+}
+
+let started = false;
+function startOnce() {
+  if (started) return;
+  started = true;
+  startEverything();
+}
+
+welcomeBtn.addEventListener('click', startOnce);
+
+// keyboard — Enter/Space start the gate; once started they skip
+let bootEnded = false;
+
+document.addEventListener('keydown', (e) => {
+  // Once the boot has handed off to the site, this handler must be inert —
+  // otherwise Enter/Space/R would still trigger skipSequence/resetSequence
+  // and replay the home typing animation or reload the page.
+  if (bootEnded) return;
+  if (e.key === 'Enter' || e.key === ' ') {
+    e.preventDefault();
+    if (!started) {
+      startOnce();
+    } else {
+      skipSequence();
+    }
+  } else if (e.key === 'r' || e.key === 'R') {
+    resetSequence();
+  }
+});
+
+// controls
+document.getElementById('skip-btn').addEventListener('click', skipSequence);
+
+
+
+  // kick off welcome typing once DOM is ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => runWelcomeTyping());
+  } else {
+    runWelcomeTyping();
+  }
+})();
+
+</script>
+
+<script>
+(function() {
+  const NEXT_PAGE = 'about.html';
+
+  // ---------- clock ----------
+  const clockEl = document.getElementById('clock');
+  function tick() {
+    const d = new Date();
+    const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let tz = '';
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
+      const p = parts.find(x => x.type === 'timeZoneName');
+      if (p) tz = p.value;
+    } catch (e) {}
+    clockEl.textContent = time + (tz ? ' ' + tz : '');
+  }
+  tick(); setInterval(tick, 1000);
+
+  // ---------- bg audio player (single play/pause toggle) ----------
+  const bgAudio = document.getElementById('bg-audio');
+  const audioToggleBtn = document.getElementById('audio-toggle-btn');
+  const MUSIC_KEY = 'tw_music_on';
+
+  function updateAudioState() {
+    if (bgAudio.paused || bgAudio.muted) {
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> music';
+    } else {
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> pause';
+    }
+  }
+
+  audioToggleBtn.addEventListener('click', () => {
+    if (bgAudio.paused || bgAudio.muted) {
+      bgAudio.muted = false;
+      bgAudio.volume = 0.4;
+      bgAudio.play().then(() => {
+        sessionStorage.setItem(MUSIC_KEY, '1');
+      }).catch(() => {});
+    } else {
+      bgAudio.pause();
+      sessionStorage.removeItem(MUSIC_KEY);
+    }
+    audioToggleBtn.blur();
+  });
+
+  bgAudio.addEventListener('play', updateAudioState);
+  bgAudio.addEventListener('pause', updateAudioState);
+  // ---------- audio visualizer (eq bars driven by Web Audio API) ----------
+  const audioViz = document.getElementById('audio-viz');
+  const vizBars = audioViz ? audioViz.querySelectorAll('.viz-bar') : [];
+  let _audioCtx, _audioSrc, _analyser, _vizData, _vizRAF;
+
+  function ensureAudioCtx() {
+    if (_audioCtx) return true;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return false;
+      _audioCtx = new Ctx();
+      _audioSrc = _audioCtx.createMediaElementSource(bgAudio);
+      _analyser = _audioCtx.createAnalyser();
+      _analyser.fftSize = 128;
+      _analyser.smoothingTimeConstant = 0.68;
+      _audioSrc.connect(_analyser);
+      _analyser.connect(_audioCtx.destination);
+      _vizData = new Uint8Array(_analyser.frequencyBinCount);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function vizTick() {
+    if (!_analyser || !vizBars.length) return;
+    _analyser.getByteFrequencyData(_vizData);
+    const bins = Math.floor(_vizData.length / vizBars.length);
+    vizBars.forEach((bar, i) => {
+      let sum = 0;
+      for (let j = 0; j < bins; j++) sum += _vizData[i * bins + j];
+      const avg = sum / bins;
+      const h = Math.max(2, Math.floor((avg / 255) * 20));
+      bar.style.height = h + 'px';
+    });
+    _vizRAF = requestAnimationFrame(vizTick);
+  }
+
+  function startViz() {
+    if (!ensureAudioCtx()) return;
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    if (audioViz) audioViz.classList.add('active');
+    if (_vizRAF) cancelAnimationFrame(_vizRAF);
+    vizTick();
+  }
+
+  function stopViz() {
+    if (_vizRAF) { cancelAnimationFrame(_vizRAF); _vizRAF = null; }
+    if (audioViz) audioViz.classList.remove('active');
+    vizBars.forEach(b => b.style.height = '2px');
+  }
+
+  bgAudio.addEventListener('play', startViz);
+  bgAudio.addEventListener('pause', stopViz);
+
+
+  // If music was enabled on a previous page in this session, try to resume.
+  // Modern browsers allow this after the user has already interacted with the origin.// ----- music continuity across pages -----
+  // Continuously persist the playhead while music is playing, and on pause,
+  // so the next page (whether navigation or refresh) can resume from the
+  // exact spot. Without this each new page would create a fresh audio
+  // element at currentTime = 0 and the track would restart.
+  const MUSIC_TIME_KEY = 'tw_music_t';
+  const MUSIC_TS_KEY = 'tw_music_ts';
+
+  function persistMusicPosition() {
+    sessionStorage.setItem(MUSIC_TIME_KEY, bgAudio.currentTime.toFixed(2));
+    sessionStorage.setItem(MUSIC_TS_KEY, Date.now().toString());
+  }
+  let _musicSaveInterval = null;
+  bgAudio.addEventListener('play', () => {
+    if (_musicSaveInterval) clearInterval(_musicSaveInterval);
+    _musicSaveInterval = setInterval(persistMusicPosition, 250);
+    persistMusicPosition();
+  });
+  bgAudio.addEventListener('pause', () => {
+    if (_musicSaveInterval) { clearInterval(_musicSaveInterval); _musicSaveInterval = null; }
+    persistMusicPosition();
+  });
+  // Save right before navigation / tab hide / refresh
+  window.addEventListener('pagehide', persistMusicPosition);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') persistMusicPosition();
+  });
+
+  // Restore playhead on every page load. Only play if music was on when the
+  // last page persisted state. If it was paused, we still set currentTime so
+  // a subsequent music-button click resumes from where it was paused — not
+  // from 0:00. If music was playing, advance the playhead by elapsed real
+  // time since the last save (modulo track duration for looped audio).
+  function restoreMusic() {
+    function applyTimeAndMaybePlay() {
+      const savedTime = parseFloat(sessionStorage.getItem(MUSIC_TIME_KEY));
+      const savedTs   = parseInt(sessionStorage.getItem(MUSIC_TS_KEY), 10);
+      const wasOn     = sessionStorage.getItem(MUSIC_KEY) === '1';
+
+      if (!isNaN(savedTime) && !isNaN(savedTs)) {
+        // Only add elapsed time if music was actually playing; if it was
+        // paused, the saved time is exact.
+        const elapsed = wasOn ? Math.max(0, (Date.now() - savedTs) / 1000) : 0;
+        let resume = savedTime + elapsed;
+        const dur = bgAudio.duration;
+        if (dur && isFinite(dur) && dur > 0) resume = resume % dur;
+        try { bgAudio.currentTime = resume; } catch (e) {}
+      }
+
+      if (wasOn) {
+        bgAudio.play().catch(() => {
+          // Browser blocked autoplay. If boot is going to play here, its
+          // .elf click is a user gesture and will retry — keep MUSIC_KEY
+          // alive so the intent isn't lost. Otherwise clear it so the user
+          // can re-enable via the music button.
+          if (!document.body.classList.contains('booting')) {
+            sessionStorage.removeItem(MUSIC_KEY);
+          }
+          updateAudioState();
+        });
+      } else {
+        updateAudioState();
+      }
+    }
+
+    if (bgAudio.readyState >= 1 && bgAudio.duration && isFinite(bgAudio.duration)) {
+      applyTimeAndMaybePlay();
+    } else {
+      bgAudio.addEventListener('loadedmetadata', applyTimeAndMaybePlay, { once: true });
+      // Fallback in case metadata never fires
+      setTimeout(applyTimeAndMaybePlay, 600);
+    }
+  }
+  restoreMusic();
+
+  // ---------- menu toggle ----------
+  const body = document.body;
+  const menuBtn = document.getElementById('menu-btn');
+  const sideMenu = document.getElementById('side-menu');
+  function setMenu(open) {
+    body.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    sideMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    menuBtn.textContent = open ? 'close' : 'menu';
+  }
+  menuBtn.addEventListener('click', () => {
+    setMenu(!body.classList.contains('menu-open'));
+    menuBtn.blur();
+  });
+
+  // ---------- cascade toggle ----------
+  document.querySelectorAll('.cascade-toggle').forEach(tg => {
+    function toggle() {
+      const c = tg.closest('.cascade');
+      const open = c.dataset.expanded === 'true';
+
+      // Work-cascade mutual exclusion: close any other open work-cascade
+      if (c.classList.contains('work-cascade')) {
+        document.querySelectorAll('.work-cascade').forEach(other => {
+          if (other !== c && other.dataset.expanded === 'true') {
+            other.dataset.expanded = 'false';
+            const otherToggle = other.querySelector('.cascade-toggle');
+            if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+            const otherIframe = other.querySelector('iframe[data-src]');
+            if (otherIframe) otherIframe.src = 'about:blank';
+          }
+        });
+      }
+
+      c.dataset.expanded = open ? 'false' : 'true';
+      tg.setAttribute('aria-expanded', open ? 'false' : 'true');
+
+      const iframe = c.querySelector('iframe[data-src]');
+      if (iframe) {
+        if (!open) {
+          // Opening — load video
+          if (iframe.src.indexOf('about:blank') !== -1) iframe.src = iframe.dataset.src;
+        } else {
+          // Closing — stop video by resetting src
+          if (c.classList.contains('work-cascade')) iframe.src = 'about:blank';
+        }
+      }
+    }
+    tg.addEventListener('click', toggle);
+    tg.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
+    });
+  });
+
+  // ---------- reveal observer ----------
+  const terminalBody = document.getElementById('terminal-body');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.25, root: terminalBody });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  }
+
+  // ---------- typing animation copy ----------
+  const introPreLines = [
+    { t: '> hi.', p: 450 },
+    { t: '> welcome to thrill wave.', p: 600 },
+    { t: '', p: 280 },
+  ];
+
+  const introPostLines = [
+    { t: '', p: 250 },
+    { t: "> we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.", p: 500 },
+    { t: '', p: 280 },
+    { t: '> press enter or scroll down to go to the next page, or click menu to jump to a page.', p: 0 },
+  ];
+
+  function escHtml(ch) { return ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch; }
+  function escAll(s) { return s.split('').map(escHtml).join(''); }
+
+  function typeLines(targetEl, lines, done) {
+    let html = '';
+    let idx = 0;
+    function next() {
+      if (idx >= lines.length) {
+        targetEl.innerHTML = html + '<span class="cursor"></span>';
+        if (done) done();
+        return;
+      }
+      const line = lines[idx];
+      const isLastLine = idx === lines.length - 1;
+      if (line.t === '') {
+        if (!isLastLine) html += '\n';
+        idx++;
+        setTimeout(next, line.p);
+        return;
+      }
+      let j = 0;
+      function ch() {
+        if (j < line.t.length) {
+          const c = line.t[j];
+          html += escHtml(c);
+          targetEl.innerHTML = html + '<span class="cursor"></span>';
+          // typing click per keystroke (skip whitespace)
+          if (c !== ' ' && c !== '\n' && typeof window.twTypeClick === 'function') {
+            window.twTypeClick();
+          }
+          j++;
+          // slightly slower than before — was 16 + rand*20, now 22 + rand*22
+          const d = c === ' ' ? 14 : 22 + Math.random() * 22;
+          setTimeout(ch, d);
+        } else {
+          if (!isLastLine) html += '\n';
+          idx++;
+          setTimeout(next, line.p);
+        }
+      }
+      ch();
+    }
+    next();
+  }
+
+  function typeCascadeToggle(done) {
+    const cascade = document.getElementById('intro-cascade');
+    const toggle = document.getElementById('intro-cascade-toggle');
+    cascade.style.opacity = '1';
+    toggle.innerHTML = '';
+
+    const plain = '> show intro_video [+]';
+    let html = '';
+    let i = 0;
+    function type() {
+      if (i >= plain.length) {
+        // Done — replace plain with styled HTML; CSS handles [+]/[-] via ::before
+        toggle.innerHTML = '<span class="prompt">&gt;</span> show <span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
+        setTimeout(done, 250);
+        return;
+      }
+      const c = plain[i];
+      html += escHtml(c);
+      toggle.innerHTML = html + '<span class="cursor"></span>';
+      if (c !== ' ' && typeof window.twTypeClick === 'function') {
+        window.twTypeClick();
+      }
+      i++;
+      const d = c === ' ' ? 14 : 22 + Math.random() * 22;
+      setTimeout(type, d);
+    }
+    type();
+  }
+
+  function expandCascadeContent() {
+    const cascade = document.getElementById('intro-cascade');
+    const iframe = document.getElementById('intro-video-iframe');
+    if (iframe.dataset.src && iframe.src.indexOf('about:blank') !== -1) {
+      iframe.src = iframe.dataset.src;
+    }
+    cascade.dataset.expanded = 'true';
+    document.getElementById('intro-cascade-toggle').setAttribute('aria-expanded', 'true');
+  }
+
+  // (legacy fade-in cascade — kept for compatibility if anything else calls it)
+  function revealIntroCascade() {
+    const cascade = document.getElementById('intro-cascade');
+    cascade.style.opacity = '1';
+    expandCascadeContent();
+  }
+
+  function runHomeIntro() {
+    // Guard against overlapping calls — typing already running, ignore.
+    if (window.twIntroRunning) return;
+    window.twIntroRunning = true;
+    const preEl = document.getElementById('intro-pre');
+    const postEl = document.getElementById('intro-post');
+    typeLines(preEl, introPreLines, () => {
+      preEl.innerHTML = preEl.innerHTML.replace('<span class="cursor"></span>', '');
+      typeCascadeToggle(() => {
+        expandCascadeContent();
+        setTimeout(() => {
+          typeLines(postEl, introPostLines, () => {
+            // typing complete — mark in session so a back-navigation doesn't
+            // replay the animation. Only refresh or thrill_wave/home click
+            // can trigger replay after this.
+            sessionStorage.setItem('tw_typing_done', '1');
+            window.twIntroRunning = false;
+          });
+        }, 700);
+      });
+    });
+  }
+
+  function preFillHome() {
+    const preEl = document.getElementById('intro-pre');
+    const postEl = document.getElementById('intro-post');
+    let preHtml = '';
+    introPreLines.forEach(l => { preHtml += escAll(l.t || '') + '\n'; });
+    preEl.innerHTML = preHtml;
+    let postHtml = '';
+    introPostLines.forEach(l => { postHtml += escAll(l.t || '') + '\n'; });
+    postEl.innerHTML = postHtml;
+    document.getElementById('intro-cascade-toggle').innerHTML = '<span class="prompt">&gt;</span> show <span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
+    revealIntroCascade();
+  }
+
+  function resetAndReplayHome() {
+    // Explicit user request to replay — clear the typing-done flag and the
+    // running guard so the typing animation kicks off fresh.
+    sessionStorage.removeItem('tw_typing_done');
+    window.twIntroRunning = false;
+    terminalBody.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      document.getElementById('intro-pre').innerHTML = '';
+      document.getElementById('intro-post').innerHTML = '';
+      document.getElementById('intro-cascade-toggle').innerHTML = '';
+      const cascade = document.getElementById('intro-cascade');
+      cascade.dataset.expanded = 'false';
+      cascade.style.opacity = '0';
+      const iframe = document.getElementById('intro-video-iframe');
+      iframe.src = 'about:blank';
+      document.getElementById('intro-cascade-toggle').setAttribute('aria-expanded', 'false');
+      setTimeout(runHomeIntro, 400);
+    }, 350);
+  }
+
+  // ---------- section snap navigation ----------
+  function getSections() { return Array.from(terminalBody.querySelectorAll('section.page')); }
+
+  function getCurrentSection() {
+    const sections = getSections();
+    const containerTop = terminalBody.getBoundingClientRect().top;
+    let current = sections[0];
+    for (const s of sections) {
+      // section is current if its top is at or above the container's visible top (with a small tolerance)
+      const sTop = s.getBoundingClientRect().top - containerTop;
+      if (sTop <= 20) current = s;
+    }
+    return current;
+  }
+
+  function scrollToNextSection() {
+    const sections = getSections();
+    const current = getCurrentSection();
+    const idx = sections.indexOf(current);
+    if (idx >= 0 && idx < sections.length - 1) {
+      const next = sections[idx + 1];
+      next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return true;
+    }
+    return false;
+  }
+
+  // ---------- keyboard nav ----------
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) { setMenu(false); return; }
+    if (e.key !== 'Enter') return;
+    const tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    e.preventDefault();
+    if (!scrollToNextSection()) {
+      window.location.href = NEXT_PAGE;
+    }
+  });
+
+  // ---------- terminal title split click handlers ----------
+  // Ensure Tone.js + typing click synth are ready when user explicitly
+  // triggers a replay. The boot script normally sets this up, but if the
+  // user navigated back to home from another page (boot skipped) we need
+  // to initialize on demand so the replay typing still has click sounds.
+  async function ensureTypeAudio() {
+    if (typeof Tone === 'undefined') return;
+    try {
+      if (Tone.context && Tone.context.state !== 'running') {
+        await Tone.start();
+      }
+      if (typeof window.twTypeClick !== 'function') {
+        const synth = new Tone.NoiseSynth({
+          noise: { type: 'white' },
+          envelope: { attack: 0.001, decay: 0.02, sustain: 0, release: 0.012 },
+          volume: -24
+        }).toDestination();
+        window.twTypeClick = function() {
+          try { synth.triggerAttackRelease(0.018, Tone.now()); } catch (e) {}
+        };
+      }
+    } catch (e) { /* best effort */ }
+  }
+
+  const titleBrand = document.getElementById('title-brand');
+  const titlePage = document.getElementById('title-page');
+  if (titleBrand) {
+    titleBrand.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await ensureTypeAudio();
+      resetAndReplayHome();
+    });
+  }
+  if (titlePage) {
+    titlePage.addEventListener('click', async (e) => {
+      e.preventDefault();
+      await ensureTypeAudio();
+      resetAndReplayHome();
+    });
+  }
+
+  // ---------- init: always run animation on page load ----------
+  document.getElementById('intro-cascade').style.opacity = '0';
+  document.getElementById('intro-cascade').style.transition = 'opacity 480ms ease';
+
+  // Expose for the boot intro to call at the end of its sequence.
+  // If the boot is running, it'll trigger this; otherwise we kick off normally,
+  // but only if the typing hasn't already been shown this session.
+  window.runHomeIntro = runHomeIntro;
+  window.twPrefillHome = preFillHome;
+  window.twResetAndReplayHome = resetAndReplayHome;
+  if (!window.bootIntroActive) {
+    const typingDone = sessionStorage.getItem('tw_typing_done') === '1';
+    if (typingDone) {
+      // user already saw the typing this session — just show the content
+      // statically. The only ways to retrigger are: refresh, or click
+      // thrill_wave / home in the terminal title.
+      setTimeout(preFillHome, 80);
+    } else {
+      setTimeout(runHomeIntro, 650);
+    }
+  }
+})();
+</script>
+
+
+
+<script>
+// ============================================================
+// Persistent in-page navigation
+// Keeps the single #bg-audio element alive while moving between pages.
+// This is what makes the soundtrack seamless.
+// ============================================================
+(function() {
+  const PAGE_ORDER = ['index.html', 'about.html', 'sitrep.html', 'work.html', 'intel.html', 'contact.html'];
+  const PAGE_LABELS = {
+    'index.html': 'home',
+    'home.html': 'home',
+    'about.html': 'about',
+    'sitrep.html': 'sitrep',
+    'work.html': 'work',
+    'intel.html': 'intel',
+    'contact.html': 'contact'
+  };
+  const PAGE_INDICATORS = {
+    'index.html': 'HOME &nbsp;·&nbsp; 001 / 006',
+    'home.html': 'HOME &nbsp;·&nbsp; 001 / 006',
+    'about.html': 'ABOUT &nbsp;·&nbsp; 002 / 006',
+    'sitrep.html': 'SITREP &nbsp;·&nbsp; 003 / 006',
+    'work.html': 'WORK &nbsp;·&nbsp; 004 / 006',
+    'intel.html': 'INTEL &nbsp;·&nbsp; 005 / 006',
+    'contact.html': 'CONTACT &nbsp;·&nbsp; 006 / 006'
+  };
+
+  const terminalBody = document.getElementById('terminal-body');
+  const sideMenu = document.getElementById('side-menu');
+  const titlePage = document.getElementById('title-page');
+  const pageIndicator = document.getElementById('page-indicator');
+  const body = document.body;
+  const menuBtn = document.getElementById('menu-btn');
+  const bgAudio = document.getElementById('bg-audio');
+  const audioToggleBtn = document.getElementById('audio-toggle-btn');
+  const audioViz = document.getElementById('audio-viz');
+  const vizBars = audioViz ? audioViz.querySelectorAll('.viz-bar') : [];
+
+  if (!terminalBody) return;
+
+  const homeHTML = terminalBody.innerHTML;
+  let currentPage = normalizePage(location.pathname);
+  let activeHashTimer = null;
+  let activeObserver = null;
+
+  function normalizePage(pathOrUrl) {
+    let name = 'index.html';
+    try {
+      const u = new URL(pathOrUrl, location.href);
+      name = u.pathname.split('/').pop() || 'index.html';
+    } catch (e) {
+      name = String(pathOrUrl).split('#')[0].split('?')[0].split('/').pop() || 'index.html';
+    }
+    if (name === '' || name === '/') name = 'index.html';
+    if (name === 'home.html') name = 'index.html';
+    return PAGE_LABELS[name] ? name : 'index.html';
+  }
+
+  function nextPageName(page) {
+    const idx = PAGE_ORDER.indexOf(page);
+    return PAGE_ORDER[(idx + 1) % PAGE_ORDER.length];
+  }
+
+  function setMenu(open) {
+    if (!menuBtn || !sideMenu) return;
+    body.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    sideMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    menuBtn.textContent = open ? 'close' : 'menu';
+    menuBtn.classList.toggle('active', open);
+  }
+
+  function setChrome(page) {
+    currentPage = page;
+    const label = PAGE_LABELS[page] || 'home';
+    if (titlePage) titlePage.textContent = label;
+    if (pageIndicator) pageIndicator.innerHTML = PAGE_INDICATORS[page] || PAGE_INDICATORS['index.html'];
+    document.title = 'Thrill Wave — ' + (label === 'home' ? 'Intelligence first. Camera second.' : label);
+
+    document.querySelectorAll('.menu-item').forEach(a => {
+      const hrefPage = normalizePage(a.getAttribute('href') || 'index.html');
+      a.classList.toggle('current', hrefPage === page);
+    });
+  }
+
+  function updateMusicButton() {
+    if (!bgAudio || !audioToggleBtn) return;
+    audioToggleBtn.innerHTML = bgAudio.paused
+      ? '<span class="audio-glyph">▶</span> music'
+      : '<span class="audio-glyph">⏸</span> pause';
+    if (audioViz) audioViz.classList.toggle('active', !(bgAudio.paused || bgAudio.muted));
+    if ((bgAudio.paused || bgAudio.muted) && vizBars.length) vizBars.forEach(b => b.style.height = '2px');
+  }
+  window.addEventListener('tw:music-sync', updateMusicButton);
+  if (bgAudio) {
+    bgAudio.addEventListener('play', updateMusicButton);
+    bgAudio.addEventListener('pause', updateMusicButton);
+  }
+
+  function initCascades() {
+    terminalBody.querySelectorAll('.cascade-toggle').forEach(tg => {
+      if (tg.dataset.pjaxBound === '1') return;
+      tg.dataset.pjaxBound = '1';
+      tg.addEventListener('click', () => {
+        const c = tg.closest('.cascade');
+        if (!c) return;
+        const open = c.dataset.expanded === 'true';
+        c.dataset.expanded = open ? 'false' : 'true';
+        tg.setAttribute('aria-expanded', open ? 'false' : 'true');
+        if (!open) {
+          c.querySelectorAll('iframe[data-src]').forEach(frame => {
+            if (frame.getAttribute('src') === 'about:blank') frame.setAttribute('src', frame.dataset.src);
+          });
+        }
+      });
+      tg.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tg.click(); }
+      });
+    });
+  }
+
+  function initReveals() {
+    if (activeObserver) activeObserver.disconnect();
+    if ('IntersectionObserver' in window) {
+      activeObserver = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            activeObserver.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.22, root: terminalBody });
+      terminalBody.querySelectorAll('.reveal').forEach(el => activeObserver.observe(el));
+    } else {
+      terminalBody.querySelectorAll('.reveal').forEach(el => el.classList.add('is-in'));
+    }
+  }
+
+  function getSections() {
+    return Array.from(terminalBody.querySelectorAll('section.page'));
+  }
+
+  function getCurrentSection() {
+    const sections = getSections();
+    const containerTop = terminalBody.getBoundingClientRect().top;
+    let current = sections[0];
+    for (const s of sections) {
+      const sTop = s.getBoundingClientRect().top - containerTop;
+      if (sTop <= 24) current = s;
+    }
+    return current;
+  }
+
+  function scrollToHash(hash, smooth) {
+    if (!hash) {
+      terminalBody.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+      return;
+    }
+    const target = terminalBody.querySelector(hash);
+    if (target) terminalBody.scrollTo({ top: target.offsetTop, behavior: smooth ? 'smooth' : 'auto' });
+  }
+
+  function syncHashToNearestSection() {
+    const sections = getSections();
+    if (!sections.length) return;
+    const y = terminalBody.scrollTop;
+    let active = sections[0];
+    sections.forEach(sec => {
+      if (Math.abs(sec.offsetTop - y) < Math.abs(active.offsetTop - y)) active = sec;
+    });
+    const base = currentPage === 'index.html' ? 'index.html' : currentPage;
+    const newUrl = base + (active ? '#' + active.id : '');
+    history.replaceState({ page: currentPage }, '', newUrl);
+  }
+
+
+  function initSectionIndicators() {
+    const sections = getSections();
+    sections.forEach((sec, idx) => {
+      sec.querySelectorAll(':scope > .section-jump, :scope > .section-end').forEach(el => el.remove());
+      if (idx < sections.length - 1) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-jump';
+        btn.setAttribute('aria-label', 'next section');
+        btn.textContent = '↓';
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          const next = sections[idx + 1];
+          if (!next) return;
+          next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          history.replaceState({ page: currentPage }, '', currentPage + '#' + next.id);
+        });
+        sec.appendChild(btn);
+      } else {
+        const end = document.createElement('span');
+        end.className = 'section-end';
+        end.textContent = 'end';
+        sec.appendChild(end);
+      }
+    });
+  }
+
+  function initHashSync() {
+    terminalBody.removeEventListener('scroll', onScrollHashSync);
+    terminalBody.addEventListener('scroll', onScrollHashSync, { passive: true });
+  }
+  function onScrollHashSync() {
+    clearTimeout(activeHashTimer);
+    activeHashTimer = setTimeout(syncHashToNearestSection, 150);
+  }
+
+  async function loadPage(url, opts = {}) {
+    const u = new URL(url, location.href);
+    let page = normalizePage(u.pathname);
+    const hash = u.hash;
+    setMenu(false);
+
+    if (page === 'index.html') {
+      terminalBody.innerHTML = homeHTML;
+    } else {
+      const res = await fetch(page, { cache: 'no-cache' });
+      if (!res.ok) throw new Error('Could not load ' + page);
+      const html = await res.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const incoming = doc.getElementById('terminal-body');
+      if (!incoming) throw new Error(page + ' is missing #terminal-body');
+      terminalBody.innerHTML = incoming.innerHTML;
+    }
+
+    setChrome(page);
+    initCascades();
+    initReveals();
+    initSectionIndicators();
+    initHashSync();
+    updateMusicButton();
+
+    if (page === 'index.html' && typeof window.twPrefillHome === 'function') {
+      requestAnimationFrame(() => {
+        try { window.twPrefillHome(); } catch (e) { console.warn('home prefill failed:', e); }
+      });
+    }
+
+    requestAnimationFrame(() => scrollToHash(hash, false));
+    if (!opts.replace) history.pushState({ page }, '', page + hash);
+  }
+
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a');
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('mailto:') || href.startsWith('tel:') || href.startsWith('#')) return;
+    if (a.target && a.target !== '_self') return;
+
+    const u = new URL(href, location.href);
+    if (u.origin !== location.origin) return;
+    const page = normalizePage(u.pathname);
+    if (!PAGE_LABELS[page]) return;
+
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    loadPage(u.href).catch(err => {
+      console.warn('PJAX failed, falling back:', err);
+      location.href = href;
+    });
+  }, true);
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) { setMenu(false); return; }
+    if (e.key !== 'Enter') return;
+    const tag = e.target && e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    if (document.body.classList.contains('booting')) return;
+
+    const sections = getSections();
+    const current = getCurrentSection();
+    const idx = sections.indexOf(current);
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    if (idx >= 0 && idx < sections.length - 1) {
+      const next = sections[idx + 1];
+      next.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState({ page: currentPage }, '', currentPage + '#' + next.id);
+    } else {
+      loadPage(nextPageName(currentPage)).catch(err => console.warn('next page failed:', err));
+    }
+  }, true);
+
+  window.addEventListener('popstate', () => {
+    loadPage(location.href, { replace: true }).catch(() => {});
+  });
+
+  // Prevent the old timestamp resume trick from fighting the shell on first load.
+  // The shell keeps audio alive; session state is only for direct refreshes.
+  setChrome(currentPage);
+  initCascades();
+  initReveals();
+  initSectionIndicators();
+  initHashSync();
+  updateMusicButton();
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Thrill Wave — Sitrep</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="frame" aria-hidden="true">
+  <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
+  <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
+  <div class="frame-label frame-label--br">SITREP &nbsp;&middot;&nbsp; 003 / 006</div>
+</div>
+
+<audio id="bg-audio" loop preload="auto">
+  <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
+</audio>
+
+<main class="content">
+  <div class="stage-wrap">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause music"><span class="audio-glyph">▶</span> music</button>
+        <div class="audio-viz" id="audio-viz">
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+          <span class="viz-bar"></span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn" id="menu-btn" aria-expanded="false" aria-controls="side-menu">menu</button>
+      </div>
+    </div>
+
+    <div class="stage">
+      <div class="terminal main">
+        <div class="terminal-bar">
+          <span class="title"><a href="index.html" class="title-brand" id="title-brand">thrill_wave</a><span class="title-sep"> &mdash; </span><a href="#" class="title-page" id="title-page">sitrep</a></span>
+          <div class="terminal-dots">
+            <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+          </div>
+        </div>
+        <div class="terminal-body" id="terminal-body">
+
+          <section id="hero" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03</span><span class="hdr-slash"> // </span><span class="hdr-name">sitrep</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt;
+&gt; <span class="accent">the brief before the big idea.</span>
+&gt;
+&gt; sitrep is our intelligence protocol.
+&gt; it studies your audience, competitors, category,
+&gt; and cultural signals before we recommend a story.
+&gt;
+&gt; the point is simple: make the right thing,
+&gt; not just a beautiful thing.</div>
+          </section>
+
+          <section id="ingest" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03A</span><span class="hdr-slash"> // </span><span class="hdr-name">ingest_map</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="data-grid four-up">
+              <div class="data-cell"><span>audience</span><p>what they want, fear, trust, ignore, repeat, and quietly Google at 11:47pm.</p></div>
+              <div class="data-cell"><span>competitors</span><p>what everyone is saying, what nobody owns, and where the category got lazy.</p></div>
+              <div class="data-cell"><span>category</span><p>the rules, expectations, patterns, taboos, language, and proof points.</p></div>
+              <div class="data-cell"><span>culture</span><p>the signals around the market that affect timing, tone, and attention.</p></div>
+            </div>
+          </section>
+
+          <section id="process" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03B</span><span class="hdr-slash"> // </span><span class="hdr-name">process</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="flowline">
+              <div><b>01</b><span>scan</span><p>collect signals from the market.</p></div>
+              <div><b>02</b><span>sift</span><p>remove noise, guesses, and pretty distractions.</p></div>
+              <div><b>03</b><span>score</span><p>rank what matters by trust, relevance, and opportunity.</p></div>
+              <div><b>04</b><span>story</span><p>turn the findings into a creative direction.</p></div>
+            </div>
+            <div class="page-content small-after">&gt; no magic. just better inputs and a calmer robot.</div>
+          </section>
+
+          <section id="output" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03C</span><span class="hdr-slash"> // </span><span class="hdr-name">output_table</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <table class="terminal-table">
+              <tr><th>deliverable</th><th>what it answers</th></tr>
+              <tr><td>audience read</td><td>who are we really trying to move?</td></tr>
+              <tr><td>competitor map</td><td>where is the white space?</td></tr>
+              <tr><td>message angles</td><td>what should we say, and why now?</td></tr>
+              <tr><td>creative direction</td><td>what story should production serve?</td></tr>
+              <tr><td>asset plan</td><td>what should be filmed, cut, launched, and reused?</td></tr>
+            </table>
+          </section>
+
+          <section id="best-for" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">best_for</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="check-columns">
+              <div>
+                <span class="check">✓</span> launching a campaign<br>
+                <span class="check">✓</span> entering a new market<br>
+                <span class="check">✓</span> repositioning a brand<br>
+                <span class="check">✓</span> explaining complex work
+              </div>
+              <div>
+                <span class="check">✓</span> sales enablement<br>
+                <span class="check">✓</span> recruitment stories<br>
+                <span class="check">✓</span> founder narratives<br>
+                <span class="check">✓</span> content that needs to matter
+              </div>
+            </div>
+          </section>
+
+          <section id="request" class="page reveal " data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03E</span><span class="hdr-slash"> // </span><span class="hdr-name">request_protocol</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content">&gt; send us the mission.
+&gt; we will come back with a read on the room.
+&gt;
+&gt; <a href="contact.html" class="cta-link">request a sitrep &rarr;</a></div>
+            <div class="next-link reveal">&gt; <a href="work.html">next: work &rarr;</a></div>
+          </section>
+</div>
+      </div>
+
+      <aside class="terminal side" id="side-menu" aria-hidden="true">
+        <div class="terminal-bar">
+          <span class="title">menu</span>
+          <div class="terminal-dots">
+            <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+          </div>
+        </div>
+        <div class="terminal-body">
+          <div class="menu-list">
+            <a href="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" class="menu-item current"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <div class="below-bar">
+      <a href="mailto:hi@thrillwave.com">hi@thrillwave.com</a>
+      <span class="sep">&middot;</span>
+      <a href="tel:+14807669585">480.766.9585</a>
+      <span class="sep social-sep">&middot;</span><span class="mobile-break" aria-hidden="true"></span>
+      <a href="https://www.instagram.com/thrillwave_" target="_blank" rel="noopener">insta</a>
+      <span class="sep">&middot;</span>
+      <a href="https://vimeo.com/thrillwave" target="_blank" rel="noopener">vimeo</a>
+      <span class="sep">&middot;</span>
+      <a href="https://x.com/thrillwave_" target="_blank" rel="noopener">x</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.tiktok.com/@thrillwave_" target="_blank" rel="noopener">tiktok</a>
+      <span class="sep">&middot;</span>
+      <a href="https://www.linkedin.com/company/thrillwave" target="_blank" rel="noopener">linkedin</a>
+      <span class="sep">&middot;</span>
+      <a href="#" target="_blank" rel="noopener">fb</a>
+    
+    </div>
+  </div>
+</main>
+
+<script>
+(function() {
+  const NEXT_PAGE = 'work.html';
+
+  const clockEl = document.getElementById('clock');
+  function tick() {
+    const d = new Date();
+    const time = d.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    let tz = '';
+    try {
+      const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(d);
+      const p = parts.find(x => x.type === 'timeZoneName');
+      if (p) tz = p.value;
+    } catch (e) {}
+    clockEl.textContent = time + (tz ? ' ' + tz : '');
+  }
+  tick(); setInterval(tick, 1000);
+  // ---------- bg audio player (cross-page persistence via sessionStorage) ----------
+  const bgAudio = document.getElementById('bg-audio');
+  const audioToggleBtn = document.getElementById('audio-toggle-btn');
+  const MUSIC_KEY = 'tw_music_on';
+
+  function updateAudioState() {
+    if (bgAudio.paused) {
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> music';
+    } else {
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> pause';
+    }
+  }
+
+  audioToggleBtn.addEventListener('click', () => {
+    if (bgAudio.paused) {
+      bgAudio.play().then(() => sessionStorage.setItem(MUSIC_KEY, '1')).catch(() => {});
+    } else {
+      bgAudio.pause();
+      sessionStorage.removeItem(MUSIC_KEY);
+    }
+    audioToggleBtn.blur();
+  });
+
+  bgAudio.addEventListener('play', updateAudioState);
+  bgAudio.addEventListener('pause', updateAudioState);
+  // ---------- audio visualizer (eq bars driven by Web Audio API) ----------
+  const audioViz = document.getElementById('audio-viz');
+  const vizBars = audioViz ? audioViz.querySelectorAll('.viz-bar') : [];
+  let _audioCtx, _audioSrc, _analyser, _vizData, _vizRAF;
+
+  function ensureAudioCtx() {
+    if (_audioCtx) return true;
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return false;
+      _audioCtx = new Ctx();
+      _audioSrc = _audioCtx.createMediaElementSource(bgAudio);
+      _analyser = _audioCtx.createAnalyser();
+      _analyser.fftSize = 128;
+      _analyser.smoothingTimeConstant = 0.68;
+      _audioSrc.connect(_analyser);
+      _analyser.connect(_audioCtx.destination);
+      _vizData = new Uint8Array(_analyser.frequencyBinCount);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function vizTick() {
+    if (!_analyser || !vizBars.length) return;
+    _analyser.getByteFrequencyData(_vizData);
+    const bins = Math.floor(_vizData.length / vizBars.length);
+    vizBars.forEach((bar, i) => {
+      let sum = 0;
+      for (let j = 0; j < bins; j++) sum += _vizData[i * bins + j];
+      const avg = sum / bins;
+      const h = Math.max(2, Math.floor((avg / 255) * 20));
+      bar.style.height = h + 'px';
+    });
+    _vizRAF = requestAnimationFrame(vizTick);
+  }
+
+  function startViz() {
+    if (!ensureAudioCtx()) return;
+    if (_audioCtx.state === 'suspended') _audioCtx.resume();
+    if (audioViz) audioViz.classList.add('active');
+    if (_vizRAF) cancelAnimationFrame(_vizRAF);
+    vizTick();
+  }
+
+  function stopViz() {
+    if (_vizRAF) { cancelAnimationFrame(_vizRAF); _vizRAF = null; }
+    if (audioViz) audioViz.classList.remove('active');
+    vizBars.forEach(b => b.style.height = '2px');
+  }
+
+  bgAudio.addEventListener('play', startViz);
+  bgAudio.addEventListener('pause', stopViz);// ----- music continuity across pages -----
+  // Continuously persist the playhead while music is playing, and on pause,
+  // so the next page (whether navigation or refresh) can resume from the
+  // exact spot. Without this each new page would create a fresh audio
+  // element at currentTime = 0 and the track would restart.
+  const MUSIC_TIME_KEY = 'tw_music_t';
+  const MUSIC_TS_KEY = 'tw_music_ts';
+
+  function persistMusicPosition() {
+    sessionStorage.setItem(MUSIC_TIME_KEY, bgAudio.currentTime.toFixed(2));
+    sessionStorage.setItem(MUSIC_TS_KEY, Date.now().toString());
+  }
+  let _musicSaveInterval = null;
+  bgAudio.addEventListener('play', () => {
+    if (_musicSaveInterval) clearInterval(_musicSaveInterval);
+    _musicSaveInterval = setInterval(persistMusicPosition, 250);
+    persistMusicPosition();
+  });
+  bgAudio.addEventListener('pause', () => {
+    if (_musicSaveInterval) { clearInterval(_musicSaveInterval); _musicSaveInterval = null; }
+    persistMusicPosition();
+  });
+  // Save right before navigation / tab hide / refresh
+  window.addEventListener('pagehide', persistMusicPosition);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') persistMusicPosition();
+  });
+
+  // Restore playhead on every page load. Only play if music was on when the
+  // last page persisted state. If it was paused, we still set currentTime so
+  // a subsequent music-button click resumes from where it was paused — not
+  // from 0:00. If music was playing, advance the playhead by elapsed real
+  // time since the last save (modulo track duration for looped audio).
+  function restoreMusic() {
+    function applyTimeAndMaybePlay() {
+      const savedTime = parseFloat(sessionStorage.getItem(MUSIC_TIME_KEY));
+      const savedTs   = parseInt(sessionStorage.getItem(MUSIC_TS_KEY), 10);
+      const wasOn     = sessionStorage.getItem(MUSIC_KEY) === '1';
+
+      if (!isNaN(savedTime) && !isNaN(savedTs)) {
+        // Only add elapsed time if music was actually playing; if it was
+        // paused, the saved time is exact.
+        const elapsed = wasOn ? Math.max(0, (Date.now() - savedTs) / 1000) : 0;
+        let resume = savedTime + elapsed;
+        const dur = bgAudio.duration;
+        if (dur && isFinite(dur) && dur > 0) resume = resume % dur;
+        try { bgAudio.currentTime = resume; } catch (e) {}
+      }
+
+      if (wasOn) {
+        bgAudio.play().catch(() => {
+          // Browser blocked autoplay. If boot is going to play here, its
+          // .elf click is a user gesture and will retry — keep MUSIC_KEY
+          // alive so the intent isn't lost. Otherwise clear it so the user
+          // can re-enable via the music button.
+          if (!document.body.classList.contains('booting')) {
+            sessionStorage.removeItem(MUSIC_KEY);
+          }
+          updateAudioState();
+        });
+      } else {
+        updateAudioState();
+      }
+    }
+
+    if (bgAudio.readyState >= 1 && bgAudio.duration && isFinite(bgAudio.duration)) {
+      applyTimeAndMaybePlay();
+    } else {
+      bgAudio.addEventListener('loadedmetadata', applyTimeAndMaybePlay, { once: true });
+      // Fallback in case metadata never fires
+      setTimeout(applyTimeAndMaybePlay, 600);
+    }
+  }
+  restoreMusic();
+
+
+  const body = document.body;
+  const menuBtn = document.getElementById('menu-btn');
+  const sideMenu = document.getElementById('side-menu');
+  function setMenu(open) {
+    body.classList.toggle('menu-open', open);
+    menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    sideMenu.setAttribute('aria-hidden', open ? 'false' : 'true');
+    menuBtn.textContent = open ? 'close' : 'menu';
+    menuBtn.classList.toggle('active', open);
+  }
+  menuBtn.addEventListener('click', () => setMenu(!body.classList.contains('menu-open')));
+  // ---------- terminal title split handlers ----------
+  const terminalBody2 = document.getElementById('terminal-body');
+  const titlePage = document.getElementById('title-page');
+  if (titlePage && terminalBody2) {
+    titlePage.addEventListener('click', (e) => {
+      e.preventDefault();
+      terminalBody2.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+  // (title-brand uses native href="index.html" navigation)
+
+
+  const terminalBody = document.getElementById('terminal-body');
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-in');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.2, root: terminalBody });
+    document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  }
+
+
+  // ---------- section hash sync for scroll + Enter navigation ----------
+  const pageSections = Array.from(document.querySelectorAll('#terminal-body section.page'));
+  let hashTimer = null;
+  function syncHashToNearestSection() {
+    if (!pageSections.length) return;
+    const y = terminalBody.scrollTop;
+    let active = pageSections[0];
+    pageSections.forEach(sec => {
+      if (Math.abs(sec.offsetTop - y) < Math.abs(active.offsetTop - y)) active = sec;
+    });
+    if (active && location.hash !== '#' + active.id) {
+      history.replaceState(null, '', '#' + active.id);
+    }
+  }
+  terminalBody.addEventListener('scroll', () => {
+    clearTimeout(hashTimer);
+    hashTimer = setTimeout(syncHashToNearestSection, 140);
+  }, { passive: true });
+  if (location.hash) {
+    const target = document.querySelector(location.hash);
+    if (target) setTimeout(() => terminalBody.scrollTo({ top: target.offsetTop, behavior: 'auto' }), 0);
+  }
+
+
+  function initSectionIndicators() {
+    const sections = Array.from(document.querySelectorAll('#terminal-body section.page'));
+    sections.forEach((sec, idx) => {
+      sec.querySelectorAll(':scope > .section-jump, :scope > .section-end').forEach(el => el.remove());
+      if (idx < sections.length - 1) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-jump';
+        btn.setAttribute('aria-label', 'next section');
+        btn.textContent = '↓';
+        btn.addEventListener('click', e => {
+          e.preventDefault();
+          e.stopPropagation();
+          const next = sections[idx + 1];
+          if (!next) return;
+          history.replaceState(null, '', '#' + next.id);
+          terminalBody.scrollTo({ top: next.offsetTop, behavior: 'smooth' });
+        });
+        sec.appendChild(btn);
+      } else {
+        const end = document.createElement('span');
+        end.className = 'section-end';
+        end.textContent = 'end';
+        sec.appendChild(end);
+      }
+    });
+  }
+  initSectionIndicators();
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && body.classList.contains('menu-open')) { setMenu(false); return; }
+    if (e.key !== 'Enter') return;
+    const tag = e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    e.preventDefault();
+    const sections = Array.from(document.querySelectorAll('#terminal-body section.page'));
+    const y = terminalBody.scrollTop;
+    const next = sections.find(sec => sec.offsetTop > y + 20);
+    if (next) {
+      history.replaceState(null, '', '#' + next.id);
+      terminalBody.scrollTo({ top: next.offsetTop, behavior: 'smooth' });
+    } else {
+      window.location.href = NEXT_PAGE;
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
