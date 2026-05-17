@@ -2286,3 +2286,39 @@ section.page > .next-link:last-child {
     margin: 0 1.8px;
   }
 }
+
+/* ============================================================
+   MOBILE MENU HOME-PAGE HOTFIX
+   The homepage intro/terminal content can sit visually near the mobile menu.
+   Keep the menu as the top interactive layer so taps hit the menu items,
+   not the homepage underneath.
+   ============================================================ */
+@media (max-width: 720px) {
+  body.menu-open .terminal.side {
+    z-index: 9999 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  body.menu-open .terminal.side .terminal-body,
+  body.menu-open .terminal.side .menu-list,
+  body.menu-open .terminal.side .menu-item {
+    position: relative;
+    z-index: 10000 !important;
+    pointer-events: auto !important;
+    touch-action: manipulation;
+  }
+
+  body.menu-open .terminal.main,
+  body.menu-open .below-bar,
+  body.menu-open .topbar-left {
+    pointer-events: none;
+  }
+
+  body.menu-open .topbar-right,
+  body.menu-open #menu-btn,
+  body.menu-open .terminal.side {
+    pointer-events: auto;
+  }
+}

@@ -2017,5 +2017,79 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 })();
 </script>
 
+
+<script>
+// ============================================================
+// MOBILE MENU HOME HOTFIX
+// Runs at the window capture phase, before older document-level handlers.
+// This keeps homepage menu taps from falling through to the home page state.
+// ============================================================
+(function mobileMenuHomeHotfix(){
+  function isMobile(){
+    return window.matchMedia && window.matchMedia('(max-width: 720px)').matches;
+  }
+
+  function normalizeHref(href){
+    if (!href) return 'index.html';
+    try {
+      var u = new URL(href, location.href);
+      var name = u.pathname.split('/').pop() || 'index.html';
+      if (name === 'home.html') name = 'index.html';
+      return name + (u.hash || '');
+    } catch (err) {
+      return href;
+    }
+  }
+
+  function closeMenu(){
+    var body = document.body;
+    var menuBtn = document.getElementById('menu-btn');
+    var sideMenu = document.getElementById('side-menu');
+    body.classList.remove('menu-open');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.textContent = 'menu';
+      menuBtn.classList.remove('active');
+    }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+  }
+
+  function go(link, e){
+    if (!link) return false;
+    var href = link.getAttribute('href') || 'index.html';
+    if (/^(mailto:|tel:|https?:\/\/)/i.test(href)) return false;
+
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    var target = normalizeHref(href);
+    closeMenu();
+
+    if (typeof window.twLoadPage === 'function') {
+      window.twLoadPage(target).catch(function(){ location.href = href; });
+    } else {
+      location.href = href;
+    }
+    return true;
+  }
+
+  function handler(e){
+    if (!isMobile()) return;
+    if (!document.body.classList.contains('menu-open')) return;
+    var target = e.target;
+    var link = target && target.closest ? target.closest('#side-menu a.menu-item') : null;
+    if (link) go(link, e);
+  }
+
+  // Window capture fires before the existing document capture listeners.
+  window.addEventListener('pointerup', handler, true);
+  window.addEventListener('touchend', handler, true);
+  window.addEventListener('click', handler, true);
+})();
+</script>
+
 </body>
 </html>
