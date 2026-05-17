@@ -10,14 +10,6 @@ body.booting > main.content {
   pointer-events: none;
 }
 
-/* Final handoff: reveal the real homepage shell under the opening layer.
-   This makes the border, top controls, terminal, and footer/contact row
-   already sit in their exact final positions before the boot overlay exits. */
-body.booting.handoff-ready > .frame,
-body.booting.handoff-ready > main.content {
-  opacity: 1;
-  pointer-events: none;
-}
 
 body.booting.handoff-ready > main.content {
   z-index: 2;
@@ -3819,5 +3811,143 @@ body.booting.handoff-ready .boot-term-inner .boot-term-title {
 @media (max-width: 720px) {
   body.booting.handoff-ready .boot-term-inner .boot-term-title {
     padding: 9px 12px !important;
+  }
+}
+
+
+/* ============================================================
+   TW FINAL HANDOFF REPAIR — no static page underneath early
+   ============================================================ */
+body.booting.handoff-ready > .frame,
+body.booting.handoff-ready > main.content {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* Exact clones of the real homepage chrome. They appear only during the
+   last half-second of opening, so the live site handoff has no hard pop. */
+.boot-chrome-clone {
+  position: fixed;
+  inset: 0;
+  z-index: 22;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+.boot-chrome-clone.is-visible { opacity: 1; }
+.boot-clone-piece {
+  position: fixed !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+}
+.boot-clone-frame {
+  z-index: 22;
+  animation: boot-chrome-in 240ms ease forwards;
+}
+.boot-clone-topbar,
+.boot-clone-below {
+  z-index: 23;
+  opacity: 0;
+  transform: translateY(3px);
+  animation: boot-chrome-in 260ms ease 80ms forwards;
+}
+.boot-clone-topbar .audio-btn,
+.boot-clone-topbar .btn,
+.boot-clone-below a {
+  pointer-events: none !important;
+}
+@keyframes boot-chrome-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* The terminal reveal now lands on the measured live terminal rectangle.
+   This avoids the little vertical jump between opening and homepage. */
+.boot-term-window.opening {
+  animation: term-open-exact 0.58s cubic-bezier(0.18, 0.86, 0.22, 1) forwards !important;
+  z-index: 24;
+}
+@keyframes term-open-exact {
+  0% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 0;
+    height: 0;
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: 0 0 0 rgba(93,208,104,0);
+  }
+  7% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(93,208,104,0.9), 0 0 54px rgba(93,208,104,0.38);
+  }
+  24% {
+    left: var(--boot-term-final-left, calc(50% - var(--term-w, 560px) / 2));
+    top: var(--boot-origin-y, 50%);
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w, 560px));
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(93,208,104,0.8), 0 0 58px rgba(93,208,104,0.32);
+  }
+  42% {
+    left: var(--boot-term-final-left, calc(50% - var(--term-w, 560px) / 2));
+    top: var(--boot-term-final-top, calc(50% - var(--term-h, 700px) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w, 560px));
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+  }
+  56% {
+    left: var(--boot-term-final-left, calc(50% - var(--term-w, 560px) / 2));
+    top: var(--boot-term-final-top, calc(50% - var(--term-h, 700px) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w, 560px));
+    height: var(--boot-title-height, 39px);
+    opacity: 1;
+    border-color: rgba(93,208,104,0.5);
+  }
+  88% {
+    left: var(--boot-term-final-left, calc(50% - var(--term-w, 560px) / 2));
+    top: var(--boot-term-final-top, calc(50% - var(--term-h, 700px) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w, 560px));
+    height: var(--boot-term-final-height, var(--term-h, 700px));
+    opacity: 1;
+    border-color: rgba(93,208,104,0.28);
+    box-shadow: 0 0 22px rgba(93,208,104,0.18);
+  }
+  100% {
+    left: var(--boot-term-final-left, calc(50% - var(--term-w, 560px) / 2));
+    top: var(--boot-term-final-top, calc(50% - var(--term-h, 700px) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w, 560px));
+    height: var(--boot-term-final-height, var(--term-h, 700px));
+    opacity: 1;
+    border-color: var(--terminal-rule);
+    box-shadow: none;
+  }
+}
+
+/* Keep the opening reveal clean, not HUD-y. */
+.boot-term-window.opening .hud-bracket,
+.boot-term-window.opening .boot-term-scan {
+  display: none !important;
+}
+
+/* Mobile divider fix: keep a visible separator between phone and insta. */
+@media (max-width: 720px) {
+  .below-bar .social-sep,
+  .boot-clone-below .social-sep {
+    display: inline-block !important;
   }
 }

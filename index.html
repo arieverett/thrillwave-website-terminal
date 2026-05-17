@@ -260,7 +260,7 @@
     if (event.key === 'Escape') closeModal(event);
   }, true);
 })();
-</script></div>
+</script>
 
 <audio id="bg-audio" loop preload="auto">
   <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
@@ -1185,24 +1185,59 @@ function prepExactHomepageHandoff() {
   const liveTitle = document.querySelector('.terminal.main .terminal-bar');
   if (!liveTerminal) return;
 
-  // Reveal the actual homepage shell underneath the boot animation, then
-  // measure the live terminal so the boot terminal can land in exactly the
-  // same rectangle on desktop and mobile.
-  body.classList.add('handoff-ready');
+  // Measure the real homepage terminal while it is still hidden by body.booting.
+  // Do NOT reveal the static site underneath the opening animation. The boot
+  // terminal uses these exact viewport coordinates as its final landing spot.
+  const rect = liveTerminal.getBoundingClientRect();
+  const titleRect = liveTitle ? liveTitle.getBoundingClientRect() : null;
+  body.style.setProperty('--boot-term-final-left', rect.left + 'px');
+  body.style.setProperty('--boot-term-final-top', rect.top + 'px');
+  body.style.setProperty('--boot-term-final-width', rect.width + 'px');
+  body.style.setProperty('--boot-term-final-height', rect.height + 'px');
+  body.style.setProperty('--boot-title-height', (titleRect ? titleRect.height : 39) + 'px');
+}
 
-  requestAnimationFrame(() => {
-    const rect = liveTerminal.getBoundingClientRect();
-    const titleRect = liveTitle ? liveTitle.getBoundingClientRect() : null;
-    body.style.setProperty('--boot-term-final-left', rect.left + 'px');
-    body.style.setProperty('--boot-term-final-top', rect.top + 'px');
-    body.style.setProperty('--boot-term-final-width', rect.width + 'px');
-    body.style.setProperty('--boot-term-final-height', rect.height + 'px');
-    body.style.setProperty('--boot-title-height', (titleRect ? titleRect.height : 39) + 'px');
+function createBootChromeClone() {
+  const root = document.getElementById('boot-root');
+  if (!root || document.getElementById('boot-chrome-clone')) return;
+
+  const shell = document.createElement('div');
+  shell.id = 'boot-chrome-clone';
+  shell.className = 'boot-chrome-clone';
+  shell.setAttribute('aria-hidden', 'true');
+
+  const pieces = [
+    ['frame', document.querySelector('.frame')],
+    ['topbar', document.querySelector('.topbar')],
+    ['below', document.querySelector('.below-bar')]
+  ];
+
+  pieces.forEach(([name, source]) => {
+    if (!source) return;
+    const clone = source.cloneNode(true);
+    clone.removeAttribute('id');
+    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+    clone.querySelectorAll('a, button').forEach(el => {
+      el.setAttribute('tabindex', '-1');
+      el.setAttribute('aria-hidden', 'true');
+    });
+    const rect = source.getBoundingClientRect();
+    clone.classList.add('boot-clone-piece', 'boot-clone-' + name);
+    clone.style.left = rect.left + 'px';
+    clone.style.top = rect.top + 'px';
+    clone.style.width = rect.width + 'px';
+    clone.style.height = rect.height + 'px';
+    shell.appendChild(clone);
   });
+
+  root.appendChild(shell);
+  requestAnimationFrame(() => shell.classList.add('is-visible'));
 }
 
 function clearExactHomepageHandoffVars() {
   document.body.classList.remove('handoff-ready');
+  const clone = document.getElementById('boot-chrome-clone');
+  if (clone) clone.remove();
   ['--boot-term-final-left','--boot-term-final-top','--boot-term-final-width','--boot-term-final-height','--boot-title-height'].forEach(v => document.body.style.removeProperty(v));
 }
 
@@ -1304,7 +1339,6 @@ async function runSequence() {
       document.body.style.setProperty('--boot-origin-x', cx + 'px');
       document.body.style.setProperty('--boot-origin-y', cy + 'px');
     } catch (e) { /* fall through to default 50%/50% */ }
-    prepExactHomepageHandoff();
   }, T.iconClick);
 
   // PHASE 7a: icon IMPLODES into a glowing spark. The .clicked recoil
@@ -1327,6 +1361,7 @@ async function runSequence() {
   schedule(() => {
     sndElfImpact();
     prepExactHomepageHandoff();
+    createBootChromeClone();
     requestAnimationFrame(() => termWindow.classList.add('opening'));
     pointer.classList.remove('visible');
     // hide the desktop chrome so it doesn't sit behind the terminal during
