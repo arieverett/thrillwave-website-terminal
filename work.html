@@ -464,5 +464,37 @@
 </script>
 
 
+<script>
+// TW title/chrome behavior: brand restarts the full home boot; page label scrolls top.
+(function(){
+  function restartHomeBoot(e){
+    if (e) {
+      e.preventDefault();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+    try {
+      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.removeItem('tw_music_on');
+      sessionStorage.removeItem('tw_music_t');
+      sessionStorage.removeItem('tw_music_ts');
+    } catch (_) {}
+    window.location.assign('index.html?boot=' + Date.now());
+  }
+  function scrollTopOnly(e){
+    if (e) e.preventDefault();
+    var body = document.getElementById('terminal-body');
+    if (body) body.scrollTo({ top: 0, behavior: 'smooth' });
+    try { history.replaceState(null, '', location.pathname.split('/').pop() || 'index.html'); } catch (_) {}
+  }
+  window.addEventListener('click', function(e){
+    var brand = e.target && e.target.closest ? e.target.closest('#title-brand, .frame-label--tl') : null;
+    if (brand) return restartHomeBoot(e);
+    var page = e.target && e.target.closest ? e.target.closest('#title-page') : null;
+    if (page) return scrollTopOnly(e);
+  }, true);
+})();
+</script>
+
 </body>
 </html>

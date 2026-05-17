@@ -1579,18 +1579,37 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   const titleBrand = document.getElementById('title-brand');
   const titlePage = document.getElementById('title-page');
+  function restartHomeBoot() {
+    // Clean restart: the brand mark always sends the user home and runs
+    // the full opening animation from frame zero. This avoids overlapping
+    // home typing replays and stale boot states.
+    try {
+      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.removeItem('tw_music_on');
+      sessionStorage.removeItem('tw_music_t');
+      sessionStorage.removeItem('tw_music_ts');
+    } catch (e) {}
+    window.location.assign('index.html?boot=' + Date.now());
+  }
+
+  function scrollCurrentPageTop() {
+    // The page label (home/about/etc.) is not a replay control.
+    // It simply returns the current terminal page to the top.
+    terminalBody.scrollTo({ top: 0, behavior: 'smooth' });
+    try { history.replaceState({ page: 'index.html' }, '', 'index.html'); } catch (e) {}
+  }
+
   if (titleBrand) {
-    titleBrand.addEventListener('click', async (e) => {
+    titleBrand.addEventListener('click', (e) => {
       e.preventDefault();
-      await ensureTypeAudio();
-      resetAndReplayHome();
+      restartHomeBoot();
     });
   }
   if (titlePage) {
-    titlePage.addEventListener('click', async (e) => {
+    titlePage.addEventListener('click', (e) => {
       e.preventDefault();
-      await ensureTypeAudio();
-      resetAndReplayHome();
+      scrollCurrentPageTop();
     });
   }
 
@@ -1919,7 +1938,41 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   window.twNavigateMenuLink = navigateMenuLink;
   window.twLoadPage = loadPage;
 
+  function restartHomeBootFromShell() {
+    try {
+      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.removeItem('tw_music_on');
+      sessionStorage.removeItem('tw_music_t');
+      sessionStorage.removeItem('tw_music_ts');
+    } catch (e) {}
+    window.location.assign('index.html?boot=' + Date.now());
+  }
+
+  function scrollShellPageTop() {
+    setMenu(false);
+    terminalBody.scrollTo({ top: 0, behavior: 'smooth' });
+    const base = currentPage || 'index.html';
+    try { history.replaceState({ page: base }, '', base); } catch (e) {}
+  }
+
   document.addEventListener('click', e => {
+    const brandRestart = e.target.closest('#title-brand, .frame-label--tl');
+    if (brandRestart) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      restartHomeBootFromShell();
+      return;
+    }
+
+    const pageTop = e.target.closest('#title-page');
+    if (pageTop) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      scrollShellPageTop();
+      return;
+    }
+
     const menuLink = e.target.closest('#side-menu a.menu-item');
     if (menuLink) {
       e.preventDefault();
