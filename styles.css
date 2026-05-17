@@ -2330,9 +2330,13 @@ body,
 .welcome-gate,
 .desktop,
 .boot-frame.expanded,
-.boot-term-window,
-.frame {
+.boot-term-window {
   background-color: #000;
+}
+
+/* Keep the outer chrome transparent so it does not cover the live terminal. */
+.frame {
+  background: transparent;
 }
 
 body {
