@@ -1876,18 +1876,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   function navigateMenuLink(menuLink) {
-    const href = (menuLink && (menuLink.dataset.page || menuLink.getAttribute('href'))) || 'index.html';
+    const href = (menuLink && menuLink.getAttribute('href')) || (menuLink && menuLink.dataset.page) || 'index.html';
     if (!href) return false;
 
     const u = new URL(href, location.href);
     const targetPage = normalizePage(u.pathname || href);
     if (!PAGE_LABELS[targetPage]) return false;
 
+    // Menu navigation should behave like a real hyperlink. Previous PJAX-style
+    // menu loading was colliding with the home terminal layer and sometimes
+    // resolving back to the homepage. A full page hop is boring, reliable,
+    // and still keeps the user on the exact page they asked for.
     setMenu(false);
-    loadPage(targetPage + (u.hash || '')).catch(err => {
-      console.warn('menu navigation failed, falling back:', err);
-      location.href = href;
-    });
+    window.location.href = targetPage + (u.hash || '');
     return true;
   }
 
@@ -2086,15 +2087,32 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     closeMenu();
 
-    if (typeof window.twLoadPage === 'function') {
-      window.twLoadPage(target).catch(function(){ window.location.href = target; });
-    } else {
-      window.location.href = target;
-    }
+    // Force the menu to act as a plain, dependable link. This bypasses the
+    // homepage PJAX/terminal handlers that were eating menu clicks.
+    window.location.href = target;
   }
 
   window.addEventListener('pointerdown', handleMenuEvent, true);
   window.addEventListener('click', handleMenuEvent, true);
+})();
+</script>
+
+
+<script>
+// TW hard menu fallback: keep menu links as real page links on every page.
+(function(){
+  function go(e){
+    const link = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+    if (!link) return;
+    const href = link.getAttribute('href') || link.dataset.page || 'index.html';
+    if (!href) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    window.location.href = href;
+  }
+  window.addEventListener('pointerdown', go, true);
+  window.addEventListener('click', go, true);
 })();
 </script>
 

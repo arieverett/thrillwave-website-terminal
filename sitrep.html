@@ -461,5 +461,24 @@
 })();
 </script>
 
+
+<script>
+// TW hard menu fallback: keep menu links as real page links on every page.
+(function(){
+  function go(e){
+    const link = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+    if (!link) return;
+    const href = link.getAttribute('href') || link.dataset.page || 'index.html';
+    if (!href) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    window.location.href = href;
+  }
+  window.addEventListener('pointerdown', go, true);
+  window.addEventListener('click', go, true);
+})();
+</script>
+
 </body>
 </html>
