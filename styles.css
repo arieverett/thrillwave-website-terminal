@@ -3436,3 +3436,144 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     padding-bottom: 24px !important;
   }
 }
+
+/* === TW final opening scanline mask/layer fix ===
+   The desktop-to-terminal green scan should behave like it lives inside the
+   outer chrome, not across the full browser window. Keep the sweep clipped to
+   the border and above the terminal reveal on desktop + mobile. */
+.radial-flash {
+  position: fixed !important;
+  inset: 24px !important;
+  width: auto !important;
+  height: auto !important;
+  opacity: 1 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+  z-index: 180 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+  margin: 0 !important;
+  mix-blend-mode: screen !important;
+}
+
+.radial-flash::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: -34px !important;
+  height: 8px !important;
+  opacity: 0 !important;
+  transform: translateY(0) !important;
+  pointer-events: none !important;
+  background:
+    repeating-linear-gradient(
+      to right,
+      rgba(0, 0, 0, 0.55) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(to bottom,
+      rgba(93, 208, 104, 0) 0%,
+      rgba(93, 208, 104, 0.92) 20%,
+      rgba(255, 255, 255, 0.98) 48%,
+      rgba(255, 255, 255, 0.98) 52%,
+      rgba(93, 208, 104, 0.92) 80%,
+      rgba(93, 208, 104, 0) 100%) !important;
+  background-blend-mode: multiply, normal !important;
+  box-shadow:
+    0 0 24px rgba(93, 208, 104, 0.95),
+    0 0 80px rgba(93, 208, 104, 0.55),
+    0 0 140px rgba(93, 208, 104, 0.25) !important;
+}
+
+.radial-flash::after {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  right: 0 !important;
+  top: -72px !important;
+  height: 72px !important;
+  opacity: 0 !important;
+  transform: translateY(0) !important;
+  pointer-events: none !important;
+  filter: blur(10px) !important;
+  background: linear-gradient(to bottom,
+    rgba(93, 208, 104, 0) 0%,
+    rgba(93, 208, 104, 0.38) 50%,
+    rgba(93, 208, 104, 0) 100%) !important;
+}
+
+.radial-flash.fire {
+  animation: none !important;
+}
+
+.radial-flash.fire::before {
+  animation: tw-clipped-scanline 0.58s cubic-bezier(0.42, 0.1, 0.6, 1) forwards !important;
+}
+
+.radial-flash.fire::after {
+  animation: tw-clipped-scanline-trail 0.58s cubic-bezier(0.42, 0.1, 0.6, 1) forwards !important;
+}
+
+@keyframes tw-clipped-scanline {
+  0%   { opacity: 0;    transform: translateY(0); }
+  6%   { opacity: 1;    transform: translateY(18px); }
+  16%  { opacity: 0.35; transform: translateY(calc((100dvh - 48px) * 0.16)); }
+  24%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.25)); }
+  38%  { opacity: 0.5;  transform: translateY(calc((100dvh - 48px) * 0.42)); }
+  52%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.58)); }
+  66%  { opacity: 0.34; transform: translateY(calc((100dvh - 48px) * 0.76)); }
+  82%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.94)); }
+  100% { opacity: 0;    transform: translateY(calc(100dvh - 48px + 76px)); }
+}
+
+@keyframes tw-clipped-scanline-trail {
+  0%   { opacity: 0;    transform: translateY(0); }
+  8%   { opacity: 0.75; transform: translateY(18px); }
+  82%  { opacity: 0.7;  transform: translateY(calc((100dvh - 48px) * 0.94)); }
+  100% { opacity: 0;    transform: translateY(calc(100dvh - 48px + 76px)); }
+}
+
+/* Keep the scan above the boot terminal during the whole handoff, especially
+   on iPhone where the terminal was appearing before the sweep crossed it. */
+.boot-term-window {
+  z-index: 120 !important;
+}
+
+.radial-flash,
+.green-flash.fire {
+  z-index: 180 !important;
+}
+
+@media (max-width: 720px) {
+  .radial-flash {
+    inset: 14px 5px !important;
+  }
+
+  @keyframes tw-clipped-scanline {
+    0%   { opacity: 0;    transform: translateY(0); }
+    6%   { opacity: 1;    transform: translateY(18px); }
+    16%  { opacity: 0.35; transform: translateY(calc((100dvh - 28px) * 0.16)); }
+    24%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.25)); }
+    38%  { opacity: 0.5;  transform: translateY(calc((100dvh - 28px) * 0.42)); }
+    52%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.58)); }
+    66%  { opacity: 0.34; transform: translateY(calc((100dvh - 28px) * 0.76)); }
+    82%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.94)); }
+    100% { opacity: 0;    transform: translateY(calc(100dvh - 28px + 76px)); }
+  }
+
+  @keyframes tw-clipped-scanline-trail {
+    0%   { opacity: 0;    transform: translateY(0); }
+    8%   { opacity: 0.75; transform: translateY(18px); }
+    82%  { opacity: 0.7;  transform: translateY(calc((100dvh - 28px) * 0.94)); }
+    100% { opacity: 0;    transform: translateY(calc(100dvh - 28px + 76px)); }
+  }
+}
+
+@media (max-width: 390px) {
+  .radial-flash {
+    inset: 13px 5px !important;
+  }
+}
