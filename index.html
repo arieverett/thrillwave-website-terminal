@@ -135,6 +135,9 @@
   <!-- Glitch flash overlay (fires at transitions) -->
   <div class="glitch-flash" id="glitch-flash"></div>
 
+  <!-- Green radial flash used after .elf launch -->
+  <div class="radial-flash" id="radial-flash"></div>
+
   <!-- Tracker line overlay (sweeps occasionally) -->
   <div class="tracker" id="tracker"></div>
 
@@ -665,8 +668,9 @@ const T = {
   desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
-  termOpen:     9700,  // terminal window begins after a longer launch beat
-  musicStart:   10150, // Robot Rock starts after the terminal reveal has begun
+  radialFlash:  9700,  // green radial flash after a longer launch beat
+  termOpen:     9900,  // terminal opens normally during the flash
+  musicStart:   10100, // Robot Rock starts after the beat, not immediately on click
   done:         11150  // sequence complete
 };
 
@@ -939,17 +943,24 @@ async function runSequence() {
     sndLaunch();
   }, T.iconClick);
 
-  // PHASE 7b: terminal opens (the terminal-open animation itself is fine —
-  // it's a window-open effect, like a real OS. Desktop stays visible behind it.)
+  // PHASE 7b: green radial flash. This replaces the app-window-launch idea.
+  // It keeps the .elf click simple, then flashes into the normal terminal open.
   schedule(() => {
-    const r = desktopIcon.getBoundingClientRect();
-    termWindow.style.setProperty('--boot-origin-x', (r.left + r.width * 0.5) + 'px');
-    termWindow.style.setProperty('--boot-origin-y', (r.top + r.height * 0.45) + 'px');
+    if (radialFlash) {
+      radialFlash.classList.remove('fire');
+      // force restart if the animation has already run
+      void radialFlash.offsetWidth;
+      radialFlash.classList.add('fire');
+    }
+  }, T.radialFlash);
+
+  // PHASE 7c: terminal opens with the original simple terminal animation.
+  schedule(() => {
     termWindow.classList.add('opening');
     pointer.classList.remove('visible');
   }, T.termOpen);
 
-  // PHASE 7c: start Robot Rock after the terminal reveal is underway.
+  // PHASE 7d: start Robot Rock after the terminal reveal is underway.
   // This keeps the .elf click from feeling like it instantly triggers music.
   schedule(() => {
     if (!robotRock) return;
