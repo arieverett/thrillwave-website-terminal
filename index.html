@@ -1084,14 +1084,14 @@ async function runWelcomeTyping() {
   // small initial beat so the cursor is visibly blinking before typing
   await new Promise(r => setTimeout(r, 320));
 
-  await typeOut(l1text, '> hi.', 80);
+  await typeOut(l1text, '> hi.', 70);
   await new Promise(r => setTimeout(r, 380));
 
   // Move the cursor down to line 2 (single DOM node — moves on append)
   l2.appendChild(cursor);
   await new Promise(r => setTimeout(r, 160));
 
-  await typeOut(l2text, '> welcome to thrill wave.', 55);
+  await typeOut(l2text, '> welcome to thrill wave.', 48);
   if (welcomeTypingAborted) return;
 
   // Hold the finished typing moment a touch longer before revealing the start button.
@@ -1476,7 +1476,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
           }
           j++;
           // Slower, calmer homepage typing — closer to the opening sequence.
-          const d = c === ' ' ? 26 : 48 + Math.random() * 34;
+          const d = c === ' ' ? 22 : 42 + Math.random() * 26;
           setTimeout(ch, d);
         } else {
           if (!isLastLine) html += '\n';
@@ -1512,7 +1512,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
         window.twTypeClick();
       }
       i++;
-      const d = c === ' ' ? 26 : 48 + Math.random() * 34;
+      const d = c === ' ' ? 22 : 42 + Math.random() * 26;
       setTimeout(type, d);
     }
     type();
@@ -1544,6 +1544,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     const preEl = document.getElementById('intro-pre');
     const postEl = document.getElementById('intro-post');
     preEl.innerHTML = '<span class="cursor"></span>';
+    // Let the cursor breathe before typing, both on normal page load and
+    // after the opening finishes. This makes the lander feel intentional.
     setTimeout(() => {
       typeLines(preEl, introPreLines, () => {
         preEl.innerHTML = preEl.innerHTML.replace('<span class="cursor"></span>', '');
@@ -1564,7 +1566,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
         }, 700);
       });
     });
-    }, 1000);
+    }, 2000);
   }
 
   function preFillHome() {
