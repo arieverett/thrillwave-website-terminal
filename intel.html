@@ -127,12 +127,12 @@
         </div>
         <div class="terminal-body">
           <div class="menu-list">
-            <a href="index.html" data-page="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
-            <a href="about.html" data-page="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
-            <a href="sitrep.html" data-page="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
-            <a href="work.html" data-page="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
-            <a href="intel.html" data-page="intel.html" class="menu-item current"><span class="num">[05]</span><span class="name">intel</span></a>
-            <a href="contact.html" data-page="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+            <a href="index.html" data-page="index.html" class="menu-item" data-real-link="true"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" data-page="about.html" class="menu-item" data-real-link="true"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" data-page="sitrep.html" class="menu-item" data-real-link="true"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" data-page="work.html" class="menu-item" data-real-link="true"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" data-page="intel.html" class="menu-item current" data-real-link="true"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" data-page="contact.html" class="menu-item" data-real-link="true"><span class="num">[06]</span><span class="name">contact</span></a>
           </div>
         </div>
       </aside>
@@ -158,6 +158,28 @@
     </div>
   </div>
 </main>
+
+<script>
+// TW hard fix: menu items are real links. Register first, in capture phase,
+// so no later terminal/PJAX/homepage handlers can steal the click.
+(function(){
+  function routeMenuLink(e){
+    var target = e.target;
+    if (!target || !target.closest) return;
+    var link = target.closest('#side-menu a.menu-item');
+    if (!link) return;
+    var href = link.href || link.getAttribute('href') || 'index.html';
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    document.body.classList.remove('menu-open');
+    window.location.assign(href);
+  }
+  window.addEventListener('pointerdown', routeMenuLink, true);
+  window.addEventListener('touchstart', routeMenuLink, true);
+  window.addEventListener('click', routeMenuLink, true);
+})();
+</script>
 
 <script>
 (function() {
@@ -419,7 +441,7 @@
         const end = document.createElement('a');
         end.href = 'contact.html';
         end.className = 'section-end';
-        end.textContent = 'END - NEXT PAGE >>';
+        end.textContent = 'end - next page >>';
         sec.appendChild(end);
       }
     });
@@ -445,24 +467,6 @@
 })();
 </script>
 
-
-<script>
-// TW hard menu fallback: keep menu links as real page links on every page.
-(function(){
-  function go(e){
-    const link = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
-    if (!link) return;
-    const href = link.getAttribute('href') || link.dataset.page || 'index.html';
-    if (!href) return;
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    window.location.href = href;
-  }
-  window.addEventListener('pointerdown', go, true);
-  window.addEventListener('click', go, true);
-})();
-</script>
 
 </body>
 </html>

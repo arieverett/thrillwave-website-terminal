@@ -2398,3 +2398,47 @@ body::before,
     letter-spacing: 1px;
   }
 }
+
+
+/* === TW final menu + section indicator polish === */
+.section-jump,
+.section-end {
+  font-family: var(--font) !important;
+  font-size: 15px !important;
+  line-height: 1 !important;
+  letter-spacing: 0.08em !important;
+  color: var(--fg) !important;
+  opacity: 0.9;
+  text-transform: none !important;
+  animation: section-arrow-blink 1.25s ease-in-out infinite;
+}
+.section-jump {
+  cursor: pointer;
+}
+.section-jump:hover,
+.section-jump:focus-visible,
+.section-end:hover,
+.section-end:focus-visible {
+  color: var(--accent) !important;
+  opacity: 1;
+  outline: none;
+}
+.section-end {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 7px 10px 7px 0;
+  cursor: pointer;
+  pointer-events: auto;
+  white-space: nowrap;
+}
+#side-menu a.menu-item[data-real-link="true"] {
+  pointer-events: auto;
+}
+@media (max-width: 720px) {
+  .section-jump,
+  .section-end {
+    font-size: 9.5px !important;
+    letter-spacing: 1px !important;
+  }
+}
