@@ -3386,3 +3386,34 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     right: 5px !important;
   }
 }
+
+
+/* === TW power confirmation modal — final click-safe pass === */
+.frame-label--tl {
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+.power-modal {
+  z-index: 2147483000 !important;
+}
+.power-modal__eyebrow {
+  color: var(--dim);
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: lowercase;
+  margin-bottom: 7px;
+}
+.power-modal__title::before {
+  content: "> ";
+  color: var(--accent);
+}
+.power-modal-open .frame-label--tl {
+  color: var(--accent) !important;
+}
+.power-modal__btn--confirm {
+  color: var(--fg);
+}
+.power-modal__btn--confirm:hover,
+.power-modal__btn--confirm:focus-visible {
+  background: rgba(93, 208, 104, 0.08);
+}
