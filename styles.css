@@ -3951,3 +3951,78 @@ body.booting.handoff-ready > main.content {
     display: inline-block !important;
   }
 }
+
+
+/* ============================================================
+   TW HANDOFF CLEANUP PATCH — terminal-only boot layer
+   - no duplicate full-page chrome during kinetic launch
+   - skip disappears after click-to-start
+   - boot terminal dots/title match live terminal exactly
+   - live shell appears only for the final settled beat to prevent jump
+   ============================================================ */
+
+/* Hide skip as soon as the opening actually starts. */
+#boot-root.boot-running .controls,
+.welcome-gate.gone ~ .controls {
+  display: none !important;
+}
+
+/* The clone layer caused duplicate borders/half-cut time/page labels. */
+.boot-chrome-clone {
+  display: none !important;
+}
+
+/* Do not reveal the live site early, except for the final settled handoff. */
+body.booting.handoff-ready > .frame,
+body.booting.handoff-ready > main.content {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+body.booting.handoff-show-live > .frame,
+body.booting.handoff-show-live > main.content {
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+/* During the final handoff beat, the boot terminal sits exactly over the
+   real terminal, then fades just enough that the swap is not visible. */
+body.booting.handoff-show-live .boot-term-window.opening {
+  transition: opacity 170ms ease !important;
+  opacity: 0.08 !important;
+}
+
+/* Match the live terminal chrome. The previous boot dots were larger than
+   the real traffic lights, which made the handoff look like it shifted. */
+.boot-term-inner .boot-term-title {
+  height: var(--boot-title-height, 40px) !important;
+  min-height: var(--boot-title-height, 40px) !important;
+  padding: 11px 16px !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+  line-height: normal !important;
+}
+.boot-term-dots {
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  flex-shrink: 0 !important;
+  margin-left: 8px !important;
+}
+.boot-term-dots .boot-dot {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+/* The boot window should only be the terminal, never a second full-page bg. */
+.boot-term-window.opening {
+  z-index: 44 !important;
+}
+
+@media (max-width: 720px) {
+  .boot-term-inner .boot-term-title {
+    padding: 9px 12px !important;
+  }
+  .below-bar .social-sep {
+    display: inline-block !important;
+  }
+}

@@ -1198,42 +1198,12 @@ function prepExactHomepageHandoff() {
 }
 
 function createBootChromeClone() {
-  const root = document.getElementById('boot-root');
-  if (!root || document.getElementById('boot-chrome-clone')) return;
-
-  const shell = document.createElement('div');
-  shell.id = 'boot-chrome-clone';
-  shell.className = 'boot-chrome-clone';
-  shell.setAttribute('aria-hidden', 'true');
-
-  const pieces = [
-    ['frame', document.querySelector('.frame')],
-    ['topbar', document.querySelector('.topbar')],
-    ['below', document.querySelector('.below-bar')]
-  ];
-
-  pieces.forEach(([name, source]) => {
-    if (!source) return;
-    const clone = source.cloneNode(true);
-    clone.removeAttribute('id');
-    clone.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
-    clone.querySelectorAll('a, button').forEach(el => {
-      el.setAttribute('tabindex', '-1');
-      el.setAttribute('aria-hidden', 'true');
-    });
-    const rect = source.getBoundingClientRect();
-    clone.classList.add('boot-clone-piece', 'boot-clone-' + name);
-    clone.style.left = rect.left + 'px';
-    clone.style.top = rect.top + 'px';
-    clone.style.width = rect.width + 'px';
-    clone.style.height = rect.height + 'px';
-    shell.appendChild(clone);
-  });
-
-  root.appendChild(shell);
-  requestAnimationFrame(() => shell.classList.add('is-visible'));
+  // Intentionally no-op. The opening sequence should not clone the full
+  // webpage chrome, because duplicate frame/time/page labels created the
+  // half-cut border look during the kinetic handoff. The boot layer now
+  // animates only the terminal window, then briefly reveals the real page
+  // underneath at the final settled frame.
 }
-
 function clearExactHomepageHandoffVars() {
   document.body.classList.remove('handoff-ready');
   const clone = document.getElementById('boot-chrome-clone');
@@ -1401,13 +1371,18 @@ async function runSequence() {
   }, T.musicStart);
 
   // PHASE 8: boot is done — swap from boot overlay to live site.
-  // The boot term-window is now at full size matching the site's terminal.
-  // We drop the .booting class so the real site renders behind/over
-  // the boot overlay, then remove the boot overlay entirely.
+  // Reveal the real homepage for a tiny final beat while the boot terminal
+  // is already fully landed. This avoids the left/up jump without showing
+  // the static terminal early during the kinetic opening.
+  schedule(() => {
+    document.body.classList.add('handoff-show-live');
+  }, Math.max(0, T.done - 180));
+
   schedule(() => {
     bootEnded = true;
     sessionStorage.setItem('tw_intro_played', '1');
     document.body.classList.remove('booting');
+    document.body.classList.remove('handoff-show-live');
     const root = document.getElementById('boot-root');
     if (root) root.remove();
     // hand off to the site's own typing intro
@@ -1535,6 +1510,7 @@ async function runWelcomeTyping() {
 
 async function startEverything() {
   welcomeTypingAborted = true;
+  document.getElementById('boot-root')?.classList.add('boot-running');
   welcomeGate.classList.add('gone');
   // The welcome click unlocks boot sound only.
   // Do NOT start or prime the background track here — on mobile that can leak
