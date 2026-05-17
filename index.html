@@ -110,6 +110,8 @@
     <div class="desktop-icon" id="desktop-icon">
       <div class="icon-glyph">&gt;_</div>
       <div class="icon-label">thrill_wave.elf</div>
+      <!-- ignition spark — bursts at the moment of impact -->
+      <span class="icon-spark" aria-hidden="true"></span>
     </div>
     <div class="desktop-clock" id="desktop-clock">--:--:--</div>
     <div class="desktop-page" id="desktop-page">home &nbsp;&middot;&nbsp; 01 / 06</div>
@@ -118,17 +120,32 @@
   <!-- Fake mouse pointer -->
   <div class="pointer" id="pointer"></div>
 
-  <!-- Terminal window opening -->
+  <!-- Terminal window opening — staged HUD launch animation -->
   <div class="boot-term-window" id="boot-term-window">
-    <div class="boot-term-inner">
-      <div class="boot-term-title">
-        <span>thrill_wave — home</span>
-        <span class="sep">[ ⏵ ⏸ ⏹ ]</span>
+    <!-- HUD corner brackets snap in at the end. Outside the clip layer so
+         they aren't trimmed by overflow:hidden during the body drop. -->
+    <span class="hud-bracket hud-bracket--tl" aria-hidden="true"></span>
+    <span class="hud-bracket hud-bracket--tr" aria-hidden="true"></span>
+    <span class="hud-bracket hud-bracket--bl" aria-hidden="true"></span>
+    <span class="hud-bracket hud-bracket--br" aria-hidden="true"></span>
+    <!-- Everything inside this wrapper is clipped by overflow:hidden,
+         so the title bar / lines don't poke out at the start when the
+         window is 0×0 and growing. -->
+    <div class="boot-term-clip">
+      <!-- horizontal scan beam sweeps during the body drop -->
+      <span class="boot-term-scan" aria-hidden="true"></span>
+      <div class="boot-term-inner">
+        <div class="boot-term-title">
+          <span class="boot-term-title-text">thrill_wave — home</span>
+          <span class="boot-term-dots" aria-hidden="true">
+            <span class="boot-dot"></span><span class="boot-dot"></span><span class="boot-dot live"></span>
+          </span>
+        </div>
+        <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>hi.</div>
+        <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>welcome to thrill wave.</div>
+        <div class="boot-term-line">&nbsp;</div>
+        <div class="boot-term-line"><span class="boot-cursor-block"></span></div>
       </div>
-      <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>hi.</div>
-      <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>welcome to thrill wave.</div>
-      <div class="boot-term-line">&nbsp;</div>
-      <div class="boot-term-line"><span class="boot-cursor-block"></span></div>
     </div>
   </div>
 
@@ -668,10 +685,11 @@ const T = {
   desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
-  radialFlash:  9700,  // green radial flash after a longer launch beat
-  termOpen:     9900,  // terminal opens normally during the flash
-  musicStart:   10100, // Robot Rock starts after the beat, not immediately on click
-  done:         11150  // sequence complete
+  iconImplode: 8800,  // icon collapses into a spark — 100ms after click
+  radialFlash:  8810,  // tight green burst right behind the spark
+  termOpen:     8830,  // beam fires + window animation begins (~130ms after click)
+  musicStart:   9080,  // Robot Rock kicks in as the title bar materializes
+  done:         9700   // sequence complete — full launch finishes ~580ms + breathing beat
 };
 
 // --- references ---
@@ -686,6 +704,7 @@ const desktopClock= document.getElementById('desktop-clock');
 const pointer     = document.getElementById('pointer');
 const termWindow  = document.getElementById('boot-term-window');
 const glitch      = document.getElementById('glitch-flash');
+const radialFlash = document.getElementById('radial-flash');
 const tracker     = document.getElementById('tracker');
 const robotRock   = document.getElementById('bg-audio');
 
@@ -934,30 +953,55 @@ async function runSequence() {
     }, 80);
   }, T.pointerMove);
 
-  // PHASE 7: click animation only. Do not start music here.
-  // The launch should breathe for a beat first, then the window reveal and
-  // music hit together like an app opening.
+  // PHASE 7: click animation. Locks in the icon's screen position so the
+  // launch animation can emanate from EXACTLY where the click happened
+  // (the icon recenters slightly on mobile; the boot-term needs to know).
   schedule(() => {
     desktopIcon.classList.add('clicked');
-    setTimeout(() => desktopIcon.classList.remove('clicked'), 140);
     sndLaunch();
+
+    // Capture icon centre in viewport pixels and publish as CSS vars on
+    // <body>. The boot-term-window keyframes reference these to start the
+    // beam from the icon's exact location.
+    try {
+      const r = desktopIcon.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      document.body.style.setProperty('--boot-origin-x', cx + 'px');
+      document.body.style.setProperty('--boot-origin-y', cy + 'px');
+    } catch (e) { /* fall through to default 50%/50% */ }
   }, T.iconClick);
 
-  // PHASE 7b: green radial flash. This replaces the app-window-launch idea.
-  // It keeps the .elf click simple, then flashes into the normal terminal open.
+  // PHASE 7a: icon IMPLODES into a glowing spark. The .clicked recoil
+  // morphs into a hard collapse — the icon disappears in a burst.
+  schedule(() => {
+    desktopIcon.classList.remove('clicked');
+    desktopIcon.classList.add('imploding');
+  }, T.iconImplode);
+
+  // PHASE 7b: small green radial pulse at the impact point. Localized
+  // (positioned at the icon, not full-screen) so it reads as a spark,
+  // not a flashbang.
   schedule(() => {
     if (radialFlash) {
       radialFlash.classList.remove('fire');
-      // force restart if the animation has already run
-      void radialFlash.offsetWidth;
+      void radialFlash.offsetWidth; // restart
       radialFlash.classList.add('fire');
     }
   }, T.radialFlash);
 
-  // PHASE 7c: terminal opens with the original simple terminal animation.
+  // PHASE 7c: terminal launch. The window animation does the heavy lifting:
+  //  - beam shoots horizontally from icon position
+  //  - bar rises and thickens into title bar (with traffic-light dots)
+  //  - body drops down, leading-edge scan ride along the bottom
+  //  - HUD corner brackets snap in at settle
   schedule(() => {
     termWindow.classList.add('opening');
     pointer.classList.remove('visible');
+    // hide the desktop chrome so it doesn't sit behind the terminal during
+    // the open — the boot-term-window covers the icon region and the desktop
+    // labels / icon underneath would otherwise be visible at the seams
+    desktop.classList.add('consumed');
   }, T.termOpen);
 
   // PHASE 7d: start Robot Rock after the terminal reveal is underway.
@@ -989,8 +1033,8 @@ async function runSequence() {
   }, T.musicStart);
 
   // PHASE 8: boot is done — swap from boot overlay to live site.
-  // The boot term-window is now at full size (560x700) matching the site's
-  // terminal. We drop the .booting class so the real site renders behind/over
+  // The boot term-window is now at full size matching the site's terminal.
+  // We drop the .booting class so the real site renders behind/over
   // the boot overlay, then remove the boot overlay entirely.
   schedule(() => {
     bootEnded = true;
@@ -1000,7 +1044,7 @@ async function runSequence() {
     if (root) root.remove();
     // hand off to the site's own typing intro
     if (typeof window.runHomeIntro === 'function') window.runHomeIntro();
-  }, T.termOpen + 900);
+  }, T.done);
 }
 
 function resetSequence() {
@@ -1021,8 +1065,10 @@ function resetSequence() {
   bootLog.style.cssText = '';
 
   desktop.classList.remove('visible');
+  desktop.classList.remove('consumed');
   desktop.style.cssText = '';
   desktopIcon.classList.remove('clicked');
+  desktopIcon.classList.remove('imploding');
   pointer.classList.remove('visible');
   pointer.style.cssText = '';
   termWindow.classList.remove('opening');

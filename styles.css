@@ -342,47 +342,52 @@ html, body {
 
 
 
-/* Green radial transition from the .elf click into the terminal window. */
+/* Green radial transition — now a TIGHT, LOCALIZED spark fired at the
+   icon position. The CSS var --boot-origin-x/y is set in JS at click
+   moment; falls back to centre. Reads as ignition, not full-screen flash. */
 .radial-flash {
   position: fixed;
-  inset: 0;
+  /* Centred on the impact point */
+  top: var(--boot-origin-y, 50%);
+  left: var(--boot-origin-x, 50%);
+  width: 240px;
+  height: 240px;
+  margin-top: -120px;
+  margin-left: -120px;
   pointer-events: none;
   z-index: 92;
   opacity: 0;
   background:
     radial-gradient(circle at center,
-      rgba(93, 208, 104, 0.55) 0%,
-      rgba(93, 208, 104, 0.22) 14%,
-      rgba(93, 208, 104, 0.07) 30%,
-      rgba(0, 0, 0, 0) 58%);
+      rgba(255, 255, 255, 0.95) 0%,
+      rgba(93, 208, 104, 0.85) 14%,
+      rgba(93, 208, 104, 0.35) 32%,
+      rgba(93, 208, 104, 0.08) 58%,
+      rgba(0, 0, 0, 0) 78%);
   mix-blend-mode: screen;
-  transform: scale(0.18);
+  transform: scale(0.08);
+  border-radius: 50%;
 }
 
 .radial-flash.fire {
-  animation: radial-green-flash 0.58s cubic-bezier(0.16, 0.88, 0.18, 1) forwards;
+  animation: radial-green-flash 0.36s cubic-bezier(0.16, 0.88, 0.18, 1) forwards;
 }
 
 @keyframes radial-green-flash {
   0% {
     opacity: 0;
-    transform: scale(0.18);
+    transform: scale(0.08);
     filter: blur(0px);
   }
-  22% {
-    opacity: 0.95;
-    transform: scale(0.55);
+  30% {
+    opacity: 1;
+    transform: scale(1);
     filter: blur(1px);
-  }
-  48% {
-    opacity: 0.75;
-    transform: scale(1.45);
-    filter: blur(3px);
   }
   100% {
     opacity: 0;
-    transform: scale(2.8);
-    filter: blur(10px);
+    transform: scale(2.2);
+    filter: blur(8px);
   }
 }
 
@@ -561,65 +566,428 @@ html, body {
 }
 
 /* ============================================
-   PHASE 7 — TERMINAL WINDOW OPENING
-   Small line → expand width → expand height
+   PHASE 7 — TERMINAL LAUNCH ANIMATION
+   "Mac OS X genie meets sci-fi HUD"
+
+   Total runtime: ~580ms from click to settled. Staged like a real
+   window manager opening an app:
+     A. Ignition  (0–80ms)   icon implodes into a spark
+     B. Beam      (80–220ms) horizontal accent-green bar shoots
+                             out from icon position to full width
+     C. Lift      (220–280ms) bar rises from icon Y to the final
+                             title-bar Y (above screen centre)
+     D. Title     (280–340ms) bar thickens to title-bar height,
+                             traffic-light dots stagger in
+     E. Drop      (340–540ms) body extends downward; leading-edge
+                             scan beam rides the bottom border
+     F. Settle    (540–680ms) HUD corner brackets snap in,
+                             border cools from accent to neutral
+
+   The CSS variables --boot-origin-x and --boot-origin-y are set
+   from JS at the moment of click (icon's viewport-centre). They
+   default to 50%/50% so the animation works even if JS misses.
    ============================================ */
 .boot-term-window {
   position: fixed;
   background: var(--bg);
-  border: 1px solid #2e2e2e;
+  border: 1px solid transparent;
   border-radius: 4px;
   z-index: 24;
-  opacity: 0;
-  top: 50%;
+  /* element grows DOWN from a fixed top edge — keeps the title bar
+     anchored at the final title-bar position and lets the body drop */
+  top: calc(50% - var(--term-h, 700px) / 2);
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   width: 0;
   height: 0;
+  opacity: 0;
+  /* No overflow:hidden here — HUD brackets need to sit outside the edge.
+     The .boot-term-clip child handles content clipping during the
+     animation's body-drop reveal. */
+  box-shadow: 0 0 0 rgba(93,208,104,0);
+  will-change: width, height, top, opacity, box-shadow, border-color;
+}
+
+/* Clip wrapper: holds the title bar, lines, and scan beam. overflow:hidden
+   here trims the inner content during growth without affecting the
+   HUD brackets, which are siblings outside this wrapper. */
+.boot-term-clip {
+  position: absolute;
+  inset: 0;
   overflow: hidden;
-  box-shadow: 0 0 40px rgba(93,208,104,0.1);
+  border-radius: inherit;
+  /* Below the brackets visually */
+  z-index: 1;
 }
 
 .boot-term-window.opening {
-  animation: term-open 0.7s cubic-bezier(0.4, 0, 0.1, 1) forwards;
+  animation: term-open 0.58s cubic-bezier(0.18, 0.86, 0.22, 1) forwards;
 }
 
 @keyframes term-open {
-  0%   { width: 0; height: 0; opacity: 1; }
-  20%  { width: 80px; height: 1px; opacity: 1; }
-  45%  { width: 560px; height: 1px; opacity: 1; }
-  100% { width: 560px; height: 700px; opacity: 1; }
+  /* A. IGNITION — seed at icon position */
+  0% {
+    top: var(--boot-origin-y, 50%);
+    width: 0;
+    height: 0;
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: 0 0 0 rgba(93,208,104,0);
+  }
+  4% {
+    top: var(--boot-origin-y, 50%);
+    width: 10px;
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow:
+      0 0 24px rgba(93,208,104,0.95),
+      0 0 60px rgba(93,208,104,0.45);
+  }
+
+  /* B. BEAM — horizontal expansion from icon point outward.
+     The bar shoots out at high speed, glowing, with a touch of motion blur. */
+  16% {
+    top: var(--boot-origin-y, 50%);
+    width: calc(var(--term-w, 560px) * 0.7);
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow:
+      0 0 36px rgba(93,208,104,1),
+      0 0 90px rgba(93,208,104,0.65);
+    filter: blur(0.3px);
+  }
+  28% {
+    /* slight overshoot — feels like a hard snap */
+    top: var(--boot-origin-y, 50%);
+    width: calc(var(--term-w, 560px) * 1.02);
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow:
+      0 0 28px rgba(93,208,104,0.95),
+      0 0 70px rgba(93,208,104,0.55);
+    filter: blur(0);
+  }
+  34% {
+    /* settle to exact width */
+    top: var(--boot-origin-y, 50%);
+    width: var(--term-w, 560px);
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow:
+      0 0 20px rgba(93,208,104,0.85),
+      0 0 56px rgba(93,208,104,0.45);
+  }
+
+  /* C. LIFT — bar rises from icon Y to the title-bar position (top of final terminal) */
+  44% {
+    top: calc(50% - var(--term-h, 700px) / 2);
+    width: var(--term-w, 560px);
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow:
+      0 0 24px rgba(93,208,104,0.9),
+      0 0 64px rgba(93,208,104,0.5);
+  }
+
+  /* D. TITLE — bar thickens into title bar */
+  56% {
+    top: calc(50% - var(--term-h, 700px) / 2);
+    width: var(--term-w, 560px);
+    height: 38px;
+    opacity: 1;
+    border-color: rgba(93,208,104,0.7);
+    box-shadow:
+      0 0 22px rgba(93,208,104,0.65),
+      0 0 50px rgba(93,208,104,0.3);
+  }
+
+  /* E. DROP — body extends downward from the title bar */
+  88% {
+    top: calc(50% - var(--term-h, 700px) / 2);
+    width: var(--term-w, 560px);
+    height: var(--term-h, 700px);
+    opacity: 1;
+    border-color: rgba(93,208,104,0.35);
+    box-shadow:
+      0 0 30px rgba(93,208,104,0.35),
+      0 0 60px rgba(93,208,104,0.18);
+  }
+
+  /* F. SETTLE — border cools to the live-site terminal's neutral rule */
+  100% {
+    top: calc(50% - var(--term-h, 700px) / 2);
+    width: var(--term-w, 560px);
+    height: var(--term-h, 700px);
+    opacity: 1;
+    border-color: var(--terminal-rule);
+    box-shadow: 0 0 40px rgba(93,208,104,0.1);
+  }
 }
 
+/* ---- TITLE BAR + TRAFFIC-LIGHT DOTS ---- */
 .boot-term-inner {
-  padding: 18px 22px;
+  padding: 0;
   font-family: var(--font);
   font-size: 12.5px;
   color: var(--fg);
-  opacity: 0;
-  transition: opacity 0.3s ease 0.55s;
 }
-
-.boot-term-window.opening .boot-term-inner { opacity: 1; }
 
 .boot-term-inner .boot-term-title {
-  font-size: 10.5px;
-  letter-spacing: 2px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 16px;
+  background: var(--terminal-bar);
+  border-bottom: 1px solid #1a1a1a;
+  height: 38px;
+  font-size: 11px;
+  letter-spacing: 1.5px;
   color: var(--muted);
   text-transform: lowercase;
-  margin-bottom: 16px;
-  display: flex;
-  justify-content: space-between;
+  /* hidden during beam/lift; revealed during title-materialize phase */
+  opacity: 0;
 }
 
-.boot-term-inner .boot-term-title .sep { color: var(--dim); }
+.boot-term-window.opening .boot-term-inner .boot-term-title {
+  /* fade in just as the title bar thickens (phase D, ~280ms in) */
+  animation: boot-title-show 0.18s ease 0.30s forwards;
+}
+
+@keyframes boot-title-show {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.boot-term-title-text { font-weight: 500; }
+
+/* Traffic light dots — real circles, matching the live site exactly */
+.boot-term-dots {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.boot-term-dots .boot-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--dim);
+  /* staggered scale-in during the title materialize phase */
+  transform: scale(0);
+  opacity: 0;
+}
+
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(1) {
+  animation: boot-dot-in 0.16s cubic-bezier(0.2, 1.4, 0.4, 1) 0.32s forwards;
+}
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(2) {
+  animation: boot-dot-in 0.16s cubic-bezier(0.2, 1.4, 0.4, 1) 0.34s forwards;
+}
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(3) {
+  animation: boot-dot-in 0.16s cubic-bezier(0.2, 1.4, 0.4, 1) 0.36s forwards,
+             boot-dot-live 0.4s ease 0.50s forwards;
+  background: var(--accent);
+}
+
+@keyframes boot-dot-in {
+  0%   { transform: scale(0);   opacity: 0; }
+  60%  { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1);   opacity: 1; }
+}
+
+@keyframes boot-dot-live {
+  /* soft pulse on the active dot once it lands */
+  0%   { box-shadow: 0 0 0 rgba(93,208,104,0); }
+  50%  { box-shadow: 0 0 8px rgba(93,208,104,0.8); }
+  100% { box-shadow: 0 0 4px rgba(93,208,104,0.5); }
+}
+
+/* ---- BODY LINES — fade in during the body drop phase ---- */
+.boot-term-inner .boot-term-line {
+  margin: 4px 22px 4px 22px;
+  opacity: 0;
+}
+.boot-term-inner .boot-term-line:first-of-type { margin-top: 16px; }
+
+.boot-term-window.opening .boot-term-inner .boot-term-line {
+  animation: boot-line-in 0.18s ease forwards;
+}
+.boot-term-window.opening .boot-term-inner .boot-term-line:nth-of-type(1) { animation-delay: 0.46s; }
+.boot-term-window.opening .boot-term-inner .boot-term-line:nth-of-type(2) { animation-delay: 0.49s; }
+.boot-term-window.opening .boot-term-inner .boot-term-line:nth-of-type(3) { animation-delay: 0.52s; }
+.boot-term-window.opening .boot-term-inner .boot-term-line:nth-of-type(4) { animation-delay: 0.54s; }
+
+@keyframes boot-line-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to   { opacity: 1; transform: none; }
+}
 
 .boot-term-inner .boot-term-prompt {
   color: var(--accent);
   margin-right: 8px;
 }
 
-.boot-term-inner .boot-term-line { margin-bottom: 4px; }
+/* ---- HUD CORNER BRACKETS ----
+   Direct children of .boot-term-window (NOT inside the clip wrapper),
+   so they can hang outside the window edge without being trimmed. */
+.hud-bracket {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--accent);
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 4px rgba(93,208,104,0.7));
+  /* Sit above the clip wrapper */
+  z-index: 4;
+}
+
+.hud-bracket--tl { top: -1px; left: -1px; border-right: 0; border-bottom: 0; }
+.hud-bracket--tr { top: -1px; right: -1px; border-left: 0; border-bottom: 0; }
+.hud-bracket--bl { bottom: -1px; left: -1px; border-right: 0; border-top: 0; }
+.hud-bracket--br { bottom: -1px; right: -1px; border-left: 0; border-top: 0; }
+
+.boot-term-window.opening .hud-bracket {
+  animation: hud-bracket-in 0.22s cubic-bezier(0.2, 0.9, 0.3, 1) 0.48s forwards;
+}
+.boot-term-window.opening .hud-bracket--tr { animation-delay: 0.50s; }
+.boot-term-window.opening .hud-bracket--bl { animation-delay: 0.52s; }
+.boot-term-window.opening .hud-bracket--br { animation-delay: 0.54s; }
+
+@keyframes hud-bracket-in {
+  0%   { opacity: 0; transform: scale(0.4); }
+  60%  { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.85; transform: scale(1); }
+}
+
+/* ---- LEADING-EDGE SCAN BEAM ----
+   A horizontal accent line that rides down the inside of the window as
+   the body extends. Looks like a scanner reading the new surface. */
+.boot-term-scan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  top: 38px;
+  background: linear-gradient(to right,
+    transparent 0%,
+    rgba(93,208,104,0.0) 5%,
+    rgba(93,208,104,0.9) 50%,
+    rgba(93,208,104,0.0) 95%,
+    transparent 100%);
+  box-shadow: 0 0 12px rgba(93,208,104,0.7), 0 4px 18px rgba(93,208,104,0.3);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  transform: translateY(0);
+}
+
+.boot-term-window.opening .boot-term-scan {
+  animation: boot-scan-sweep 0.34s cubic-bezier(0.4, 0.05, 0.6, 0.98) 0.30s forwards;
+}
+
+@keyframes boot-scan-sweep {
+  0%   { opacity: 0; transform: translateY(0); }
+  10%  { opacity: 1; }
+  90%  { opacity: 0.8; }
+  100% { opacity: 0; transform: translateY(calc(var(--term-h, 700px) - 40px)); }
+}
+
+/* ============================================
+   ICON IGNITION SPARK + IMPLOSION
+   Spark fires from inside the icon glyph at the moment of click.
+   Icon then collapses to nothing.
+   ============================================ */
+.icon-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--accent) 35%, rgba(93,208,104,0) 70%);
+  transform: translate(-50%, -50%) scale(0);
+  pointer-events: none;
+  opacity: 0;
+  /* Position relative to the .icon-glyph centre, not the whole icon box */
+  margin-top: -22px;
+}
+
+.desktop-icon.imploding .icon-spark {
+  animation: icon-spark-burst 0.4s cubic-bezier(0.15, 0.8, 0.25, 1) forwards;
+}
+
+@keyframes icon-spark-burst {
+  0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+  20%  { transform: translate(-50%, -50%) scale(2.2); opacity: 1; }
+  60%  { transform: translate(-50%, -50%) scale(4); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(6); opacity: 0; }
+}
+
+/* The icon glyph itself collapses — fast inward squish */
+.desktop-icon.imploding .icon-glyph,
+.desktop-icon.imploding .icon-label {
+  animation: icon-implode 0.22s cubic-bezier(0.5, 0, 0.8, 0.4) forwards;
+}
+
+@keyframes icon-implode {
+  0%   { transform: scale(1);    opacity: 1; filter: brightness(1); }
+  35%  { transform: scale(1.06); opacity: 1; filter: brightness(2.4); }
+  100% { transform: scale(0.0);  opacity: 0; filter: brightness(0.4); }
+}
+
+/* Once the window starts launching, hide the rest of the desktop chrome
+   so labels and the icon socket don't peek around the new terminal. */
+.desktop.consumed .desktop-brand,
+.desktop.consumed .desktop-page,
+.desktop.consumed .desktop-clock {
+  transition: opacity 0.22s ease 0.05s;
+  opacity: 0;
+}
+
+/* ---- REDUCED MOTION FALLBACK ----
+   Users with prefers-reduced-motion get a clean fade-in to the final
+   state, no beam/lift/scan effects. The terminal still appears, just
+   without the kinetic flair. */
+@media (prefers-reduced-motion: reduce) {
+  .boot-term-window.opening {
+    animation: term-open-static 0.22s ease forwards;
+  }
+  @keyframes term-open-static {
+    from { opacity: 0; }
+    to {
+      opacity: 1;
+      top: calc(50% - var(--term-h, 700px) / 2);
+      width: var(--term-w, 560px);
+      height: var(--term-h, 700px);
+      border-color: var(--terminal-rule);
+    }
+  }
+  .boot-term-window.opening .boot-term-inner .boot-term-title,
+  .boot-term-window.opening .boot-term-inner .boot-term-line,
+  .boot-term-window.opening .boot-term-dots .boot-dot,
+  .boot-term-window.opening .hud-bracket,
+  .boot-term-window.opening .boot-term-scan {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+  .boot-term-window.opening .boot-term-scan { opacity: 0; }
+  .desktop-icon.imploding .icon-glyph,
+  .desktop-icon.imploding .icon-label,
+  .desktop-icon.imploding .icon-spark {
+    animation-duration: 0.12s;
+  }
+  .radial-flash.fire {
+    animation-duration: 0.18s;
+  }
+}
 
 /* ============================================
    CRT GLOBAL OVERLAYS — scanlines, vignette, flicker
@@ -2074,50 +2442,41 @@ section.page > .next-link:last-child {
   }
 
   .boot-term-inner {
-    padding: 15px 16px;
     font-size: 11px;
   }
 
   .boot-term-inner .boot-term-title {
-    font-size: 9px;
+    font-size: 9.5px;
     letter-spacing: 1.2px;
-    margin-bottom: 13px;
+    padding: 9px 12px;
+    height: 32px;
   }
 
-  @keyframes term-open {
-    0% {
-      top: var(--boot-origin-y, 50%);
-      left: var(--boot-origin-x, 50%);
-      width: 42px;
-      height: 24px;
-      opacity: 0;
-      transform: translate(-50%, -50%) scaleX(0.36) scaleY(0.72);
-    }
-    16% {
-      top: var(--boot-origin-y, 50%);
-      left: var(--boot-origin-x, 50%);
-      width: 132px;
-      height: 28px;
-      opacity: 1;
-      transform: translate(-50%, -50%) scaleX(1);
-    }
-    40% {
-      top: calc(50% - (var(--term-h) / 2));
-      left: 50%;
-      width: var(--term-w);
-      height: 43px;
-      opacity: 1;
-      transform: translateX(-50%);
-    }
-    100% {
-      top: calc(50% - (var(--term-h) / 2));
-      left: 50%;
-      width: var(--term-w);
-      height: var(--term-h);
-      opacity: 1;
-      transform: translateX(-50%);
-    }
+  .boot-term-inner .boot-term-line {
+    margin-left: 14px;
+    margin-right: 14px;
   }
+  .boot-term-inner .boot-term-line:first-of-type {
+    margin-top: 12px;
+  }
+
+  /* Smaller traffic-light dots on mobile to match the live site's chrome */
+  .boot-term-dots .boot-dot {
+    width: 7px;
+    height: 7px;
+  }
+  .boot-term-dots { gap: 6px; }
+
+  /* Tighter HUD brackets on small screens */
+  .hud-bracket {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* The unified desktop @keyframes term-open uses --term-w / --term-h
+     variables and works on all viewports — no mobile-only override needed.
+     The title bar's TOP anchor (calc(50% - var(--term-h) / 2)) adapts to
+     the mobile --term-h automatically. */
 }
 
 @media (max-width: 390px) {
