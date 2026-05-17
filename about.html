@@ -14,7 +14,7 @@
 <div class="frame" aria-hidden="true">
   <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
-  <div class="frame-label frame-label--br">ABOUT &nbsp;&middot;&nbsp; 002 / 006</div>
+  <div class="frame-label frame-label--br">about &nbsp;&middot;&nbsp; 02 / 06</div>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -102,7 +102,7 @@
           </section>
 
           <section id="team" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02B</span><span class="hdr-slash"> // </span><span class="hdr-name">operator_roster</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02B</span><span class="hdr-slash"> // </span><span class="hdr-name">operator roster</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="team-grid profile-grid">
               <div class="team-card">
                 <div class="photo"><img src="assets/team/chris.avif" alt="Chris Kuzman"></div>
@@ -125,7 +125,7 @@
           </section>
 
           <section id="philosophy" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02C</span><span class="hdr-slash"> // </span><span class="hdr-name">how_we_think</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02C</span><span class="hdr-slash"> // </span><span class="hdr-name">how we think</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="principle-list">
               <div><span>01</span><p><b>make it true.</b> The strongest creative starts with what people already care about.</p></div>
               <div><span>02</span><p><b>make it simple.</b> Complexity is welcome in the research. Not in the final message.</p></div>
@@ -135,7 +135,7 @@
           </section>
 
           <section id="next-step" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02D</span><span class="hdr-slash"> // </span><span class="hdr-name">next_signal</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02D</span><span class="hdr-slash"> // </span><span class="hdr-name">next signal</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="page-content">&gt;
 &gt; next, meet the system behind the work.
 &gt; it is called sitrep.
@@ -157,12 +157,12 @@
         </div>
         <div class="terminal-body">
           <div class="menu-list">
-            <a href="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
-            <a href="about.html" class="menu-item current"><span class="num">[02]</span><span class="name">about</span></a>
-            <a href="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
-            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
-            <a href="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
-            <a href="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+            <a href="index.html" data-page="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" data-page="about.html" class="menu-item current"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" data-page="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" data-page="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" data-page="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" data-page="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
           </div>
         </div>
       </aside>
@@ -457,9 +457,10 @@
         });
         sec.appendChild(btn);
       } else {
-        const end = document.createElement('span');
+        const end = document.createElement('a');
+        end.href = 'sitrep.html';
         end.className = 'section-end';
-        end.textContent = 'end';
+        end.textContent = 'END - NEXT PAGE >>';
         sec.appendChild(end);
       }
     });

@@ -897,6 +897,7 @@ body.menu-open .topbar {
   letter-spacing: 1.6px;
   padding: 7px 13px;
   cursor: pointer;
+  pointer-events: auto;
   text-decoration: none;
   text-transform: lowercase;
   transition: color 120ms ease, border-color 120ms ease;
@@ -974,6 +975,23 @@ body.menu-open .stage { gap: var(--gap); }
   width: var(--term-w);
   height: var(--term-h);
   flex-shrink: 0;
+  position: relative;
+}
+
+.terminal.main.is-loading::after {
+  content: '> loading next file...';
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  z-index: 6;
+  color: var(--accent);
+  font-size: 11px;
+  letter-spacing: 1.2px;
+  background: rgba(0,0,0,0.86);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  padding: 6px 8px;
+  animation: section-arrow-blink 0.9s steps(2, end) infinite;
 }
 
 .terminal.side {
@@ -2288,7 +2306,7 @@ section.page > .next-link:last-child {
 }
 
 /* ============================================================
-   MOBILE MENU HOME-PAGE HOTFIX
+   MOBILE MENU LAYERING
    The homepage intro/terminal content can sit visually near the mobile menu.
    Keep the menu as the top interactive layer so taps hit the menu items,
    not the homepage underneath.
@@ -2347,4 +2365,36 @@ body {
 body::before,
 .desktop::before {
   opacity: 0;
+}
+
+
+/* === TW polish: section end behaves like an action, on desktop + mobile === */
+.section-end {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: var(--accent);
+  font-family: var(--font);
+  cursor: pointer;
+  pointer-events: auto;
+  text-decoration: none;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.section-end:hover,
+.section-end:focus-visible {
+  color: var(--fg);
+  outline: none;
+}
+@media (max-width: 720px) {
+  .terminal.main.is-loading::after {
+    left: 14px;
+    bottom: 12px;
+    font-size: 9.5px;
+    padding: 5px 7px;
+  }
+  .section-end {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+  }
 }

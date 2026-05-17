@@ -14,7 +14,7 @@
 <div class="frame" aria-hidden="true">
   <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
-  <div class="frame-label frame-label--br">CONTACT &nbsp;&middot;&nbsp; 006 / 006</div>
+  <div class="frame-label frame-label--br">contact &nbsp;&middot;&nbsp; 06 / 06</div>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -84,7 +84,7 @@
           </section>
 
           <section id="brief" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06B</span><span class="hdr-slash"> // </span><span class="hdr-name">what_to_send</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06B</span><span class="hdr-slash"> // </span><span class="hdr-name">what to send</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="terminal-form">
               <div><label>mission</label><p>what are you trying to make happen?</p></div>
               <div><label>audience</label><p>who needs to care?</p></div>
@@ -107,7 +107,7 @@
           </section>
 
           <section id="loop" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06D</span><span class="hdr-slash"> // </span><span class="hdr-name">loop_home</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06D</span><span class="hdr-slash"> // </span><span class="hdr-name">loop home</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="page-content">&gt; end of transmission.
 &gt; loop back to the beginning whenever you are ready.
 &gt;
@@ -126,12 +126,12 @@
         </div>
         <div class="terminal-body">
           <div class="menu-list">
-            <a href="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
-            <a href="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
-            <a href="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
-            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
-            <a href="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
-            <a href="contact.html" class="menu-item current"><span class="num">[06]</span><span class="name">contact</span></a>
+            <a href="index.html" data-page="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" data-page="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" data-page="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" data-page="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" data-page="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" data-page="contact.html" class="menu-item current"><span class="num">[06]</span><span class="name">contact</span></a>
           </div>
         </div>
       </aside>
@@ -415,9 +415,10 @@
         });
         sec.appendChild(btn);
       } else {
-        const end = document.createElement('span');
+        const end = document.createElement('a');
+        end.href = 'index.html';
         end.className = 'section-end';
-        end.textContent = 'end';
+        end.textContent = 'END - NEXT PAGE >>';
         sec.appendChild(end);
       }
     });

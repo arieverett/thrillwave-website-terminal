@@ -14,7 +14,7 @@
 <div class="frame" aria-hidden="true">
   <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
-  <div class="frame-label frame-label--br">INTEL &nbsp;&middot;&nbsp; 005 / 006</div>
+  <div class="frame-label frame-label--br">intel &nbsp;&middot;&nbsp; 05 / 06</div>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -72,7 +72,7 @@
           </section>
 
           <section id="dispatch" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05A</span><span class="hdr-slash"> // </span><span class="hdr-name">dispatch_types</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05A</span><span class="hdr-slash"> // </span><span class="hdr-name">dispatch types</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="dispatch-list">
               <div><span>signal</span><p>what changed in a category, and why it matters.</p></div>
               <div><span>tear_down</span><p>what a campaign did well, badly, or accidentally.</p></div>
@@ -82,7 +82,7 @@
           </section>
 
           <section id="matrix" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05B</span><span class="hdr-slash"> // </span><span class="hdr-name">editorial_matrix</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05B</span><span class="hdr-slash"> // </span><span class="hdr-name">editorial matrix</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <table class="terminal-table matrix-table">
               <tr><th>topic</th><th>why we write about it</th><th>useful for</th></tr>
               <tr><td>attention</td><td>people are busy and mildly haunted</td><td>campaign planning</td></tr>
@@ -127,12 +127,12 @@
         </div>
         <div class="terminal-body">
           <div class="menu-list">
-            <a href="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
-            <a href="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
-            <a href="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
-            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
-            <a href="intel.html" class="menu-item current"><span class="num">[05]</span><span class="name">intel</span></a>
-            <a href="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+            <a href="index.html" data-page="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" data-page="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" data-page="sitrep.html" class="menu-item"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" data-page="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" data-page="intel.html" class="menu-item current"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" data-page="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
           </div>
         </div>
       </aside>
@@ -416,9 +416,10 @@
         });
         sec.appendChild(btn);
       } else {
-        const end = document.createElement('span');
+        const end = document.createElement('a');
+        end.href = 'contact.html';
         end.className = 'section-end';
-        end.textContent = 'end';
+        end.textContent = 'END - NEXT PAGE >>';
         sec.appendChild(end);
       }
     });

@@ -14,7 +14,7 @@
 <div class="frame" aria-hidden="true">
   <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
-  <div class="frame-label frame-label--br">SITREP &nbsp;&middot;&nbsp; 003 / 006</div>
+  <div class="frame-label frame-label--br">sitrep &nbsp;&middot;&nbsp; 03 / 06</div>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -73,7 +73,7 @@
           </section>
 
           <section id="ingest" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03A</span><span class="hdr-slash"> // </span><span class="hdr-name">ingest_map</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03A</span><span class="hdr-slash"> // </span><span class="hdr-name">ingest map</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="data-grid four-up">
               <div class="data-cell"><span>audience</span><p>what they want, fear, trust, ignore, repeat, and quietly Google at 11:47pm.</p></div>
               <div class="data-cell"><span>competitors</span><p>what everyone is saying, what nobody owns, and where the category got lazy.</p></div>
@@ -94,7 +94,7 @@
           </section>
 
           <section id="output" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03C</span><span class="hdr-slash"> // </span><span class="hdr-name">output_table</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03C</span><span class="hdr-slash"> // </span><span class="hdr-name">output table</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <table class="terminal-table">
               <tr><th>deliverable</th><th>what it answers</th></tr>
               <tr><td>audience read</td><td>who are we really trying to move?</td></tr>
@@ -106,7 +106,7 @@
           </section>
 
           <section id="best-for" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">best_for</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">best for</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="check-columns">
               <div>
                 <span class="check">✓</span> launching a campaign<br>
@@ -124,7 +124,7 @@
           </section>
 
           <section id="request" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03E</span><span class="hdr-slash"> // </span><span class="hdr-name">request_protocol</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03E</span><span class="hdr-slash"> // </span><span class="hdr-name">request protocol</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="page-content">&gt; send us the mission.
 &gt; we will come back with a read on the room.
 &gt;
@@ -143,12 +143,12 @@
         </div>
         <div class="terminal-body">
           <div class="menu-list">
-            <a href="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
-            <a href="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
-            <a href="sitrep.html" class="menu-item current"><span class="num">[03]</span><span class="name">sitrep</span></a>
-            <a href="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
-            <a href="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
-            <a href="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
+            <a href="index.html" data-page="index.html" class="menu-item"><span class="num">[01]</span><span class="name">home</span></a>
+            <a href="about.html" data-page="about.html" class="menu-item"><span class="num">[02]</span><span class="name">about</span></a>
+            <a href="sitrep.html" data-page="sitrep.html" class="menu-item current"><span class="num">[03]</span><span class="name">sitrep</span></a>
+            <a href="work.html" data-page="work.html" class="menu-item"><span class="num">[04]</span><span class="name">work</span></a>
+            <a href="intel.html" data-page="intel.html" class="menu-item"><span class="num">[05]</span><span class="name">intel</span></a>
+            <a href="contact.html" data-page="contact.html" class="menu-item"><span class="num">[06]</span><span class="name">contact</span></a>
           </div>
         </div>
       </aside>
@@ -432,9 +432,10 @@
         });
         sec.appendChild(btn);
       } else {
-        const end = document.createElement('span');
+        const end = document.createElement('a');
+        end.href = 'work.html';
         end.className = 'section-end';
-        end.textContent = 'end';
+        end.textContent = 'END - NEXT PAGE >>';
         sec.appendChild(end);
       }
     });
