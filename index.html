@@ -1318,26 +1318,24 @@ async function runSequence() {
     desktopIcon.classList.add('imploding');
   }, T.iconImplode);
 
-  // PHASE 7b: legacy scanline hook intentionally disabled. The new
-  // transition is carried by the .elf-to-terminal kinetic launch itself,
-  // which matches the final homepage terminal more cleanly.
-  // sndElfImpact now fires with the terminal reveal below.
-
-  // PHASE 7c: terminal launch. The window animation does the heavy lifting:
-  //  - beam shoots horizontally from icon position
-  //  - bar rises and thickens into title bar (with traffic-light dots)
-  //  - body drops down, leading-edge scan ride along the bottom
-  //  - HUD corner brackets snap in at settle
+  // PHASE 7b/7c: final handoff scan.
+  // The kinetic terminal mock was close, but any separate mock can drift by a
+  // few pixels from the real site. This version reveals the actual homepage
+  // shell in-place with a clipped top-to-bottom green scanline. The homepage
+  // text animation does not start until the scan finishes, so the terminal is
+  // visible but blank during the reveal.
   schedule(() => {
     sndElfImpact();
-    prepExactHomepageHandoff();
-    createBootChromeClone();
-    requestAnimationFrame(() => termWindow.classList.add('opening'));
     pointer.classList.remove('visible');
-    // hide the desktop chrome so it doesn't sit behind the terminal during
-    // the open — the boot-term-window covers the icon region and the desktop
-    // labels / icon underneath would otherwise be visible at the seams
+    desktopIcon.classList.remove('imploding');
     desktop.classList.add('consumed');
+    document.getElementById('boot-root')?.classList.add('scan-handoff');
+    document.body.classList.add('handoff-show-live');
+    if (greenFlash) {
+      greenFlash.classList.remove('fire', 'frame-scan');
+      void greenFlash.offsetWidth;
+      greenFlash.classList.add('frame-scan');
+    }
   }, T.termOpen);
 
   // PHASE 7d: start Robot Rock after the terminal reveal is underway.
@@ -1370,14 +1368,8 @@ async function runSequence() {
     }
   }, T.musicStart);
 
-  // PHASE 8: boot is done — swap from boot overlay to live site.
-  // Reveal the real homepage for a tiny final beat while the boot terminal
-  // is already fully landed. This avoids the left/up jump without showing
-  // the static terminal early during the kinetic opening.
-  schedule(() => {
-    document.body.classList.add('handoff-show-live');
-  }, Math.max(0, T.done - 180));
-
+  // PHASE 8: boot is done — remove the overlay after the scanline has
+  // revealed the real homepage shell. Home typing starts immediately after.
   schedule(() => {
     bootEnded = true;
     sessionStorage.setItem('tw_intro_played', '1');
@@ -1416,6 +1408,9 @@ function resetSequence() {
   pointer.style.cssText = '';
   termWindow.classList.remove('opening');
   termWindow.style.cssText = '';
+  if (greenFlash) greenFlash.classList.remove('fire', 'frame-scan');
+  document.getElementById('boot-root')?.classList.remove('scan-handoff');
+  document.body.classList.remove('handoff-show-live');
   clearExactHomepageHandoffVars();
 
   // re-trigger the CSS animation for power-on

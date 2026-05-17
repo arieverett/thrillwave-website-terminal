@@ -4026,3 +4026,216 @@ body.booting.handoff-show-live .boot-term-window.opening {
     display: inline-block !important;
   }
 }
+
+/* ============================================================
+   FINAL SHIP PATCH — scanline handoff + top-down UI reveals
+   ============================================================ */
+
+/* During the final boot handoff, do not mock another webpage. Reveal the
+   actual homepage shell under one clipped scanline so there is no pixel jump. */
+#boot-root.scan-handoff .desktop,
+#boot-root.scan-handoff .boot-frame,
+#boot-root.scan-handoff .pointer,
+#boot-root.scan-handoff .boot-term-window,
+#boot-root.scan-handoff .controls,
+#boot-root.scan-handoff .radial-flash,
+#boot-root.scan-handoff .tracker,
+#boot-root.scan-handoff .crt-scanlines,
+#boot-root.scan-handoff .crt-roll,
+#boot-root.scan-handoff .crt-vignette {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  animation: none !important;
+  pointer-events: none !important;
+}
+
+body.booting.handoff-show-live > .frame,
+body.booting.handoff-show-live > main.content {
+  opacity: 1 !important;
+  pointer-events: none !important;
+}
+
+/* Clipped frame-wide top-to-bottom green scan. It uses the real outer frame
+   dimensions instead of viewport dimensions. */
+.green-flash.frame-scan {
+  position: fixed !important;
+  inset: 24px !important;
+  z-index: 99999 !important;
+  overflow: hidden !important;
+  border-radius: 4px !important;
+  pointer-events: none !important;
+  background: transparent !important;
+  clip-path: none !important;
+}
+
+.green-flash.frame-scan::before {
+  content: '' !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  width: 100% !important;
+  height: 26px !important;
+  opacity: 0 !important;
+  transform: translateY(-120%) !important;
+  background: linear-gradient(
+    to bottom,
+    rgba(93,208,104,0),
+    rgba(93,208,104,0.28) 18%,
+    rgba(93,208,104,0.95) 48%,
+    rgba(255,255,255,0.84) 52%,
+    rgba(93,208,104,0.65) 64%,
+    rgba(93,208,104,0)
+  ) !important;
+  box-shadow:
+    0 0 22px rgba(93,208,104,0.9),
+    0 0 74px rgba(93,208,104,0.38) !important;
+  animation: tw-frame-scan-reveal 1.12s cubic-bezier(0.16,0.78,0.2,1) both !important;
+}
+
+.green-flash.frame-scan::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+  background:
+    linear-gradient(to bottom,
+      rgba(93,208,104,0.00) 0%,
+      rgba(93,208,104,0.08) 42%,
+      rgba(93,208,104,0.18) 50%,
+      rgba(93,208,104,0.06) 58%,
+      rgba(93,208,104,0.00) 100%),
+    radial-gradient(circle at 50% 18%, rgba(93,208,104,0.18), rgba(93,208,104,0) 48%) !important;
+  animation: tw-frame-scan-glow 1.12s cubic-bezier(0.16,0.78,0.2,1) both !important;
+}
+
+@keyframes tw-frame-scan-reveal {
+  0%   { opacity: 0; transform: translateY(-120%); }
+  8%   { opacity: 1; }
+  78%  { opacity: 1; }
+  100% { opacity: 0; transform: translateY(calc(100vh - 48px + 120%)); }
+}
+
+@keyframes tw-frame-scan-glow {
+  0%   { opacity: 0; }
+  18%  { opacity: 0.26; }
+  62%  { opacity: 0.18; }
+  100% { opacity: 0; }
+}
+
+body.booting.handoff-show-live .terminal.main,
+body.booting.handoff-show-live .topbar,
+body.booting.handoff-show-live .below-bar {
+  animation: tw-interface-scan-sheen 1.12s cubic-bezier(0.16,0.78,0.2,1) both;
+}
+
+@keyframes tw-interface-scan-sheen {
+  0%   { filter: brightness(0.82); box-shadow: none; }
+  18%  { filter: brightness(1.08); box-shadow: 0 0 0 1px rgba(93,208,104,0.08), 0 0 34px rgba(93,208,104,0.16); }
+  100% { filter: brightness(1); box-shadow: none; }
+}
+
+/* Replace the side-menu's old width wipe with a top-down terminal reveal. */
+.terminal.side {
+  width: 0;
+  max-height: 0;
+  clip-path: inset(0 0 100% 0);
+  transform-origin: top center;
+  opacity: 0;
+  transition:
+    clip-path 300ms cubic-bezier(0.2,0.82,0.22,1),
+    max-height 300ms cubic-bezier(0.2,0.82,0.22,1),
+    opacity 140ms ease,
+    width 0ms linear 300ms;
+}
+body.menu-open .terminal.side {
+  width: var(--menu-w);
+  max-height: var(--term-h);
+  clip-path: inset(0 0 0 0);
+  opacity: 1;
+  transition:
+    width 0ms linear,
+    clip-path 320ms cubic-bezier(0.16,0.86,0.24,1),
+    max-height 320ms cubic-bezier(0.16,0.86,0.24,1),
+    opacity 120ms ease;
+}
+
+/* Power modal uses the same top-to-bottom reveal language. */
+.power-modal__panel {
+  transform-origin: top center !important;
+  transform: scaleY(0.04) !important;
+  clip-path: inset(0 0 100% 0) !important;
+  opacity: 0 !important;
+  transition:
+    transform 300ms cubic-bezier(0.16,0.86,0.24,1),
+    clip-path 300ms cubic-bezier(0.16,0.86,0.24,1),
+    opacity 120ms ease !important;
+}
+.power-modal.is-open .power-modal__panel {
+  transform: scaleY(1) !important;
+  clip-path: inset(0 0 0 0) !important;
+  opacity: 1 !important;
+}
+
+/* Mobile alignment: music/menu button edges line up with the terminal edges. */
+@media (max-width: 720px) {
+  .stage-wrap,
+  .topbar,
+  .stage,
+  .below-bar {
+    width: var(--term-w) !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+  .topbar {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  .topbar-left,
+  .topbar-right {
+    margin: 0 !important;
+  }
+  .topbar-right {
+    margin-left: auto !important;
+  }
+  .audio-btn,
+  #menu-btn {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+  .terminal.side {
+    width: var(--menu-w) !important;
+    max-height: 0 !important;
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition:
+      clip-path 300ms cubic-bezier(0.2,0.82,0.22,1),
+      max-height 300ms cubic-bezier(0.2,0.82,0.22,1),
+      opacity 120ms ease,
+      visibility 0ms linear 300ms !important;
+  }
+  body.menu-open .terminal.side {
+    width: var(--menu-w) !important;
+    max-height: min(calc(100dvh - 96px), 520px) !important;
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    transition:
+      visibility 0ms linear,
+      clip-path 320ms cubic-bezier(0.16,0.86,0.24,1),
+      max-height 320ms cubic-bezier(0.16,0.86,0.24,1),
+      opacity 120ms ease !important;
+  }
+  .green-flash.frame-scan {
+    inset: 12px 6px !important;
+  }
+  @keyframes tw-frame-scan-reveal {
+    0%   { opacity: 0; transform: translateY(-120%); }
+    8%   { opacity: 1; }
+    78%  { opacity: 1; }
+    100% { opacity: 0; transform: translateY(calc(100dvh - 24px + 120%)); }
+  }
+  .below-bar .social-sep {
+    display: inline-block !important;
+  }
+}
