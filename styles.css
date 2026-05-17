@@ -348,66 +348,93 @@ html, body {
 
 
 
-/* Green radial transition — now a TIGHT, LOCALIZED spark fired at the
-   icon position. The CSS var --boot-origin-x/y is set in JS at click
-   moment; falls back to centre. Reads as ignition, not full-screen flash. */
+/* Desktop→terminal transition — GRITTY SCANLINE SWEEP.
+   A bright accent-green horizontal bar rips from the top of the screen
+   to the bottom, flickering with CRT-style grit as it travels. Replaces
+   the previous radial burst — straight-line motion matches the CRT
+   power-on flash's discipline. The bar reveals the terminal that's
+   materialising behind it. */
 .radial-flash {
   position: fixed;
-  /* Centred on the impact point */
-  top: var(--boot-origin-y, 50%);
-  left: var(--boot-origin-x, 50%);
-  width: 240px;
-  height: 240px;
-  margin-top: -120px;
-  margin-left: -120px;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  height: 8px;
   pointer-events: none;
   z-index: 92;
   opacity: 0;
-  background:
-    radial-gradient(circle at center,
-      rgba(255, 255, 255, 0.95) 0%,
-      rgba(93, 208, 104, 0.85) 14%,
-      rgba(93, 208, 104, 0.35) 32%,
-      rgba(93, 208, 104, 0.08) 58%,
-      rgba(0, 0, 0, 0) 78%);
+  /* white-hot core, accent-green edges — same gradient grammar as the
+     CRT power-on bar */
+  background: linear-gradient(to bottom,
+    rgba(93, 208, 104, 0) 0%,
+    rgba(93, 208, 104, 0.9) 20%,
+    rgba(255, 255, 255, 0.98) 48%,
+    rgba(255, 255, 255, 0.98) 52%,
+    rgba(93, 208, 104, 0.9) 80%,
+    rgba(93, 208, 104, 0) 100%);
+  box-shadow:
+    0 0 24px rgba(93, 208, 104, 0.95),
+    0 0 80px rgba(93, 208, 104, 0.55),
+    0 0 140px rgba(93, 208, 104, 0.25);
+  transform: translateY(-12px);
+  /* No more radial — kill the old margin-based centring */
+  margin: 0;
+  border-radius: 0;
   mix-blend-mode: screen;
-  transform: scale(0.08);
-  border-radius: 50%;
+}
+
+/* Gritty texture — vertical pixel stripes inside the bar, like a real
+   CRT raster. Multiply over the bar's gradient so the bright stops show
+   through with banding. */
+.radial-flash::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(0, 0, 0, 0.55) 0 1px,
+    transparent 1px 3px
+  );
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+/* Trailing diffusion glow — a wider, fuzzier band trailing above the
+   hard bar so the sweep has weight and motion blur. */
+.radial-flash::after {
+  content: '';
+  position: absolute;
+  top: -28px;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: linear-gradient(to bottom,
+    rgba(93, 208, 104, 0) 0%,
+    rgba(93, 208, 104, 0.35) 50%,
+    rgba(93, 208, 104, 0) 100%);
+  filter: blur(10px);
+  pointer-events: none;
 }
 
 .radial-flash.fire {
-  animation: radial-green-flash 0.44s cubic-bezier(0.18, 0.7, 0.1, 1) forwards;
+  animation: scanline-sweep 0.44s cubic-bezier(0.42, 0.1, 0.6, 1) forwards;
 }
 
-@keyframes radial-green-flash {
-  /* Starts as a tight spark at the icon, blooms outward, then rapidly
-     expands to fill the screen at the tail end — like the CRT power-on
-     flash but green and radial. */
-  0% {
-    opacity: 0;
-    transform: scale(0.08);
-    filter: blur(0px);
-  }
-  22% {
-    opacity: 1;
-    transform: scale(1);
-    filter: blur(1px);
-  }
-  55% {
-    opacity: 0.9;
-    transform: scale(3);
-    filter: blur(3px);
-  }
-  85% {
-    opacity: 0.6;
-    transform: scale(8);
-    filter: blur(8px);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(10);
-    filter: blur(14px);
-  }
+@keyframes scanline-sweep {
+  /* Sweep from above the viewport to past the bottom, with brightness
+     flickers along the way — the bar stutters in/out of phase like a
+     loose CRT signal. */
+  0%   { opacity: 0;   transform: translateY(-12px); }
+  6%   { opacity: 1;   transform: translateY(0); }
+  16%  { opacity: 0.35; transform: translateY(14vh); }   /* flicker dim */
+  24%  { opacity: 1;   transform: translateY(24vh); }
+  38%  { opacity: 0.5; transform: translateY(40vh); }    /* flicker dim */
+  50%  { opacity: 1;   transform: translateY(54vh); }
+  64%  { opacity: 0.3; transform: translateY(70vh); }    /* flicker dim */
+  78%  { opacity: 1;   transform: translateY(86vh); }
+  92%  { opacity: 0.7; transform: translateY(98vh); }
+  100% { opacity: 0;   transform: translateY(108vh); }
 }
 
 /* ---- GREEN SCREEN FLASH ----

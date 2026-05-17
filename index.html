@@ -613,6 +613,21 @@ async function initAudio() {
       volume: -24
     }).toDestination();
 
+    // 6) CRT ignite — unique sound for the BIOS→desktop frame ignition.
+    //    A descending sawtooth sweep (power surge whoosh) paired with a
+    //    short noise pop at the start (filament snap). Distinct from the
+    //    beep, click, and launch sounds.
+    SND.igniteTone = new Tone.Synth({
+      oscillator: { type: 'sawtooth' },
+      envelope: { attack: 0.004, decay: 0.22, sustain: 0, release: 0.06 },
+      volume: -18
+    }).toDestination();
+    SND.ignitePop = new Tone.NoiseSynth({
+      noise: { type: 'pink' },
+      envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
+      volume: -18
+    }).toDestination();
+
     audioReady = true;
   } catch (e) {
     console.warn('audio init error:', e);
@@ -669,6 +684,21 @@ function sndLaunch() {
     // crisp two-note ascending blip — sounds like "click + go"
     SND.launch.triggerAttackRelease('E5', 0.04, now);
     SND.launch.triggerAttackRelease('A5', 0.05, now + 0.055);
+  });
+}
+
+// CRT ignite — BIOS→desktop frame ignition. Pink-noise pop layered with
+// a descending sawtooth sweep (~1200Hz → 180Hz). Unique character vs the
+// crisp launch blip and the muted boot beep.
+function sndIgnite() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.ignitePop.triggerAttackRelease(0.04, now);
+    // descending sweep, like a power surge whoosh
+    SND.igniteTone.frequency.setValueAtTime(1100, now);
+    SND.igniteTone.frequency.exponentialRampToValueAtTime(160, now + 0.22);
+    SND.igniteTone.triggerAttackRelease(1100, 0.22, now + 0.01);
   });
 }
 
@@ -942,6 +972,7 @@ async function runSequence() {
       void greenFlash.offsetWidth;
       greenFlash.classList.add('fire');
     }
+    sndIgnite();
     // cool the border back to gray after expansion settles
     setTimeout(() => frame.classList.add('cool'), 600);
   }, T.frameRexpand);
