@@ -3134,3 +3134,62 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     padding-right: 11px;
   }
 }
+
+
+/* === TW final shipping polish: power chrome + mobile frame comfort === */
+.frame-label--tl {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45em;
+}
+
+@media (max-width: 720px) {
+  /* More breathing room between the phone edge and the outer border,
+     while keeping the live controls tucked close enough to preserve space. */
+  .frame,
+  .desktop {
+    inset: 20px 8px;
+  }
+
+  .frame-label--tl,
+  .desktop-brand {
+    top: -6px;
+    left: 10px;
+  }
+
+  .frame-label--bl,
+  .desktop-clock {
+    bottom: -6px;
+    left: 10px;
+  }
+
+  .frame-label--br,
+  .desktop-page {
+    bottom: -6px;
+    right: 10px;
+  }
+
+  .content {
+    padding: 36px 8px 34px;
+  }
+
+  .stage-wrap {
+    gap: 7px;
+  }
+
+  .below-bar {
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+}
+
+@media (max-width: 390px) {
+  .frame,
+  .desktop {
+    inset: 18px 7px;
+  }
+
+  .content {
+    padding: 34px 7px 32px;
+  }
+}

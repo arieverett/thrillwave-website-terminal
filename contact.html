@@ -80,7 +80,7 @@
 <body>
 
 <div class="frame" aria-hidden="true">
-  <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
+  <a href="index.html" class="frame-label frame-label--tl">⏻ thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
   <div class="frame-label frame-label--br">contact &nbsp;&middot;&nbsp; 06 / 06</div>
 </div>
@@ -549,6 +549,18 @@
     } catch (_) {}
     window.location.assign('index.html?homeIntro=' + Date.now());
   }
+  function powerResetSite(e){
+    if (e) {
+      e.preventDefault();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+    try {
+      Object.keys(sessionStorage).forEach(function(k){
+        if (k.indexOf('tw_') === 0) sessionStorage.removeItem(k);
+      });
+    } catch (_) {}
+    window.location.assign('index.html?boot=' + Date.now());
+  }
   function scrollTopOnly(e){
     if (e) e.preventDefault();
     var body = document.getElementById('terminal-body');
@@ -556,7 +568,9 @@
     try { history.replaceState(null, '', location.pathname.split('/').pop() || 'index.html'); } catch (_) {}
   }
   window.addEventListener('click', function(e){
-    var brand = e.target && e.target.closest ? e.target.closest('#title-brand, .frame-label--tl') : null;
+    var power = e.target && e.target.closest ? e.target.closest('.frame-label--tl') : null;
+    if (power) return powerResetSite(e);
+    var brand = e.target && e.target.closest ? e.target.closest('#title-brand') : null;
     if (brand) return restartHomeBoot(e);
     var page = e.target && e.target.closest ? e.target.closest('#title-page') : null;
     if (page) return scrollTopOnly(e);

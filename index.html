@@ -174,7 +174,7 @@
 
 
 <div class="frame" aria-hidden="true">
-  <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
+  <a href="index.html" class="frame-label frame-label--tl">⏻ thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
   <div class="frame-label frame-label--br" id="page-indicator">home &nbsp;&middot;&nbsp; 01 / 06</div>
 </div>
@@ -528,8 +528,19 @@
   } catch (e) { /* older browsers — best effort */ }
 
   const params = new URLSearchParams(location.search);
+  const powerBoot = params.has('boot');
   const replayHomeIntro = params.has('homeIntro');
-  if (replayHomeIntro) {
+
+  if (powerBoot) {
+    // Power/reset link from the outer chrome: wipe the site session and
+    // start the full opening sequence from the beginning.
+    try {
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.indexOf('tw_') === 0) sessionStorage.removeItem(k);
+      });
+    } catch (e) {}
+    try { history.replaceState(null, '', 'index.html'); } catch (e) {}
+  } else if (replayHomeIntro) {
     try {
       sessionStorage.setItem('tw_intro_played', '1');
       sessionStorage.removeItem('tw_typing_done');
@@ -537,7 +548,7 @@
     try { history.replaceState(null, '', 'index.html'); } catch (e) {}
   }
 
-  const introPlayed = sessionStorage.getItem('tw_intro_played') === '1';
+  const introPlayed = !powerBoot && sessionStorage.getItem('tw_intro_played') === '1';
 
   if (!isHome || introPlayed) {
     // Skip boot — strip the overlay and the booting class so the site shows normally
@@ -1856,14 +1867,14 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
             sessionStorage.setItem('tw_typing_done', '1');
             window.twIntroRunning = false;
             document.body.classList.remove('home-intro-running');
-            // 2850ms wait before flipping the gate that reveals the
+            // 2350ms wait before flipping the gate that reveals the
             // first section-jump arrow. The original 850ms was felt by
-            // the user as too soon — extending by 2s gives the typing
-            // landing a longer beat to breathe before the "scroll down"
-            // hint shows up.
+            // the user as too soon — keeping a short beat gives the typing
+            // landing enough room to breathe before the "scroll down"
+            // hint shows up in sync with the music.
             setTimeout(() => {
               document.body.classList.add('home-intro-complete');
-            }, 2850);
+            }, 2350);
           });
         }, 700);
       });
@@ -2351,6 +2362,16 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     }
   }
 
+  function powerResetSite() {
+    try {
+      Object.keys(sessionStorage).forEach(k => {
+        if (k.indexOf('tw_') === 0) sessionStorage.removeItem(k);
+      });
+    } catch (e) {}
+    setMenu(false);
+    window.location.assign('index.html?boot=' + Date.now());
+  }
+
   function scrollShellPageTop() {
     setMenu(false);
     terminalBody.scrollTo({ top: 0, behavior: 'smooth' });
@@ -2359,7 +2380,15 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   document.addEventListener('click', e => {
-    const brandRestart = e.target.closest('#title-brand, .frame-label--tl');
+    const powerRestart = e.target.closest('.frame-label--tl');
+    if (powerRestart) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      powerResetSite();
+      return;
+    }
+
+    const brandRestart = e.target.closest('#title-brand');
     if (brandRestart) {
       e.preventDefault();
       e.stopImmediatePropagation();
