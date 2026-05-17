@@ -1494,7 +1494,7 @@ section.page a:hover {
   padding: 5px 10px;
   margin: 0 -6px;
   cursor: pointer;
-  transition: background 80ms ease, color 80ms ease;
+  transition: color 120ms ease;
   text-decoration: none !important;
   color: inherit;
   font-family: inherit;
@@ -1506,10 +1506,15 @@ section.page a:hover {
 .menu-item .name { color: var(--muted); font-weight: 500; }
 
 .menu-item:hover, .menu-item:focus-visible {
-  background: var(--fg);
+  background: transparent;
   outline: none;
 }
-.menu-item:hover .num, .menu-item:hover .name { color: #000; }
+.menu-item:hover .num,
+.menu-item:hover .name,
+.menu-item:focus-visible .num,
+.menu-item:focus-visible .name {
+  color: var(--accent);
+}
 
 .menu-item.current { pointer-events: none; }
 .menu-item.current .num, .menu-item.current .name { color: var(--fg); }
@@ -2441,4 +2446,17 @@ body::before,
     font-size: 9.5px !important;
     letter-spacing: 1px !important;
   }
+}
+
+
+/* === TW polish: menu hover matches site language === */
+.menu-item:hover,
+.menu-item:focus-visible {
+  background: transparent !important;
+}
+.menu-item:hover .num,
+.menu-item:hover .name,
+.menu-item:focus-visible .num,
+.menu-item:focus-visible .name {
+  color: var(--accent) !important;
 }
