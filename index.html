@@ -1814,7 +1814,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   async function loadPage(url, opts = {}) {
     const u = new URL(url, location.href);
-    let page = normalizePage(u.pathname);
+    let page = normalizePage(u.pathname || url);
     const hash = u.hash;
     setMenu(false);
 
@@ -1847,23 +1847,33 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (!opts.replace) history.pushState({ page }, '', page + hash);
   }
 
+  function navigateMenuLink(menuLink) {
+    const href = menuLink && menuLink.getAttribute('href');
+    if (!href) return false;
+
+    const targetPage = normalizePage(href);
+    if (!PAGE_LABELS[targetPage]) return false;
+
+    setMenu(false);
+    loadPage(targetPage).catch(err => {
+      console.warn('menu navigation failed, falling back:', err);
+      location.href = href;
+    });
+    return true;
+  }
+
+  // Expose this for mobile/touch handlers so menu navigation never falls
+  // through to the homepage or a stale page state.
+  window.twNavigateMenuLink = navigateMenuLink;
+  window.twLoadPage = loadPage;
+
   document.addEventListener('click', e => {
     const menuLink = e.target.closest('#side-menu a.menu-item');
     if (menuLink) {
-      const href = menuLink.getAttribute('href');
-      if (href) {
-        const u = new URL(href, location.href);
-        if (u.origin === location.origin) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          setMenu(false);
-          loadPage(u.href).catch(err => {
-            console.warn('menu navigation failed, falling back:', err);
-            location.href = href;
-          });
-          return;
-        }
-      }
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      navigateMenuLink(menuLink);
+      return;
     }
 
     const a = e.target.closest('a');
@@ -1874,12 +1884,12 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     const u = new URL(href, location.href);
     if (u.origin !== location.origin) return;
-    const page = normalizePage(u.pathname);
+    const page = normalizePage(href);
     if (!PAGE_LABELS[page]) return;
 
     e.preventDefault();
     e.stopImmediatePropagation();
-    loadPage(u.href).catch(err => {
+    loadPage(page + u.hash).catch(err => {
       console.warn('PJAX failed, falling back:', err);
       location.href = href;
     });
@@ -1984,7 +1994,14 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     const menuLink = e.target.closest('#side-menu a.menu-item');
     if (menuLink) {
-      closeMenu();
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (typeof window.twNavigateMenuLink === 'function') {
+        window.twNavigateMenuLink(menuLink);
+      } else {
+        closeMenu();
+        window.location.href = menuLink.getAttribute('href') || 'index.html';
+      }
     }
   }, true);
 
