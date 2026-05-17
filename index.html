@@ -665,8 +665,8 @@ const T = {
   desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
-  termOpen:     8950,  // terminal window opens
-  done:         9700   // sequence complete
+  termOpen:     9700,  // terminal window opens after a longer launch beat
+  done:         11000  // sequence complete
 };
 
 // --- references ---
@@ -971,6 +971,9 @@ async function runSequence() {
   // PHASE 7b: terminal opens (the terminal-open animation itself is fine —
   // it's a window-open effect, like a real OS. Desktop stays visible behind it.)
   schedule(() => {
+    const r = desktopIcon.getBoundingClientRect();
+    termWindow.style.setProperty('--boot-origin-x', (r.left + r.width * 0.5) + 'px');
+    termWindow.style.setProperty('--boot-origin-y', (r.top + r.height * 0.45) + 'px');
     termWindow.classList.add('opening');
     pointer.classList.remove('visible');
   }, T.termOpen);
@@ -987,7 +990,7 @@ async function runSequence() {
     if (root) root.remove();
     // hand off to the site's own typing intro
     if (typeof window.runHomeIntro === 'function') window.runHomeIntro();
-  }, T.termOpen + 700);
+  }, T.termOpen + 1250);
 }
 
 function resetSequence() {
@@ -1084,14 +1087,14 @@ async function runWelcomeTyping() {
   // small initial beat so the cursor is visibly blinking before typing
   await new Promise(r => setTimeout(r, 320));
 
-  await typeOut(l1text, '> hi.', 70);
-  await new Promise(r => setTimeout(r, 380));
+  await typeOut(l1text, '> hi.', 60);
+  await new Promise(r => setTimeout(r, 900));
 
   // Move the cursor down to line 2 (single DOM node — moves on append)
   l2.appendChild(cursor);
   await new Promise(r => setTimeout(r, 160));
 
-  await typeOut(l2text, '> welcome to thrill wave.', 48);
+  await typeOut(l2text, '> welcome to thrill wave.', 42);
   if (welcomeTypingAborted) return;
 
   // Hold the finished typing moment a touch longer before revealing the start button.
@@ -1432,7 +1435,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   // ---------- typing animation copy ----------
   const introPreLines = [
-    { t: '> hi.', p: 450 },
+    { t: '> hi.', p: 950 },
     { t: '> welcome to thrill wave.', p: 600 },
     { t: '', p: 280 },
   ];
@@ -1476,7 +1479,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
           }
           j++;
           // Slower, calmer homepage typing — closer to the opening sequence.
-          const d = c === ' ' ? 22 : 42 + Math.random() * 26;
+          const d = c === ' ' ? 18 : 36 + Math.random() * 22;
           setTimeout(ch, d);
         } else {
           if (!isLastLine) html += '\n';
@@ -1512,7 +1515,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
         window.twTypeClick();
       }
       i++;
-      const d = c === ' ' ? 22 : 42 + Math.random() * 26;
+      const d = c === ' ' ? 18 : 36 + Math.random() * 22;
       setTimeout(type, d);
     }
     type();
