@@ -2481,3 +2481,16 @@ a.frame-label:focus-visible {
     padding-right: 8px !important;
   }
 }
+
+
+/* Homepage polish: do not show the first down-arrow until the lander typing animation finishes. */
+body.home-intro-running #hero > .section-jump,
+body:not(.home-intro-complete) #hero > .section-jump {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+body.home-intro-complete #hero > .section-jump {
+  visibility: visible;
+}

@@ -1472,6 +1472,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     // Guard against overlapping calls — typing already running, ignore.
     if (window.twIntroRunning) return;
     window.twIntroRunning = true;
+    document.body.classList.remove('home-intro-complete');
+    document.body.classList.add('home-intro-running');
     const preEl = document.getElementById('intro-pre');
     const postEl = document.getElementById('intro-post');
     typeLines(preEl, introPreLines, () => {
@@ -1485,6 +1487,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
             // can trigger replay after this.
             sessionStorage.setItem('tw_typing_done', '1');
             window.twIntroRunning = false;
+            document.body.classList.remove('home-intro-running');
+            document.body.classList.add('home-intro-complete');
           });
         }, 700);
       });
@@ -1502,6 +1506,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     postEl.innerHTML = postHtml;
     document.getElementById('intro-cascade-toggle').innerHTML = '<span class="prompt">&gt;</span> show <span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
     revealIntroCascade();
+    document.body.classList.remove('home-intro-running');
+    document.body.classList.add('home-intro-complete');
   }
 
   function resetAndReplayHome() {
@@ -1509,6 +1515,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     // running guard so the typing animation kicks off fresh.
     sessionStorage.removeItem('tw_typing_done');
     window.twIntroRunning = false;
+    document.body.classList.remove('home-intro-complete');
+    document.body.classList.add('home-intro-running');
     terminalBody.scrollTo({ top: 0, behavior: 'smooth' });
     setTimeout(() => {
       document.getElementById('intro-pre').innerHTML = '';
