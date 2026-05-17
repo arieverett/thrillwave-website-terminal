@@ -2499,7 +2499,9 @@ body.home-intro-complete #hero > .section-jump {
 /* === TW animation/cascade repair pass === */
 /* Let the first homepage section cue wait until the lander finishes, then fade in gently. */
 #hero > .section-jump {
-  transition: opacity 680ms ease 950ms, color 140ms ease !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 1250ms ease 120ms, color 140ms ease !important;
 }
 body.home-intro-running #hero > .section-jump,
 body:not(.home-intro-complete) #hero > .section-jump {
