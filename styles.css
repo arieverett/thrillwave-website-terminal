@@ -438,36 +438,56 @@ html, body {
 }
 
 /* ---- GREEN SCREEN FLASH ----
-   The BIOS-to-desktop counterpart to the white CRT power-on flash. Fires
-   when the boot-frame snap-expands. Quick radial green burst that fills
-   the screen, then fades. */
+   The BIOS→desktop counterpart to the white CRT power-on flash. Mirrors
+   that flash's grammar exactly — thin green horizontal line snaps in at
+   centre, then a green fill blooms vertically to cover the screen and
+   fades. Linear blink, not a radial bloom. */
 .green-flash {
   position: fixed;
   inset: 0;
   z-index: 91;
   pointer-events: none;
+  background: transparent;
+}
+
+.green-flash::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background: #5dd068;
+  box-shadow: 0 0 60px 8px rgba(93, 208, 104, 0.85);
+  transform: translateY(-50%);
+}
+
+.green-flash::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #5dd068;
   opacity: 0;
-  background:
-    radial-gradient(circle at center,
-      rgba(255, 255, 255, 0.85) 0%,
-      rgba(93, 208, 104, 0.95) 8%,
-      rgba(93, 208, 104, 0.6) 28%,
-      rgba(93, 208, 104, 0.18) 55%,
-      rgba(0, 0, 0, 0) 80%);
-  mix-blend-mode: screen;
-  transform: scale(0);
-  filter: blur(0px);
 }
 
-.green-flash.fire {
-  animation: green-flash-burst 0.26s cubic-bezier(0.2, 0.7, 0.1, 1) forwards;
+.green-flash.fire::before {
+  animation: green-line 0.07s cubic-bezier(0.2, 0.7, 0.1, 1) forwards;
 }
 
-@keyframes green-flash-burst {
-  0%   { opacity: 0; transform: scale(0);   filter: blur(0px); }
-  35%  { opacity: 1; transform: scale(0.7); filter: blur(1px); }
-  65%  { opacity: 0.9; transform: scale(1.6); filter: blur(4px); }
-  100% { opacity: 0; transform: scale(2.4); filter: blur(10px); }
+.green-flash.fire::after {
+  animation: green-fill 0.09s 0.04s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+}
+
+@keyframes green-line {
+  0%   { height: 0; }
+  40%  { height: 2px; }
+  100% { height: 2px; }
+}
+
+@keyframes green-fill {
+  0%   { opacity: 0; transform: scaleY(0); }
+  30%  { opacity: 0.95; transform: scaleY(1); }
+  100% { opacity: 0; transform: scaleY(1); }
 }
 
 /* ============================================
@@ -2927,9 +2947,11 @@ body::before,
   line-height: 1 !important;
   letter-spacing: 0.08em !important;
   color: var(--fg) !important;
-  opacity: 0.9;
+  opacity: 0;
   text-transform: none !important;
-  animation: section-arrow-blink 1.25s ease-in-out infinite;
+  /* 1s delay before the arrow starts blinking — gives the section
+     a moment to settle before the navigation hint shows up. */
+  animation: section-arrow-blink 1.25s ease-in-out 1s infinite;
 }
 .section-jump {
   cursor: pointer;

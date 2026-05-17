@@ -600,6 +600,8 @@ async function initAudio() {
     // 4) Elf impact — replaces the bright two-note "launch" blip with a
     //   tough, gritty, deep impact. A MembraneSynth pitch-drop layered
     //   with a pink-noise burst gives a hard "thunk-grit" hit.
+    //   (Now used for the scanline-sweep transition; the elf icon click
+    //   uses sndMouseClick — a typical mouse click, see below.)
     SND.elfImpact = new Tone.MembraneSynth({
       pitchDecay: 0.02,
       octaves: 5,
@@ -611,6 +613,21 @@ async function initAudio() {
       noise: { type: 'pink' },
       envelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.04 },
       volume: -14
+    }).toDestination();
+
+    // 4b) Mouse click — typical real-world mouse-button click: a quick
+    //    high-frequency tick (the button release) preceded by a softer
+    //    low-frequency thud (the button press), all under 50ms total.
+    //    Used for the .elf icon click moment.
+    SND.mouseClickHi = new Tone.NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.008, sustain: 0, release: 0.008 },
+      volume: -12
+    }).toDestination();
+    SND.mouseClickLo = new Tone.NoiseSynth({
+      noise: { type: 'pink' },
+      envelope: { attack: 0.001, decay: 0.012, sustain: 0, release: 0.012 },
+      volume: -18
     }).toDestination();
 
     // 5) Type click — louder, slightly fuller click for the home page
@@ -734,14 +751,27 @@ function sndPadOff() {
 }
 
 function sndLaunch() {
-  // Legacy name retained as a no-op alias — the elf click now uses
-  // sndElfImpact. Anything else calling sndLaunch falls through silently.
-  sndElfImpact();
+  // Legacy name retained as an alias — the elf click now triggers
+  // sndMouseClick (a typical mouse click), not a deep impact.
+  sndMouseClick();
 }
 
-// Elf impact — tough, gritty, deep. Replaces the old two-note "launch" blip.
+// Mouse click — typical button-press sound. Two stacked noise bursts:
+// a soft pink "press" then a bright white "release" ~6ms later. Reads
+// as a real mouse-click, distinct from the per-keystroke type-click.
+function sndMouseClick() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.mouseClickLo.triggerAttackRelease(0.012, now);
+    SND.mouseClickHi.triggerAttackRelease(0.008, now + 0.006);
+  });
+}
+
+// Elf impact — tough, gritty, deep. Currently used for the scanline-
+// sweep transition (replaces the descending-sawtooth sweep tone).
 // Sub-bass thunk (membrane pitch drop from C2) layered with a pink-noise
-// grit burst. Lands like a hard mechanical hit, not a pac-man pickup.
+// grit burst. Lands like a hard mechanical hit.
 function sndElfImpact() {
   if (!audioReady) return;
   safe(() => {
@@ -841,7 +871,7 @@ const T = {
   iconImplode: 8800,  // icon collapses into a spark — 100ms after click
   radialFlash:  8810,  // tight green burst right behind the spark
   termOpen:     8830,  // beam fires + window animation begins (~130ms after click)
-  musicStart:   9080,  // Robot Rock kicks in as the title bar materializes
+  musicStart:   8980,  // Robot Rock kicks in 150ms after termOpen — slightly
   done:         9700   // sequence complete — full launch finishes ~580ms + breathing beat
 };
 
@@ -1154,7 +1184,7 @@ async function runSequence() {
       void radialFlash.offsetWidth; // restart
       radialFlash.classList.add('fire');
     }
-    sndSweep();
+    sndElfImpact();
   }, T.radialFlash);
 
   // PHASE 7c: terminal launch. The window animation does the heavy lifting:
@@ -1679,7 +1709,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     { t: '', p: 250 },
     { t: "> we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.", p: 500 },
     { t: '', p: 280 },
-    { t: '> press enter or scroll down to go to the next page, or click menu to jump to a page.', p: 0 },
+    { t: '> press enter or scroll down to go to the next section, or click menu to jump to a page.', p: 0 },
   ];
 
   function escHtml(ch) { return ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch; }
