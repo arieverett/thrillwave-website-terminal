@@ -3529,3 +3529,172 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     line-height: 1.75 !important;
   }
 }
+
+
+/* ============================================================
+   FINAL OPENING POLISH — cleaner welcome size + exact terminal handoff
+   ============================================================ */
+/* Slightly larger welcome copy/button, still restrained and terminal-like. */
+.welcome-line {
+  font-size: 14px !important;
+  line-height: 1.58 !important;
+}
+.welcome-btn {
+  font-size: 11.6px !important;
+  height: 29px !important;
+  padding: 9px 17px !important;
+}
+
+/* The green full-frame scanline is retired for this version. The transition
+   is now handled by the .elf → terminal launch, which makes the handoff less
+   busy and easier to match to the static homepage. */
+.radial-flash,
+.radial-flash.fire {
+  display: none !important;
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+/* Match the opening terminal's final landing spot to the real homepage
+   terminal. The real terminal sits slightly below exact vertical center
+   because the top controls and footer live in the same centered stack. */
+:root {
+  --boot-term-y-nudge: 8px;
+  --boot-title-h: 39px;
+}
+.boot-term-window {
+  top: calc(50% - var(--term-h, 700px) / 2 + var(--boot-term-y-nudge)) !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 0;
+  height: 0;
+}
+
+/* Replace the previous sci-fi scanline reveal with a tighter early-00s
+   app-launch feel: the clicked icon becomes a thin title bar, the bar snaps
+   to the exact terminal position, then the window drops open from the title
+   edge into the same dimensions as the live homepage terminal. */
+.boot-term-window.opening {
+  animation: tw-elf-terminal-launch 0.62s cubic-bezier(0.18, 0.86, 0.22, 1) forwards !important;
+}
+
+@keyframes tw-elf-terminal-launch {
+  0% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 52px;
+    height: 2px;
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: 0 0 0 rgba(93,208,104,0);
+  }
+  8% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 86px;
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 28px rgba(93,208,104,0.8), 0 0 64px rgba(93,208,104,0.35);
+  }
+  28% {
+    left: 50%;
+    top: calc(50% - var(--term-h, 700px) / 2 + var(--boot-term-y-nudge));
+    transform: translateX(-50%);
+    width: calc(var(--term-w, 560px) * 1.025);
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 30px rgba(93,208,104,0.8), 0 0 70px rgba(93,208,104,0.35);
+  }
+  38% {
+    left: 50%;
+    top: calc(50% - var(--term-h, 700px) / 2 + var(--boot-term-y-nudge));
+    transform: translateX(-50%);
+    width: var(--term-w, 560px);
+    height: var(--boot-title-h);
+    opacity: 1;
+    border-color: rgba(93,208,104,0.6);
+    box-shadow: 0 0 22px rgba(93,208,104,0.45), 0 0 48px rgba(93,208,104,0.2);
+  }
+  78% {
+    left: 50%;
+    top: calc(50% - var(--term-h, 700px) / 2 + var(--boot-term-y-nudge));
+    transform: translateX(-50%);
+    width: var(--term-w, 560px);
+    height: var(--term-h, 700px);
+    opacity: 1;
+    border-color: rgba(93,208,104,0.28);
+    box-shadow: 0 0 24px rgba(93,208,104,0.22), 0 0 52px rgba(93,208,104,0.12);
+  }
+  100% {
+    left: 50%;
+    top: calc(50% - var(--term-h, 700px) / 2 + var(--boot-term-y-nudge));
+    transform: translateX(-50%);
+    width: var(--term-w, 560px);
+    height: var(--term-h, 700px);
+    opacity: 1;
+    border-color: var(--terminal-rule);
+    box-shadow: none;
+  }
+}
+
+/* Match the live terminal chrome exactly at the landing moment. */
+.boot-term-inner .boot-term-title {
+  height: auto !important;
+  min-height: 39px !important;
+  padding: 11px 16px !important;
+  background: var(--terminal-bar) !important;
+  border-bottom: 1px solid #1a1a1a !important;
+  font-size: 11px !important;
+  letter-spacing: 1.5px !important;
+}
+.boot-term-dots {
+  gap: 5px !important;
+}
+.boot-term-dots .boot-dot {
+  width: 6px !important;
+  height: 6px !important;
+  background: #2e2e2e !important;
+}
+.boot-term-dots .boot-dot.live,
+.boot-term-dots .boot-dot:nth-child(3) {
+  background: var(--accent) !important;
+  box-shadow: 0 0 4px rgba(93,208,104,0.5) !important;
+}
+.boot-term-window.opening .boot-term-inner .boot-term-title {
+  animation: boot-title-show 0.16s ease 0.22s forwards !important;
+}
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(1) { animation-delay: 0.24s !important; }
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(2) { animation-delay: 0.26s !important; }
+.boot-term-window.opening .boot-term-dots .boot-dot:nth-child(3) { animation-delay: 0.28s, 0.44s !important; }
+
+/* These HUD/scan ornaments were the main source of the final-frame mismatch.
+   The live homepage terminal has no corner brackets or internal scan beam. */
+.hud-bracket,
+.boot-term-scan {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --boot-term-y-nudge: 7px;
+    --boot-title-h: 36px;
+  }
+  .welcome-line {
+    font-size: 13px !important;
+  }
+  .welcome-btn {
+    font-size: 10.5px !important;
+    height: 28px !important;
+    padding: 8px 14px !important;
+  }
+  .boot-term-inner .boot-term-title {
+    min-height: 36px !important;
+    padding: 9px 12px !important;
+    font-size: 9.8px !important;
+    letter-spacing: 1.05px !important;
+  }
+}

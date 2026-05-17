@@ -978,11 +978,11 @@ const T = {
   desktopShow:  7480,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
-  iconImplode: 8800,  // icon collapses into a spark — 100ms after click
-  radialFlash:  8810,  // tight green burst right behind the spark
-  termOpen:     8830,  // beam fires + window animation begins (~130ms after click)
-  musicStart:   8980,  // Robot Rock kicks in 150ms after termOpen — slightly
-  done:         9700   // sequence complete — full launch finishes ~580ms + breathing beat
+  iconImplode: 8840,  // icon collapses into a spark after a tiny click beat
+  radialFlash:  0,     // disabled visually; kept as a harmless legacy hook
+  termOpen:     9070,  // terminal reveal begins after a stronger .elf pause
+  musicStart:   9280,  // Robot Rock starts after the terminal reveal has momentum
+  done:         10120  // sequence complete after the terminal lands cleanly
 };
 
 // --- references ---
@@ -1284,18 +1284,10 @@ async function runSequence() {
     desktopIcon.classList.add('imploding');
   }, T.iconImplode);
 
-  // PHASE 7b: the scanline sweep — a gritty horizontal bar streaks from
-  // top of screen to bottom, reading the new surface as the terminal
-  // materialises behind it. The pop+descending-sawtooth pairs with the
-  // top-to-bottom motion of the bar.
-  schedule(() => {
-    if (radialFlash) {
-      radialFlash.classList.remove('fire');
-      void radialFlash.offsetWidth; // restart
-      radialFlash.classList.add('fire');
-    }
-    sndElfImpact();
-  }, T.radialFlash);
+  // PHASE 7b: legacy scanline hook intentionally disabled. The new
+  // transition is carried by the .elf-to-terminal kinetic launch itself,
+  // which matches the final homepage terminal more cleanly.
+  // sndElfImpact now fires with the terminal reveal below.
 
   // PHASE 7c: terminal launch. The window animation does the heavy lifting:
   //  - beam shoots horizontally from icon position
@@ -1303,6 +1295,7 @@ async function runSequence() {
   //  - body drops down, leading-edge scan ride along the bottom
   //  - HUD corner brackets snap in at settle
   schedule(() => {
+    sndElfImpact();
     termWindow.classList.add('opening');
     pointer.classList.remove('visible');
     // hide the desktop chrome so it doesn't sit behind the terminal during
