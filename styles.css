@@ -3135,61 +3135,137 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
   }
 }
 
+/* === TW opening handoff polish: exact border match + clipped green scan ===
+   Keeps the opening desktop mockup aligned with the real static website frame,
+   and confines the green transition sweep to the inside of that frame. */
+.desktop {
+  inset: 24px !important;
+  border: 1px solid var(--rule) !important;
+  border-radius: 4px !important;
+  background: #000 !important;
+  overflow: visible !important;
+}
 
-/* === TW final shipping polish: power chrome + mobile frame comfort === */
-.frame-label--tl {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45em;
+.desktop-brand,
+.desktop-clock,
+.desktop-page {
+  font-size: 10.5px !important;
+  letter-spacing: 2.5px !important;
+  line-height: 1 !important;
+  font-weight: 500 !important;
+  color: var(--muted) !important;
+  background: #000 !important;
+  padding: 0 10px !important;
+  text-transform: none !important;
+}
+
+.desktop-brand {
+  top: -7px !important;
+  left: 22px !important;
+}
+
+.desktop-clock {
+  bottom: -7px !important;
+  left: 22px !important;
+}
+
+.desktop-page {
+  bottom: -7px !important;
+  right: 22px !important;
+}
+
+#boot-root.clean-desktop .desktop-brand,
+#boot-root.clean-desktop .desktop-clock,
+#boot-root.clean-desktop .desktop-page {
+  line-height: 1 !important;
+  text-transform: none !important;
+}
+
+#boot-root.clean-desktop .desktop-brand {
+  top: -7px !important;
+}
+
+#boot-root.clean-desktop .desktop-clock,
+#boot-root.clean-desktop .desktop-page {
+  bottom: -7px !important;
+}
+
+/* Clip the green transition to the same rectangle as the outer website chrome,
+   so it reads like the terminal field is scanning on instead of the whole
+   browser window flashing. */
+.green-flash {
+  inset: 24px !important;
+  overflow: hidden !important;
+  border-radius: 4px !important;
+}
+
+.green-flash::before {
+  left: 0 !important;
+  width: 100% !important;
+}
+
+.green-flash::after {
+  inset: 0 !important;
+  border-radius: 4px !important;
 }
 
 @media (max-width: 720px) {
-  /* More breathing room between the phone edge and the outer border,
-     while keeping the live controls tucked close enough to preserve space. */
-  .frame,
-  .desktop {
-    inset: 20px 8px;
+  .desktop,
+  .green-flash {
+    inset: 14px !important;
   }
 
-  .frame-label--tl,
-  .desktop-brand {
-    top: -6px;
-    left: 10px;
-  }
-
-  .frame-label--bl,
-  .desktop-clock {
-    bottom: -6px;
-    left: 10px;
-  }
-
-  .frame-label--br,
+  .desktop-brand,
+  .desktop-clock,
   .desktop-page {
-    bottom: -6px;
-    right: 10px;
+    font-size: 8.8px !important;
+    letter-spacing: 1.15px !important;
+    padding: 0 6px !important;
+    line-height: 1.25 !important;
   }
 
-  .content {
-    padding: 36px 8px 34px;
+  .desktop-brand {
+    top: -6px !important;
+    left: 12px !important;
   }
 
-  .stage-wrap {
-    gap: 7px;
+  .desktop-clock {
+    bottom: -6px !important;
+    left: 12px !important;
   }
 
-  .below-bar {
-    padding-left: 4px;
-    padding-right: 4px;
+  .desktop-page {
+    bottom: -6px !important;
+    right: 12px !important;
+    max-width: 58vw !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    text-align: right !important;
   }
 }
 
 @media (max-width: 390px) {
-  .frame,
-  .desktop {
-    inset: 18px 7px;
+  .desktop,
+  .green-flash {
+    inset: 12px !important;
   }
 
-  .content {
-    padding: 34px 7px 32px;
+  .desktop-brand,
+  .desktop-clock,
+  .desktop-page {
+    font-size: 8.2px !important;
+    letter-spacing: 0.85px !important;
+    padding: 0 5px !important;
+  }
+
+  .desktop-brand,
+  .desktop-clock {
+    left: 9px !important;
+  }
+
+  .desktop-page {
+    right: 9px !important;
+    max-width: 55vw !important;
   }
 }
