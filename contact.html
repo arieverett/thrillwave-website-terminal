@@ -79,94 +79,11 @@
 </head>
 <body>
 
-<div class="frame">
-  <a href="index.html?power=1" class="frame-label frame-label--tl" data-power-control onclick="return window.twPowerConfirm ? window.twPowerConfirm(event) : false;">⏻ thrill_wave</a>
+<div class="frame" aria-hidden="true">
+  <a href="index.html" class="frame-label frame-label--tl">thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
   <div class="frame-label frame-label--br">contact &nbsp;&middot;&nbsp; 06 / 06</div>
 </div>
-<div class="power-modal" id="power-modal" aria-hidden="true">
-  <div class="power-modal__panel terminal" role="dialog" aria-modal="true" aria-labelledby="power-modal-title">
-    <div class="power-modal__bar terminal-bar">
-      <span class="power-modal__bar-title">thrill_wave — power</span>
-      <div class="terminal-dots" aria-hidden="true">
-        <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
-      </div>
-    </div>
-    <div class="power-modal__body">
-      <div class="power-modal__title" id="power-modal-title">turn off thrill_wave os? this will reset the site and start it from the beginning.</div>
-      <div class="power-modal__actions">
-        <button class="power-modal__btn power-modal__btn--confirm" type="button" data-power-confirm>yes</button>
-        <button class="power-modal__btn" type="button" data-power-cancel>no</button>
-      </div>
-    </div>
-  </div>
-</div>
-<script>
-(function(){
-  function getModal(){ return document.getElementById('power-modal'); }
-  function openModal(event){
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-    }
-    var modal = getModal();
-    if (!modal) return false;
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.classList.add('power-modal-open');
-    var noBtn = modal.querySelector('[data-power-cancel]');
-    if (noBtn) setTimeout(function(){ noBtn.focus(); }, 30);
-    return false;
-  }
-  function closeModal(event){
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-    }
-    var modal = getModal();
-    if (!modal) return false;
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-    document.body.classList.remove('power-modal-open');
-    return false;
-  }
-  function confirmShutdown(event){
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-      if (event.stopImmediatePropagation) event.stopImmediatePropagation();
-    }
-    try {
-      sessionStorage.removeItem('tw_intro_played');
-      sessionStorage.removeItem('tw_typing_done');
-      sessionStorage.removeItem('tw_music_on');
-      sessionStorage.removeItem('tw_music_t');
-      sessionStorage.removeItem('tw_home_complete');
-    } catch (_) {}
-    window.location.href = 'index.html?power=' + Date.now();
-    return false;
-  }
-  window.twPowerConfirm = openModal;
-  window.twPowerCancel = closeModal;
-  window.twPowerShutdown = confirmShutdown;
-
-  document.addEventListener('click', function(event){
-    var target = event.target;
-    if (!target || !target.closest) return;
-    if (target.closest('[data-power-control]')) return openModal(event);
-    if (target.closest('[data-power-cancel]')) return closeModal(event);
-    if (target.closest('[data-power-confirm]')) return confirmShutdown(event);
-    var modal = getModal();
-    if (modal && modal.classList.contains('is-open') && target === modal) return closeModal(event);
-  }, true);
-
-  document.addEventListener('keydown', function(event){
-    if (event.key === 'Escape') closeModal(event);
-  }, true);
-})();
-</script></div>
 
 <audio id="bg-audio" loop preload="auto">
   <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
@@ -260,7 +177,7 @@
           <section id="loop" class="page reveal " data-nav-section>
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06D</span><span class="hdr-slash"> // </span><span class="hdr-name">loop home</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="page-content">&gt; end of transmission.
-&gt; loop back to the beginning whenever you are ready.
+&gt; loop back to the beginning when ready.
 &gt;
 &gt; <a href="index.html" class="cta-link">return home &rarr;</a></div>
             <div class="next-link reveal">&gt; <a href="index.html">next: home &rarr;</a></div>
@@ -639,7 +556,7 @@
     try { history.replaceState(null, '', location.pathname.split('/').pop() || 'index.html'); } catch (_) {}
   }
   window.addEventListener('click', function(e){
-    var brand = e.target && e.target.closest ? e.target.closest('#title-brand') : null;
+    var brand = e.target && e.target.closest ? e.target.closest('#title-brand, .frame-label--tl') : null;
     if (brand) return restartHomeBoot(e);
     var page = e.target && e.target.closest ? e.target.closest('#title-page') : null;
     if (page) return scrollTopOnly(e);
@@ -720,8 +637,6 @@
   window.twBindCleanCascades = bindCleanToggles;
 })();
 </script>
-
-
 
 </body>
 </html>

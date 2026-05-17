@@ -4352,3 +4352,156 @@ body.tw-system-wake .below-bar {
     100% { opacity: 0; transform: translateY(calc(100dvh - 24px)) scaleY(0.9); }
   }
 }
+
+
+/* ============================================================
+   TW refinement pass — cleaner scanline, border-native wake glow,
+   desktop menu wipe, and cohesive terminal-style prompts
+   ============================================================ */
+
+/* The scanline should read as a gritty phosphor bar, not a black-gradient overlay. */
+body.tw-frame-scan::after {
+  height: 10px !important;
+  border-radius: 2px !important;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0,0,0,0.00) 0 5px,
+      rgba(0,0,0,0.22) 5px 7px,
+      rgba(255,255,255,0.18) 7px 8px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,0.18) 0 1px,
+      rgba(93,208,104,0.94) 1px 3px,
+      rgba(44,128,58,0.86) 3px 5px
+    ),
+    #5dd068 !important;
+  box-shadow:
+    0 0 10px rgba(93,208,104,0.92),
+    0 0 28px rgba(93,208,104,0.62),
+    0 0 70px rgba(93,208,104,0.24) !important;
+  mix-blend-mode: screen;
+}
+
+/* Retire the big overlay glow. Make the real UI borders glow like tubes/metal catching light. */
+body.tw-system-wake .content::after {
+  display: none !important;
+}
+
+body.tw-system-wake .frame {
+  animation: tw-neon-border-wake 5.1s ease both;
+}
+
+body.tw-system-wake .audio-btn,
+body.tw-system-wake #menu-btn {
+  animation: tw-neon-control-wake 4.8s ease 0.22s both;
+}
+
+body.tw-system-wake .audio-viz {
+  animation: tw-neon-control-wake 4.8s ease 0.30s both;
+}
+
+body.tw-system-wake .terminal.main {
+  animation: tw-neon-terminal-wake 5.15s ease 0.62s both !important;
+}
+
+body.tw-system-wake .terminal.main .terminal-bar {
+  animation: tw-neon-terminal-bar-wake 4.6s ease 0.72s both;
+}
+
+body.tw-system-wake .below-bar {
+  animation: tw-neon-footer-wake 4.5s ease 1.18s both !important;
+}
+
+@keyframes tw-neon-border-wake {
+  0%   { border-color: var(--rule); box-shadow: none; filter: brightness(0.94); }
+  10%  { border-color: rgba(93,208,104,0.78); box-shadow: 0 0 20px rgba(93,208,104,0.18), inset 0 0 14px rgba(93,208,104,0.06); }
+  45%  { border-color: rgba(93,208,104,0.45); box-shadow: 0 0 26px rgba(93,208,104,0.12), inset 0 0 18px rgba(93,208,104,0.04); }
+  100% { border-color: var(--rule); box-shadow: none; filter: brightness(1); }
+}
+
+@keyframes tw-neon-control-wake {
+  0%   { border-color: var(--rule); box-shadow: none; color: var(--muted); }
+  18%  { border-color: rgba(93,208,104,0.85); box-shadow: 0 0 22px rgba(93,208,104,0.22); color: var(--fg); }
+  58%  { border-color: rgba(93,208,104,0.42); box-shadow: 0 0 18px rgba(93,208,104,0.12); }
+  100% { border-color: var(--rule); box-shadow: none; color: var(--muted); }
+}
+
+@keyframes tw-neon-terminal-wake {
+  0%   { border-color: var(--terminal-rule); box-shadow: none; filter: brightness(0.95); }
+  16%  { border-color: rgba(93,208,104,0.82); box-shadow: 0 0 30px rgba(93,208,104,0.20), inset 0 0 20px rgba(93,208,104,0.055); filter: brightness(1.08); }
+  54%  { border-color: rgba(93,208,104,0.40); box-shadow: 0 0 24px rgba(93,208,104,0.12), inset 0 0 16px rgba(93,208,104,0.035); }
+  100% { border-color: var(--terminal-rule); box-shadow: none; filter: brightness(1); }
+}
+
+@keyframes tw-neon-terminal-bar-wake {
+  0%   { border-bottom-color: #1a1a1a; box-shadow: none; }
+  22%  { border-bottom-color: rgba(93,208,104,0.48); box-shadow: inset 0 -1px 0 rgba(93,208,104,0.25); }
+  100% { border-bottom-color: #1a1a1a; box-shadow: none; }
+}
+
+@keyframes tw-neon-footer-wake {
+  0%   { filter: brightness(0.92); text-shadow: none; }
+  24%  { filter: brightness(1.16); text-shadow: 0 0 12px rgba(93,208,104,0.22); }
+  100% { filter: brightness(1); text-shadow: none; }
+}
+
+/* Desktop menu returns to the original horizontal terminal drawer language. */
+@media (min-width: 721px) {
+  .terminal.side {
+    width: 0 !important;
+    max-height: var(--term-h) !important;
+    clip-path: inset(0 100% 0 0) !important;
+    opacity: 0;
+    transform-origin: left center;
+    transition:
+      width 320ms cubic-bezier(0.16,0.86,0.24,1),
+      clip-path 320ms cubic-bezier(0.16,0.86,0.24,1),
+      opacity 140ms ease !important;
+  }
+  body.menu-open .terminal.side {
+    width: var(--menu-w) !important;
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1;
+  }
+}
+
+/* Mobile keeps the top-to-bottom menu reveal. */
+@media (max-width: 720px) {
+  .terminal.side {
+    clip-path: inset(0 0 100% 0) !important;
+    transform-origin: top center;
+  }
+  body.menu-open .terminal.side {
+    clip-path: inset(0 0 0 0) !important;
+  }
+  body.tw-frame-scan::after {
+    height: 9px !important;
+  }
+  .below-bar .social-sep {
+    display: inline !important;
+  }
+}
+
+/* Cohesive terminal grammar: remove triangle-bullet feeling and use ASCII prompts. */
+.data-cell p::before,
+.flowline p::before,
+.principle-list p::before,
+.terminal-form p::before,
+.contact-grid em::before,
+.stat-label::before,
+.tile-list li::before {
+  content: '>> ';
+  color: var(--muted);
+}
+
+.tile-list li,
+.data-cell p,
+.flowline p,
+.principle-list p,
+.terminal-form p,
+.contact-grid em,
+.stat-label {
+  position: relative;
+}
