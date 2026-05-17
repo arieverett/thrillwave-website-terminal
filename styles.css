@@ -439,9 +439,11 @@ html, body {
 
 /* ---- GREEN SCREEN FLASH ----
    The BIOS→desktop counterpart to the white CRT power-on flash. Mirrors
-   that flash's grammar exactly — thin green horizontal line snaps in at
-   centre, then a green fill blooms vertically to cover the screen and
-   fades. Linear blink, not a radial bloom. */
+   that flash's grammar: thin green horizontal line snaps in at centre,
+   then a green fill blooms vertically. Critical: every visible style
+   (height, opacity, box-shadow, background) lives INSIDE the keyframes
+   so the element is fully invisible in its static state and returns to
+   invisible after the animation. */
 .green-flash {
   position: fixed;
   inset: 0;
@@ -457,9 +459,11 @@ html, body {
   left: 0;
   width: 100%;
   height: 0;
-  background: #5dd068;
-  box-shadow: 0 0 60px 8px rgba(93, 208, 104, 0.85);
   transform: translateY(-50%);
+  opacity: 0;
+  /* No background, no box-shadow in the static state. A box-shadow on a
+     0-tall element still renders its blur outward, which was leaving a
+     persistent green halo across the screen before the animation fired. */
 }
 
 .green-flash::after {
@@ -471,23 +475,40 @@ html, body {
 }
 
 .green-flash.fire::before {
-  animation: green-line 0.07s cubic-bezier(0.2, 0.7, 0.1, 1) forwards;
+  animation: green-line 0.18s cubic-bezier(0.2, 0.7, 0.1, 1) both;
 }
 
 .green-flash.fire::after {
-  animation: green-fill 0.09s 0.04s cubic-bezier(0.4, 0, 0.6, 1) forwards;
+  animation: green-fill 0.16s 0.05s cubic-bezier(0.4, 0, 0.6, 1) both;
 }
 
 @keyframes green-line {
-  0%   { height: 0; }
-  40%  { height: 2px; }
-  100% { height: 2px; }
+  0%   {
+    height: 0; opacity: 0;
+    background: transparent;
+    box-shadow: 0 0 0 0 rgba(93, 208, 104, 0);
+  }
+  18%  {
+    height: 2px; opacity: 1;
+    background: #5dd068;
+    box-shadow: 0 0 60px 8px rgba(93, 208, 104, 0.85);
+  }
+  70%  {
+    height: 2px; opacity: 1;
+    background: #5dd068;
+    box-shadow: 0 0 60px 8px rgba(93, 208, 104, 0.85);
+  }
+  100% {
+    height: 0; opacity: 0;
+    background: transparent;
+    box-shadow: 0 0 0 0 rgba(93, 208, 104, 0);
+  }
 }
 
 @keyframes green-fill {
-  0%   { opacity: 0; transform: scaleY(0); }
+  0%   { opacity: 0;    transform: scaleY(0); }
   30%  { opacity: 0.95; transform: scaleY(1); }
-  100% { opacity: 0; transform: scaleY(1); }
+  100% { opacity: 0;    transform: scaleY(1); }
 }
 
 /* ============================================
@@ -2943,19 +2964,28 @@ body::before,
 .section-jump,
 .section-end {
   font-family: var(--font) !important;
-  font-size: 15px !important;
   line-height: 1 !important;
   letter-spacing: 0.08em !important;
   color: var(--fg) !important;
   opacity: 0;
   text-transform: none !important;
-  /* 1s delay before the arrow starts blinking — gives the section
-     a moment to settle before the navigation hint shows up. */
+}
+
+/* Section-jump (between sections) keeps the larger arrow and the
+   vertical bounce — it's a literal "scroll down" hint. */
+.section-jump {
+  font-size: 15px !important;
+  cursor: pointer;
   animation: section-arrow-blink 1.25s ease-in-out 1s infinite;
 }
-.section-jump {
-  cursor: pointer;
+
+/* Section-end (end of page → next page) reads as a "go right to the
+   next page" hint: smaller font, horizontal bounce instead of vertical. */
+.section-end {
+  font-size: 11px !important;
+  animation: section-end-blink 1.25s ease-in-out 1s infinite;
 }
+
 .section-jump:hover,
 .section-jump:focus-visible,
 .section-end:hover,
@@ -2976,10 +3006,22 @@ body::before,
 #side-menu a.menu-item[data-real-link="true"] {
   pointer-events: auto;
 }
+
+/* Horizontal counterpart to section-arrow-blink — same opacity contour,
+   bouncing right instead of down. The whole end-of-page link nudges to
+   the right at the bright peak. */
+@keyframes section-end-blink {
+  0%, 100% { opacity: 0.22; transform: translateX(0); }
+  45%      { opacity: 0.9;  transform: translateX(6px); }
+}
+
 @media (max-width: 720px) {
-  .section-jump,
-  .section-end {
+  .section-jump {
     font-size: 9.5px !important;
+    letter-spacing: 1px !important;
+  }
+  .section-end {
+    font-size: 9px !important;
     letter-spacing: 1px !important;
   }
 }
