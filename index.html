@@ -623,6 +623,7 @@
   if (!isHome || introPlayed) {
     // Skip boot — strip the overlay and the booting class so the site shows normally
     document.body.classList.remove('booting');
+    clearExactHomepageHandoffVars();
     const root = document.getElementById('boot-root');
     if (root) root.remove();
     return;
@@ -1177,6 +1178,34 @@ async function runBootLog() {
 }
 
 // ------------------------------------------------------------
+
+function prepExactHomepageHandoff() {
+  const body = document.body;
+  const liveTerminal = document.querySelector('.terminal.main');
+  const liveTitle = document.querySelector('.terminal.main .terminal-bar');
+  if (!liveTerminal) return;
+
+  // Reveal the actual homepage shell underneath the boot animation, then
+  // measure the live terminal so the boot terminal can land in exactly the
+  // same rectangle on desktop and mobile.
+  body.classList.add('handoff-ready');
+
+  requestAnimationFrame(() => {
+    const rect = liveTerminal.getBoundingClientRect();
+    const titleRect = liveTitle ? liveTitle.getBoundingClientRect() : null;
+    body.style.setProperty('--boot-term-final-left', rect.left + 'px');
+    body.style.setProperty('--boot-term-final-top', rect.top + 'px');
+    body.style.setProperty('--boot-term-final-width', rect.width + 'px');
+    body.style.setProperty('--boot-term-final-height', rect.height + 'px');
+    body.style.setProperty('--boot-title-height', (titleRect ? titleRect.height : 39) + 'px');
+  });
+}
+
+function clearExactHomepageHandoffVars() {
+  document.body.classList.remove('handoff-ready');
+  ['--boot-term-final-left','--boot-term-final-top','--boot-term-final-width','--boot-term-final-height','--boot-title-height'].forEach(v => document.body.style.removeProperty(v));
+}
+
 async function runSequence() {
   aborted = false;
 
@@ -1275,6 +1304,7 @@ async function runSequence() {
       document.body.style.setProperty('--boot-origin-x', cx + 'px');
       document.body.style.setProperty('--boot-origin-y', cy + 'px');
     } catch (e) { /* fall through to default 50%/50% */ }
+    prepExactHomepageHandoff();
   }, T.iconClick);
 
   // PHASE 7a: icon IMPLODES into a glowing spark. The .clicked recoil
@@ -1296,7 +1326,8 @@ async function runSequence() {
   //  - HUD corner brackets snap in at settle
   schedule(() => {
     sndElfImpact();
-    termWindow.classList.add('opening');
+    prepExactHomepageHandoff();
+    requestAnimationFrame(() => termWindow.classList.add('opening'));
     pointer.classList.remove('visible');
     // hide the desktop chrome so it doesn't sit behind the terminal during
     // the open — the boot-term-window covers the icon region and the desktop
@@ -1375,6 +1406,7 @@ function resetSequence() {
   pointer.style.cssText = '';
   termWindow.classList.remove('opening');
   termWindow.style.cssText = '';
+  clearExactHomepageHandoffVars();
 
   // re-trigger the CSS animation for power-on
   const newPower = crtPower.cloneNode(true);

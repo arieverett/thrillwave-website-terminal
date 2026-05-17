@@ -10,6 +10,19 @@ body.booting > main.content {
   pointer-events: none;
 }
 
+/* Final handoff: reveal the real homepage shell under the opening layer.
+   This makes the border, top controls, terminal, and footer/contact row
+   already sit in their exact final positions before the boot overlay exits. */
+body.booting.handoff-ready > .frame,
+body.booting.handoff-ready > main.content {
+  opacity: 1;
+  pointer-events: none;
+}
+
+body.booting.handoff-ready > main.content {
+  z-index: 2;
+}
+
 /* The boot's own term-window animation ends at 560x700 to exactly match
    the site's terminal. Once boot ends and the site shows, both terminals
    visually align — no jump. */
@@ -3696,5 +3709,115 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     padding: 9px 12px !important;
     font-size: 9.8px !important;
     letter-spacing: 1.05px !important;
+  }
+}
+
+
+/* ============================================================
+   EXACT HOMEPAGE HANDOFF PATCH
+   The opening terminal now lands on the measured live .terminal.main rect,
+   while the real homepage shell is visible underneath. This removes the
+   small vertical jump between the opening layer and the static homepage.
+   ============================================================ */
+body.booting.handoff-ready .desktop.consumed,
+body.booting.handoff-ready #boot-root.clean-desktop .boot-frame.expanded {
+  opacity: 0 !important;
+  transition: opacity 120ms ease;
+}
+
+body.booting.handoff-ready .boot-term-window {
+  z-index: 42;
+}
+
+body.booting.handoff-ready > .frame {
+  z-index: 35;
+}
+
+/* Override the previous approximation-based launch. JS supplies exact px
+   values for the live terminal's left/top/width/height. */
+body.booting.handoff-ready .boot-term-window.opening {
+  animation: tw-exact-homepage-terminal-launch 0.62s cubic-bezier(0.18, 0.86, 0.22, 1) forwards !important;
+  transform: none !important;
+}
+
+@keyframes tw-exact-homepage-terminal-launch {
+  0% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 54px;
+    height: 2px;
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: 0 0 0 rgba(93,208,104,0);
+  }
+  10% {
+    left: var(--boot-origin-x, 50%);
+    top: var(--boot-origin-y, 50%);
+    transform: translate(-50%, -50%);
+    width: 90px;
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(93,208,104,0.75), 0 0 58px rgba(93,208,104,0.32);
+  }
+  34% {
+    left: var(--boot-term-final-left, 50%);
+    top: var(--boot-term-final-top, calc(50% - var(--term-h) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w));
+    height: 2px;
+    opacity: 1;
+    border-color: var(--accent);
+    box-shadow: 0 0 24px rgba(93,208,104,0.62), 0 0 48px rgba(93,208,104,0.24);
+  }
+  48% {
+    left: var(--boot-term-final-left, 50%);
+    top: var(--boot-term-final-top, calc(50% - var(--term-h) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w));
+    height: var(--boot-title-height, 39px);
+    opacity: 1;
+    border-color: rgba(93,208,104,0.5);
+    box-shadow: 0 0 18px rgba(93,208,104,0.32);
+  }
+  88% {
+    left: var(--boot-term-final-left, 50%);
+    top: var(--boot-term-final-top, calc(50% - var(--term-h) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w));
+    height: var(--boot-term-final-height, var(--term-h));
+    opacity: 1;
+    border-color: rgba(93,208,104,0.2);
+    box-shadow: 0 0 14px rgba(93,208,104,0.12);
+  }
+  100% {
+    left: var(--boot-term-final-left, 50%);
+    top: var(--boot-term-final-top, calc(50% - var(--term-h) / 2));
+    transform: none;
+    width: var(--boot-term-final-width, var(--term-w));
+    height: var(--boot-term-final-height, var(--term-h));
+    opacity: 0;
+    border-color: var(--terminal-rule);
+    box-shadow: none;
+  }
+}
+
+/* The measured handoff uses the real terminal behind it, so any extra HUD
+   ornaments on the boot terminal are removed to prevent a visible mismatch. */
+body.booting.handoff-ready .hud-bracket,
+body.booting.handoff-ready .boot-term-scan {
+  display: none !important;
+}
+
+body.booting.handoff-ready .boot-term-inner .boot-term-title {
+  height: var(--boot-title-height, 39px) !important;
+  min-height: var(--boot-title-height, 39px) !important;
+  padding: 11px 16px !important;
+}
+
+@media (max-width: 720px) {
+  body.booting.handoff-ready .boot-term-inner .boot-term-title {
+    padding: 9px 12px !important;
   }
 }
