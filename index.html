@@ -849,11 +849,23 @@ async function runSequence() {
       robotRock.volume = 0.4;
       robotRock.muted = false;
       robotRock.dataset.primed = '0';
-      // Commit to music-on state only at the .elf launch. This keeps the
-      // welcome gate silent and makes the music feel tied to the OS opening.
-      sessionStorage.setItem('tw_music_on', '1');
-      robotRock.play().catch(e => console.warn('robot rock play blocked:', e));
-      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      // Commit to music-on state only after the .elf launch actually starts playback.
+      // This prevents the button from showing pause when iOS has the element in
+      // a weird allowed-but-silent state.
+      const p = robotRock.play();
+      if (p && p.then) {
+        p.then(() => {
+          sessionStorage.setItem('tw_music_on', '1');
+          window.dispatchEvent(new CustomEvent('tw:music-sync'));
+        }).catch(e => {
+          console.warn('robot rock play blocked:', e);
+          sessionStorage.removeItem('tw_music_on');
+          window.dispatchEvent(new CustomEvent('tw:music-sync'));
+        });
+      } else {
+        sessionStorage.setItem('tw_music_on', '1');
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      }
     }
   }, T.iconClick);
 
@@ -1139,6 +1151,18 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   function startViz() {
+    // Mobile Safari is touchy with Web Audio + media elements.
+    // If we create a MediaElementSource during the timed .elf launch,
+    // the audio can route into a suspended AudioContext: the button says
+    // pause, the timeline moves, but no sound comes out.
+    // On mobile, skip the analyser entirely and let the <audio> element
+    // play directly. The visualizer is cosmetic; reliable music matters more.
+    const mobileAudio = window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches;
+    if (mobileAudio) {
+      if (audioViz) audioViz.classList.toggle('active', !bgAudio.paused && !bgAudio.muted && bgAudio.volume > 0);
+      return;
+    }
+
     // During the iPhone unlock prime, the media element briefly plays muted.
     // Do not connect the analyser/audio graph then, or the song can leak
     // through before the .elf click.

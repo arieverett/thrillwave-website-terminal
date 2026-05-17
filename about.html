@@ -269,6 +269,11 @@
   }
 
   function startViz() {
+    const mobileAudio = window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches;
+    if (mobileAudio) {
+      if (audioViz) audioViz.classList.toggle('active', !bgAudio.paused && !bgAudio.muted && bgAudio.volume > 0);
+      return;
+    }
     if (!ensureAudioCtx()) return;
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
     if (audioViz) audioViz.classList.add('active');
