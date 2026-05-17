@@ -701,6 +701,20 @@ async function initAudio() {
       volume: -38
     }).toDestination();
 
+    // 10) Whir — BIOS→desktop transition sound. AMSynth with high
+    //     harmonicity + square modulator gives a metallic spinning
+    //     texture. The frequency ramps up over ~180ms to read as a
+    //     motor spinning up. Distinct from both the white-flash beep
+    //     and any other sound in the boot.
+    SND.whir = new Tone.AMSynth({
+      harmonicity: 6,
+      oscillator: { type: 'sawtooth' },
+      modulation: { type: 'square' },
+      modulationEnvelope: { attack: 0.005, decay: 0.12, sustain: 0.6, release: 0.06 },
+      envelope: { attack: 0.005, decay: 0.18, sustain: 0, release: 0.06 },
+      volume: -16
+    }).toDestination();
+
     audioReady = true;
   } catch (e) {
     console.warn('audio init error:', e);
@@ -715,6 +729,21 @@ function sndBeep() {
   safe(() => {
     const now = Tone.now();
     SND.beep.start(now).stop(now + 0.07);
+  });
+}
+
+// Whir — BIOS→desktop transition. AMSynth note with frequency ramped
+// from ~220Hz up to ~720Hz over 180ms. The amplitude-modulation gives
+// the metallic spinning quality; the rising contour reads as "motor
+// powering up". Replaces the prior sndBeep call so it's distinct from
+// the white CRT power-on flash.
+function sndWhir() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.whir.frequency.setValueAtTime(220, now);
+    SND.whir.frequency.exponentialRampToValueAtTime(720, now + 0.16);
+    SND.whir.triggerAttackRelease(220, 0.2, now);
   });
 }
 
@@ -1122,7 +1151,7 @@ async function runSequence() {
       void greenFlash.offsetWidth;
       greenFlash.classList.add('fire');
     }
-    sndBeep();
+    sndWhir();
     // cool the border back to gray after expansion settles
     setTimeout(() => frame.classList.add('cool'), 600);
   }, T.frameRexpand);
@@ -1827,9 +1856,14 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
             sessionStorage.setItem('tw_typing_done', '1');
             window.twIntroRunning = false;
             document.body.classList.remove('home-intro-running');
+            // 2850ms wait before flipping the gate that reveals the
+            // first section-jump arrow. The original 850ms was felt by
+            // the user as too soon — extending by 2s gives the typing
+            // landing a longer beat to breathe before the "scroll down"
+            // hint shows up.
             setTimeout(() => {
               document.body.classList.add('home-intro-complete');
-            }, 850);
+            }, 2850);
           });
         }, 700);
       });
