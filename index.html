@@ -597,11 +597,19 @@ async function initAudio() {
       volume: -16
     }).toDestination();
 
-    // 4) Launch sound — bright UI click for the thrill_wave.elf launch
-    //   Two quick ascending blips: clean "click + launch" feel.
-    SND.launch = new Tone.Synth({
-      oscillator: { type: 'square' },
-      envelope: { attack: 0.002, decay: 0.05, sustain: 0, release: 0.04 },
+    // 4) Elf impact — replaces the bright two-note "launch" blip with a
+    //   tough, gritty, deep impact. A MembraneSynth pitch-drop layered
+    //   with a pink-noise burst gives a hard "thunk-grit" hit.
+    SND.elfImpact = new Tone.MembraneSynth({
+      pitchDecay: 0.02,
+      octaves: 5,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.001, decay: 0.22, sustain: 0, release: 0.12 },
+      volume: -8
+    }).toDestination();
+    SND.elfGrit = new Tone.NoiseSynth({
+      noise: { type: 'pink' },
+      envelope: { attack: 0.001, decay: 0.08, sustain: 0, release: 0.04 },
       volume: -14
     }).toDestination();
 
@@ -613,19 +621,67 @@ async function initAudio() {
       volume: -24
     }).toDestination();
 
-    // 6) CRT ignite — unique sound for the BIOS→desktop frame ignition.
-    //    A descending sawtooth sweep (power surge whoosh) paired with a
-    //    short noise pop at the start (filament snap). Distinct from the
-    //    beep, click, and launch sounds.
-    SND.igniteTone = new Tone.Synth({
+    // 6) Sweep — pink-noise pop layered with a descending sawtooth.
+    //    Originally written for BIOS→desktop ignition; now used for the
+    //    desktop→terminal scanline sweep (downward sweep tone matches the
+    //    top-to-bottom bar motion).
+    SND.sweepTone = new Tone.Synth({
       oscillator: { type: 'sawtooth' },
       envelope: { attack: 0.004, decay: 0.22, sustain: 0, release: 0.06 },
       volume: -18
     }).toDestination();
-    SND.ignitePop = new Tone.NoiseSynth({
+    SND.sweepPop = new Tone.NoiseSynth({
       noise: { type: 'pink' },
       envelope: { attack: 0.001, decay: 0.05, sustain: 0, release: 0.02 },
       volume: -18
+    }).toDestination();
+
+    // 7) Welcome-gate click — fuller white-noise burst with a brief
+    //    high-pitch click overlay. "Pop" feel, distinct from the per-
+    //    keystroke type-click.
+    SND.startClick = new Tone.NoiseSynth({
+      noise: { type: 'white' },
+      envelope: { attack: 0.001, decay: 0.04, sustain: 0, release: 0.02 },
+      volume: -12
+    }).toDestination();
+    SND.startClickTone = new Tone.Synth({
+      oscillator: { type: 'square' },
+      envelope: { attack: 0.001, decay: 0.03, sustain: 0, release: 0.02 },
+      volume: -16
+    }).toDestination();
+
+    // 8) Machine power-on — "turning on" sound played just after the
+    //    welcome click. Low membrane thump + filtered noise spin-up.
+    SND.machineThump = new Tone.MembraneSynth({
+      pitchDecay: 0.08,
+      octaves: 3,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.005, decay: 0.5, sustain: 0, release: 0.3 },
+      volume: -12
+    }).toDestination();
+    SND.machineHiss = new Tone.NoiseSynth({
+      noise: { type: 'brown' },
+      envelope: { attack: 0.08, decay: 0.6, sustain: 0, release: 0.25 },
+      volume: -22
+    }).toDestination();
+
+    // 9) Low background hum — runs continuously from welcome-click until
+    //    the music kicks in. FatOscillator at sub-bass frequency with a
+    //    second detuned voice for movement. Very low volume so it sits
+    //    under everything as a "machine is on" undercurrent.
+    SND.hum = new Tone.FatOscillator({
+      frequency: 58,
+      type: 'sine',
+      spread: 6,
+      count: 3,
+      volume: -30
+    }).toDestination();
+    SND.humHi = new Tone.FatOscillator({
+      frequency: 116,
+      type: 'sine',
+      spread: 4,
+      count: 2,
+      volume: -38
     }).toDestination();
 
     audioReady = true;
@@ -678,27 +734,91 @@ function sndPadOff() {
 }
 
 function sndLaunch() {
+  // Legacy name retained as a no-op alias — the elf click now uses
+  // sndElfImpact. Anything else calling sndLaunch falls through silently.
+  sndElfImpact();
+}
+
+// Elf impact — tough, gritty, deep. Replaces the old two-note "launch" blip.
+// Sub-bass thunk (membrane pitch drop from C2) layered with a pink-noise
+// grit burst. Lands like a hard mechanical hit, not a pac-man pickup.
+function sndElfImpact() {
   if (!audioReady) return;
   safe(() => {
     const now = Tone.now();
-    // crisp two-note ascending blip — sounds like "click + go"
-    SND.launch.triggerAttackRelease('E5', 0.04, now);
-    SND.launch.triggerAttackRelease('A5', 0.05, now + 0.055);
+    SND.elfImpact.triggerAttackRelease('C2', 0.18, now);
+    SND.elfGrit.triggerAttackRelease(0.06, now + 0.005);
   });
 }
 
-// CRT ignite — BIOS→desktop frame ignition. Pink-noise pop layered with
-// a descending sawtooth sweep (~1200Hz → 180Hz). Unique character vs the
-// crisp launch blip and the muted boot beep.
-function sndIgnite() {
+// Sweep — pink-noise pop + descending sawtooth (1100Hz → 160Hz). Used for
+// the desktop→terminal scanline sweep. The downward frequency contour
+// pairs with the bar's top-to-bottom motion.
+function sndSweep() {
   if (!audioReady) return;
   safe(() => {
     const now = Tone.now();
-    SND.ignitePop.triggerAttackRelease(0.04, now);
-    // descending sweep, like a power surge whoosh
-    SND.igniteTone.frequency.setValueAtTime(1100, now);
-    SND.igniteTone.frequency.exponentialRampToValueAtTime(160, now + 0.22);
-    SND.igniteTone.triggerAttackRelease(1100, 0.22, now + 0.01);
+    SND.sweepPop.triggerAttackRelease(0.04, now);
+    SND.sweepTone.frequency.setValueAtTime(1100, now);
+    SND.sweepTone.frequency.exponentialRampToValueAtTime(160, now + 0.22);
+    SND.sweepTone.triggerAttackRelease(1100, 0.22, now + 0.01);
+  });
+}
+
+// Welcome click — fires the instant the user taps "click to start". A
+// fuller pop (white-noise burst + brief high-square chirp) so it reads
+// as a positive button confirmation, not a per-keystroke tick.
+function sndStartClick() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.startClick.triggerAttackRelease(0.03, now);
+    SND.startClickTone.triggerAttackRelease('C6', 0.025, now + 0.002);
+  });
+}
+
+// Machine power-on — fires shortly after sndStartClick. Low sub-bass
+// thump (membrane pitch drop from A1) with a brown-noise spin-up that
+// blooms in over ~600ms. "Turning on" the device.
+function sndMachineOn() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.machineThump.triggerAttackRelease('A1', 0.5, now);
+    SND.machineHiss.triggerAttackRelease(0.7, now + 0.03);
+  });
+}
+
+// Low background hum — fat sub-bass oscillator(s) running continuously
+// underneath the boot until music starts. Adds a "machine is on" presence
+// to the entire pre-music phase.
+let humRunning = false;
+function sndHumOn() {
+  if (!audioReady || humRunning) return;
+  humRunning = true;
+  safe(() => {
+    const now = Tone.now();
+    SND.hum.start(now);
+    SND.humHi.start(now);
+    // Soft fade-in over 400ms so the hum doesn't pop into existence
+    SND.hum.volume.value = -60;
+    SND.humHi.volume.value = -70;
+    SND.hum.volume.rampTo(-30, 0.4);
+    SND.humHi.volume.rampTo(-38, 0.4);
+  });
+}
+
+function sndHumOff() {
+  if (!audioReady || !humRunning) return;
+  humRunning = false;
+  safe(() => {
+    const now = Tone.now();
+    // Soft fade-out so the hum dissolves into the music
+    SND.hum.volume.rampTo(-60, 0.6);
+    SND.humHi.volume.rampTo(-70, 0.6);
+    setTimeout(() => {
+      safe(() => { SND.hum.stop(); SND.humHi.stop(); });
+    }, 700);
   });
 }
 
@@ -972,7 +1092,7 @@ async function runSequence() {
       void greenFlash.offsetWidth;
       greenFlash.classList.add('fire');
     }
-    sndIgnite();
+    sndBeep();
     // cool the border back to gray after expansion settles
     setTimeout(() => frame.classList.add('cool'), 600);
   }, T.frameRexpand);
@@ -1024,15 +1144,17 @@ async function runSequence() {
     desktopIcon.classList.add('imploding');
   }, T.iconImplode);
 
-  // PHASE 7b: small green radial pulse at the impact point. Localized
-  // (positioned at the icon, not full-screen) so it reads as a spark,
-  // not a flashbang.
+  // PHASE 7b: the scanline sweep — a gritty horizontal bar streaks from
+  // top of screen to bottom, reading the new surface as the terminal
+  // materialises behind it. The pop+descending-sawtooth pairs with the
+  // top-to-bottom motion of the bar.
   schedule(() => {
     if (radialFlash) {
       radialFlash.classList.remove('fire');
       void radialFlash.offsetWidth; // restart
       radialFlash.classList.add('fire');
     }
+    sndSweep();
   }, T.radialFlash);
 
   // PHASE 7c: terminal launch. The window animation does the heavy lifting:
@@ -1051,7 +1173,9 @@ async function runSequence() {
 
   // PHASE 7d: start Robot Rock after the terminal reveal is underway.
   // This keeps the .elf click from feeling like it instantly triggers music.
+  // The background hum is faded out here too — the music takes over.
   schedule(() => {
+    sndHumOff();
     if (!robotRock) return;
     const wasPrimed = robotRock.dataset.primed === '1';
     if (wasPrimed || sessionStorage.getItem('tw_music_t') === null) {
@@ -1129,6 +1253,7 @@ function resetSequence() {
 function skipSequence() {
   abortSequence();
   sndPadOff();
+  sndHumOff();
   bootEnded = true;
   // hand straight off to the live site — no partial boot state
   sessionStorage.setItem('tw_intro_played', '1');
@@ -1218,6 +1343,15 @@ async function startEverything() {
   // matching the desktop sequence.
   try { await initAudio(); } catch (e) { console.warn('audio init failed:', e); }
   primeMusicForIOS();
+
+  // Sound stack — fired in the user's click gesture so the audio unlocks
+  // immediately. The click pop sells "I just pressed the button"; the
+  // machine-on hits ~140ms later to sell "now it's powering up"; the low
+  // hum starts underneath everything and runs until music takes over.
+  sndStartClick();
+  sndHumOn();
+  setTimeout(sndMachineOn, 140);
+
   // wait for the gate to fade out before kicking off the boot
   setTimeout(() => runSequence(), 600);
   setTimeout(() => welcomeGate.remove(), 1000);
