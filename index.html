@@ -591,18 +591,35 @@ function isMobileAudioGate() {
 
 function primeMusicForIOS() {
   if (!robotRock || !isMobileAudioGate()) return;
-  // iPhone Safari needs the media element touched during the original tap.
-  // Keep it muted and zero-volume so the music is not heard until .elf opens.
-  if (robotRock.dataset.primed === '1') return;
+  // iPhone Safari needs the media element unlocked during the original tap.
+  // Important: do NOT leave the song playing silently. The visualizer's
+  // Web Audio route can make a muted media element audible on mobile.
+  // So we do a tiny muted play, immediately pause, and reset to 0.
+  if (robotRock.dataset.primed === '1' || robotRock.dataset.priming === '1') return;
   try {
-    robotRock.dataset.primed = '1';
+    robotRock.dataset.priming = '1';
     robotRock.muted = true;
     robotRock.volume = 0;
     robotRock.currentTime = 0;
     const p = robotRock.play();
-    if (p && p.catch) p.catch(() => { robotRock.dataset.primed = '0'; });
+    const finishPrime = () => {
+      try { robotRock.pause(); } catch (e) {}
+      try { robotRock.currentTime = 0; } catch (e) {}
+      robotRock.dataset.primed = '1';
+      robotRock.dataset.priming = '0';
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    };
+    if (p && p.then) {
+      p.then(() => setTimeout(finishPrime, 30)).catch(() => {
+        robotRock.dataset.primed = '0';
+        robotRock.dataset.priming = '0';
+      });
+    } else {
+      setTimeout(finishPrime, 30);
+    }
   } catch (e) {
     robotRock.dataset.primed = '0';
+    robotRock.dataset.priming = '0';
   }
 }
 
@@ -828,6 +845,7 @@ async function runSequence() {
       if (wasPrimed || sessionStorage.getItem('tw_music_t') === null) {
         try { robotRock.currentTime = 0; } catch (e) {}
       }
+      robotRock.dataset.priming = '0';
       robotRock.volume = 0.4;
       robotRock.muted = false;
       robotRock.dataset.primed = '0';
@@ -1059,7 +1077,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   const MUSIC_KEY = 'tw_music_on';
 
   function updateAudioState() {
-    if (bgAudio.paused || bgAudio.muted) {
+    if (bgAudio.paused || bgAudio.muted || bgAudio.volume === 0 || bgAudio.dataset.priming === '1') {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> music';
     } else {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> pause';
@@ -1121,6 +1139,13 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   function startViz() {
+    // During the iPhone unlock prime, the media element briefly plays muted.
+    // Do not connect the analyser/audio graph then, or the song can leak
+    // through before the .elf click.
+    if (bgAudio.dataset.priming === '1' || bgAudio.muted || bgAudio.volume === 0) {
+      stopViz();
+      return;
+    }
     if (!ensureAudioCtx()) return;
     if (_audioCtx.state === 'suspended') _audioCtx.resume();
     if (audioViz) audioViz.classList.add('active');
