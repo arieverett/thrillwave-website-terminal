@@ -155,6 +155,9 @@
   <!-- Green radial flash used after .elf launch -->
   <div class="radial-flash" id="radial-flash"></div>
 
+  <!-- Green screen flash — fires on BIOS→desktop and desktop→terminal -->
+  <div class="green-flash" id="green-flash"></div>
+
   <!-- Tracker line overlay (sweeps occasionally) -->
   <div class="tracker" id="tracker"></div>
 
@@ -681,8 +684,8 @@ const T = {
   bootLogStart: 980,   // first boot line
   bootLogEnd:   6600,  // BIOS log hard-cuts off, frame collapses
   frameRedot:   6720,  // dot re-appears at center for desktop reveal
-  frameRexpand: 7040,  // dot blows out to edges (desktop frame ignites)
-  desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
+  frameRexpand: 7220,  // dot blows out to edges — 500ms of dot flicker before
+  desktopShow:  7480,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
   iconImplode: 8800,  // icon collapses into a spark — 100ms after click
@@ -705,6 +708,7 @@ const pointer     = document.getElementById('pointer');
 const termWindow  = document.getElementById('boot-term-window');
 const glitch      = document.getElementById('glitch-flash');
 const radialFlash = document.getElementById('radial-flash');
+const greenFlash  = document.getElementById('green-flash');
 const tracker     = document.getElementById('tracker');
 const robotRock   = document.getElementById('bg-audio');
 
@@ -924,10 +928,20 @@ async function runSequence() {
     frame.classList.add('dot');
   }, T.frameRedot);
 
-  // PHASE 5c: dot blows up to the screen edges (border = desktop frame)
+  // PHASE 5c: dot blows up to the screen edges (border = desktop frame).
+  // Pair the expansion with a green radial flash from the dot's centre —
+  // the desktop equivalent of the white CRT power-on flash. Reset the
+  // boot-origin vars to dead-centre so the flash radiates from the dot.
   schedule(() => {
     frame.classList.remove('dot');
     frame.classList.add('expanded');
+    document.body.style.setProperty('--boot-origin-x', '50%');
+    document.body.style.setProperty('--boot-origin-y', '50%');
+    if (greenFlash) {
+      greenFlash.classList.remove('fire');
+      void greenFlash.offsetWidth;
+      greenFlash.classList.add('fire');
+    }
     // cool the border back to gray after expansion settles
     setTimeout(() => frame.classList.add('cool'), 600);
   }, T.frameRexpand);
