@@ -4505,3 +4505,125 @@ body.tw-system-wake .below-bar {
 .stat-label {
   position: relative;
 }
+
+
+/* ============================================================
+   TW final animation + prompt-format pass
+   ============================================================ */
+
+/* Scanline: faster, thicker, cleaner green phosphor bar. */
+body.tw-frame-scan::after {
+  height: 18px !important;
+  border-radius: 2px !important;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(255,255,255,0.12) 0 1px,
+      rgba(93,208,104,0.98) 1px 16px,
+      rgba(93,208,104,0.78) 16px 18px
+    ),
+    #5dd068 !important;
+  box-shadow:
+    0 0 16px rgba(93,208,104,0.98),
+    0 0 42px rgba(93,208,104,0.58),
+    0 0 86px rgba(93,208,104,0.22) !important;
+  animation-duration: 0.82s !important;
+  mix-blend-mode: screen;
+}
+
+@media (max-width: 720px) {
+  body.tw-frame-scan::after { height: 16px !important; }
+}
+
+/* Wake glow: a shorter reflection that tracks downward, with light spilling
+   softly onto the black field and catching the metal/tube borders. */
+body.tw-system-wake .content::after {
+  display: block !important;
+  content: '';
+  position: fixed;
+  left: 18px;
+  right: 18px;
+  top: 20px;
+  height: 78px;
+  z-index: 35;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 999px;
+  background: linear-gradient(
+    to bottom,
+    rgba(93,208,104,0) 0%,
+    rgba(93,208,104,0.16) 34%,
+    rgba(190,255,199,0.28) 50%,
+    rgba(93,208,104,0.12) 66%,
+    rgba(93,208,104,0) 100%
+  );
+  filter: blur(12px);
+  mix-blend-mode: screen;
+  animation: tw-tracking-neon-wake 4.8s cubic-bezier(0.16,0.76,0.18,1) both !important;
+}
+
+@keyframes tw-tracking-neon-wake {
+  0%   { opacity: 0; transform: translateY(-120px); }
+  8%   { opacity: 0.78; }
+  44%  { opacity: 0.62; }
+  78%  { opacity: 0.30; }
+  100% { opacity: 0; transform: translateY(calc(100vh - 120px)); }
+}
+
+body.tw-system-wake .frame,
+body.tw-system-wake .terminal.main,
+body.tw-system-wake .audio-btn,
+body.tw-system-wake #menu-btn,
+body.tw-system-wake .audio-viz,
+body.tw-system-wake .below-bar {
+  animation-duration: 4.75s !important;
+}
+
+body.tw-system-wake .frame,
+body.tw-system-wake .terminal.main {
+  box-shadow:
+    0 0 22px rgba(93,208,104,0.16),
+    inset 0 0 18px rgba(93,208,104,0.035);
+}
+
+/* Terminal prompt grammar: every visible prompt marker should be white. */
+.prompt,
+.boot-term-prompt,
+.section-jump,
+.section-end,
+.page-content,
+.cascade-toggle .prompt,
+.power-modal-line .prompt {
+  color: var(--fg) !important;
+}
+
+/* Equalize cascade command spacing so the prompt reads like one terminal line. */
+.cascade-toggle {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0;
+  white-space: normal;
+}
+.cascade-toggle .prompt { margin-right: 1ch; }
+.cascade-toggle .cmd-name { margin-left: 1ch; }
+.cascade-toggle .toggle-mark { margin-left: 1ch; }
+
+/* Kill legacy pseudo-bullets that were adding extra >> spacing. */
+.data-cell p::before,
+.flowline p::before,
+.principle-list p::before,
+.terminal-form p::before,
+.contact-grid em::before,
+.stat-label::before,
+.tile-list li::before {
+  content: none !important;
+}
+
+@media (max-width: 720px) {
+  body.tw-system-wake .content::after {
+    left: 8px;
+    right: 8px;
+    top: 12px;
+    height: 64px;
+  }
+}
