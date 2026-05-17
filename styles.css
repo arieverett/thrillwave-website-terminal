@@ -3476,3 +3476,19 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     padding: 18px 15px 15px;
   }
 }
+
+
+/* === TW power modal body clean-up === */
+.power-modal__eyebrow,
+.power-modal__copy {
+  display: none !important;
+}
+
+.power-modal__body,
+.power-modal__title {
+  color: var(--fg) !important;
+}
+
+.power-modal__title::before {
+  content: none !important;
+}
