@@ -1331,6 +1331,13 @@ async function runSequence() {
     desktop.classList.add('consumed');
     document.getElementById('boot-root')?.classList.add('scan-handoff');
     document.body.classList.add('handoff-show-live');
+    document.body.classList.remove('tw-frame-scan', 'tw-system-wake');
+    void document.body.offsetWidth;
+    document.body.classList.add('tw-frame-scan', 'tw-system-wake');
+    window.clearTimeout(window.twSystemWakeTimer);
+    window.twSystemWakeTimer = window.setTimeout(() => {
+      document.body.classList.remove('tw-frame-scan', 'tw-system-wake');
+    }, 5200);
     if (greenFlash) {
       greenFlash.classList.remove('fire', 'frame-scan');
       void greenFlash.offsetWidth;
@@ -1375,6 +1382,7 @@ async function runSequence() {
     sessionStorage.setItem('tw_intro_played', '1');
     document.body.classList.remove('booting');
     document.body.classList.remove('handoff-show-live');
+    document.body.classList.remove('tw-frame-scan');
     const root = document.getElementById('boot-root');
     if (root) root.remove();
     // hand off to the site's own typing intro
@@ -1410,7 +1418,8 @@ function resetSequence() {
   termWindow.style.cssText = '';
   if (greenFlash) greenFlash.classList.remove('fire', 'frame-scan');
   document.getElementById('boot-root')?.classList.remove('scan-handoff');
-  document.body.classList.remove('handoff-show-live');
+  document.body.classList.remove('handoff-show-live', 'tw-frame-scan', 'tw-system-wake');
+  window.clearTimeout(window.twSystemWakeTimer);
   clearExactHomepageHandoffVars();
 
   // re-trigger the CSS animation for power-on
