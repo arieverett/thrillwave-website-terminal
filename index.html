@@ -2199,5 +2199,79 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 </script>
 
 
+
+
+<script>
+// ============================================================
+// CASCADE HARD RESET — desktop + mobile
+// Removes older stacked listeners by replacing each cascade toggle once, then
+// binds one clean controller. This keeps [+]/[-] reliable across every page.
+// ============================================================
+(function cascadeHardReset(){
+  function resetIframes(cascade, opening){
+    cascade.querySelectorAll('iframe[data-src]').forEach(function(frame){
+      if (opening) {
+        if (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank') {
+          frame.setAttribute('src', frame.dataset.src);
+        }
+      } else if (cascade.classList.contains('work-cascade')) {
+        frame.setAttribute('src', 'about:blank');
+      }
+    });
+  }
+
+  function closeOtherWorkCascades(current){
+    if (!current.classList.contains('work-cascade')) return;
+    document.querySelectorAll('.work-cascade[data-expanded="true"]').forEach(function(other){
+      if (other === current) return;
+      other.dataset.expanded = 'false';
+      var otherToggle = other.querySelector('.cascade-toggle');
+      if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+      other.querySelectorAll('iframe[data-src]').forEach(function(frame){ frame.setAttribute('src', 'about:blank'); });
+    });
+  }
+
+  function toggleCascade(toggle){
+    var cascade = toggle && toggle.closest ? toggle.closest('.cascade') : null;
+    if (!cascade) return;
+    var opening = cascade.dataset.expanded !== 'true';
+    if (opening) closeOtherWorkCascades(cascade);
+    cascade.dataset.expanded = opening ? 'true' : 'false';
+    toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+    resetIframes(cascade, opening);
+  }
+
+  function bindCleanToggles(){
+    document.querySelectorAll('.cascade-toggle').forEach(function(toggle){
+      if (toggle.dataset.cleanCascadeBound === '1') return;
+      var clean = toggle.cloneNode(true);
+      clean.dataset.cleanCascadeBound = '1';
+      clean.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        toggleCascade(clean);
+      });
+      clean.addEventListener('keydown', function(e){
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+          toggleCascade(clean);
+        }
+      });
+      toggle.replaceWith(clean);
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bindCleanToggles);
+  } else {
+    bindCleanToggles();
+  }
+  window.twBindCleanCascades = bindCleanToggles;
+})();
+</script>
+
 </body>
 </html>

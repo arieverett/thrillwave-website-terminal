@@ -2494,3 +2494,40 @@ body:not(.home-intro-complete) #hero > .section-jump {
 body.home-intro-complete #hero > .section-jump {
   visibility: visible;
 }
+
+
+/* === TW animation/cascade repair pass === */
+/* Let the first homepage section cue wait until the lander finishes, then fade in gently. */
+#hero > .section-jump {
+  transition: opacity 680ms ease 950ms, color 140ms ease !important;
+}
+body.home-intro-running #hero > .section-jump,
+body:not(.home-intro-complete) #hero > .section-jump {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition-delay: 0ms !important;
+}
+body.home-intro-complete #hero > .section-jump {
+  visibility: visible !important;
+  opacity: 0.9 !important;
+  pointer-events: auto !important;
+}
+body.home-intro-complete #hero > .section-jump:hover,
+body.home-intro-complete #hero > .section-jump:focus-visible {
+  color: var(--accent) !important;
+  opacity: 1 !important;
+}
+
+/* Mobile intro cascade spacing: keep terminal wording readable on small screens. */
+@media (max-width: 720px) {
+  .intro-cascade .cascade-toggle {
+    gap: 0.42em !important;
+  }
+  .intro-cascade .cascade-toggle .prompt {
+    margin-right: 0.18em !important;
+  }
+  .intro-cascade .cascade-toggle .cmd-name {
+    margin-left: 0.18em !important;
+  }
+}
