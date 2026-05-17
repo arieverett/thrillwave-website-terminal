@@ -150,9 +150,9 @@
 
           <section id="what_we_do" class="page reveal">
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">01</span><span class="hdr-slash"> // </span><span class="hdr-name">what_we_do</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="page-content">&gt; we make content from beginning to end, and every
-&gt; project begins with a <a href="sitrep.html" class="cta-link">sitrep &rarr;</a> so we know exactly
-&gt; what story to tell before a camera ever turns on.
+            <div class="page-content">&gt; we make content end to end. every project begins
+&gt; with a <a href="sitrep.html" class="cta-link">sitrep &rarr;</a>, so we know the story before
+&gt; a camera ever turns on.
 &gt;
 &gt; ▸ <span class="accent">strategy &amp; intelligence</span> <span class="dim">────────────────────</span>
 &gt;   sitrep · audience research · messaging
@@ -170,11 +170,10 @@
 
           <section id="sitrep" class="page reveal">
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02</span><span class="hdr-slash"> // </span><span class="hdr-name">sitrep</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="page-content">&gt; sitrep is our in-house intelligence and research
-&gt; platform. it studies your brand, your competitors,
-&gt; and your category at depth &mdash; pulling signal from
-&gt; millions of insights, not a handful of opinions &mdash;
-&gt; so we know the best possible story to tell, and why.</div>
+            <div class="page-content">&gt; sitrep is our in-house intelligence platform.
+&gt; it studies your brand, competitors, and category &mdash;
+&gt; pulling signal from millions of insights, not opinions &mdash;
+&gt; so we know the best story to tell, and why.</div>
 
             <div class="triptych">
               <div class="tile">
@@ -378,18 +377,14 @@
       <a href="mailto:hi@thrillwave.com">hi@thrillwave.com</a>
       <span class="sep">&middot;</span>
       <a href="tel:+14807669585">480.766.9585</a>
-      <span class="sep social-sep">&middot;</span><span class="mobile-break" aria-hidden="true"></span>
+      <span class="sep social-sep">&middot;</span>
       <a href="https://www.instagram.com/thrillwave_" target="_blank" rel="noopener">insta</a>
       <span class="sep">&middot;</span>
       <a href="https://vimeo.com/thrillwave" target="_blank" rel="noopener">vimeo</a>
       <span class="sep">&middot;</span>
       <a href="https://x.com/thrillwave_" target="_blank" rel="noopener">x</a>
       <span class="sep">&middot;</span>
-      <a href="https://www.tiktok.com/@thrillwave_" target="_blank" rel="noopener">tiktok</a>
-      <span class="sep">&middot;</span>
       <a href="https://www.linkedin.com/company/thrillwave" target="_blank" rel="noopener">linkedin</a>
-      <span class="sep">&middot;</span>
-      <a href="#" target="_blank" rel="noopener">fb</a>
     
     </div>
 
@@ -957,30 +952,14 @@ async function runWelcomeTyping() {
 
 // typing is kicked off below, after sessionStorage check
 
-function primeRobotRockForMobile() {
-  if (!robotRock) return;
-  try {
-    // iOS/Safari needs the media element started directly inside the user's tap.
-    // Keep it silent until the animated .elf click, then unmute there.
-    robotRock.currentTime = 0;
-    robotRock.volume = 0.4;
-    robotRock.muted = true;
-    const p = robotRock.play();
-    if (p && typeof p.catch === 'function') p.catch(e => console.warn('robot rock prime blocked:', e));
-  } catch (e) {
-    console.warn('robot rock prime error:', e);
-  }
-}
-
 async function startEverything() {
   welcomeTypingAborted = true;
   welcomeGate.classList.add('gone');
-  // Prime the real soundtrack during the user's tap so mobile Safari allows it.
-  // It stays muted until the desktop launches thrill_wave.elf.
-  primeRobotRockForMobile();
-  // The welcome click unlocks boot sound only. Background music becomes audible later,
-  // exactly when the desktop launches thrill_wave.elf.
-  // unlock audio (may fail silently if blocked)
+  // The welcome click unlocks boot sound only.
+  // Do NOT start or prime the background track here — on mobile that can leak
+  // through the visualizer/audio graph and make the song feel like it starts twice.
+  // Background music becomes audible only at the animated thrill_wave.elf click,
+  // matching the desktop sequence.
   try { await initAudio(); } catch (e) { console.warn('audio init failed:', e); }
   // wait for the gate to fade out before kicking off the boot
   setTimeout(() => runSequence(), 600);
@@ -1848,6 +1827,84 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   initSectionIndicators();
   initHashSync();
   updateMusicButton();
+})();
+</script>
+
+<script>
+// ============================================================
+// MOBILE FINAL PASS
+// - cascade toggles use one delegated controller on touch/click
+// - menu closes as soon as a page link is chosen
+// ============================================================
+(function mobileFinalPass(){
+  const isMobile = () => window.matchMedia('(max-width: 720px)').matches;
+
+  function closeMenu(){
+    const body = document.body;
+    const menuBtn = document.getElementById('menu-btn');
+    const sideMenu = document.getElementById('side-menu');
+    body.classList.remove('menu-open');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.textContent = 'menu';
+      menuBtn.classList.remove('active');
+    }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden','true');
+  }
+
+  function toggleCascade(toggle){
+    const c = toggle && toggle.closest('.cascade');
+    if (!c) return;
+    const opening = c.dataset.expanded !== 'true';
+
+    if (opening && c.classList.contains('work-cascade')) {
+      document.querySelectorAll('.work-cascade[data-expanded="true"]').forEach(other => {
+        if (other === c) return;
+        other.dataset.expanded = 'false';
+        const t = other.querySelector('.cascade-toggle');
+        if (t) t.setAttribute('aria-expanded','false');
+        other.querySelectorAll('iframe[data-src]').forEach(frame => frame.setAttribute('src','about:blank'));
+      });
+    }
+
+    c.dataset.expanded = opening ? 'true' : 'false';
+    toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
+
+    c.querySelectorAll('iframe[data-src]').forEach(frame => {
+      if (opening) {
+        if (frame.getAttribute('src') === 'about:blank') frame.setAttribute('src', frame.dataset.src);
+      } else if (c.classList.contains('work-cascade')) {
+        frame.setAttribute('src','about:blank');
+      }
+    });
+  }
+
+  // Capture first on mobile so older duplicate cascade listeners cannot double-toggle.
+  document.addEventListener('click', function(e){
+    if (!isMobile()) return;
+    const toggle = e.target.closest('.cascade-toggle');
+    if (toggle) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      toggleCascade(toggle);
+      return;
+    }
+
+    const menuLink = e.target.closest('#side-menu a.menu-item');
+    if (menuLink) {
+      closeMenu();
+    }
+  }, true);
+
+  document.addEventListener('keydown', function(e){
+    if (!isMobile()) return;
+    const toggle = e.target.closest && e.target.closest('.cascade-toggle');
+    if (toggle && (e.key === 'Enter' || e.key === ' ')) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      toggleCascade(toggle);
+    }
+  }, true);
 })();
 </script>
 
