@@ -585,6 +585,27 @@ const glitch      = document.getElementById('glitch-flash');
 const tracker     = document.getElementById('tracker');
 const robotRock   = document.getElementById('bg-audio');
 
+function isMobileAudioGate() {
+  return window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches;
+}
+
+function primeMusicForIOS() {
+  if (!robotRock || !isMobileAudioGate()) return;
+  // iPhone Safari needs the media element touched during the original tap.
+  // Keep it muted and zero-volume so the music is not heard until .elf opens.
+  if (robotRock.dataset.primed === '1') return;
+  try {
+    robotRock.dataset.primed = '1';
+    robotRock.muted = true;
+    robotRock.volume = 0;
+    robotRock.currentTime = 0;
+    const p = robotRock.play();
+    if (p && p.catch) p.catch(() => { robotRock.dataset.primed = '0'; });
+  } catch (e) {
+    robotRock.dataset.primed = '0';
+  }
+}
+
 // --- boot log lines ---
 // each line can be: [type, content, delayAfter (ms)]
 // types: 'instant' | 'progress' | 'plain'
@@ -801,17 +822,19 @@ async function runSequence() {
     // If music was already restored from a previous page navigation
     // (it's playing or about to play), don't reset it.
     if (robotRock) {
+      const wasPrimed = robotRock.dataset.primed === '1';
+      // If mobile primed the track silently at the first tap, rewind here so
+      // the audible music still begins exactly at the .elf click.
+      if (wasPrimed || sessionStorage.getItem('tw_music_t') === null) {
+        try { robotRock.currentTime = 0; } catch (e) {}
+      }
       robotRock.volume = 0.4;
       robotRock.muted = false;
+      robotRock.dataset.primed = '0';
       // Commit to music-on state only at the .elf launch. This keeps the
       // welcome gate silent and makes the music feel tied to the OS opening.
       sessionStorage.setItem('tw_music_on', '1');
-      if (robotRock.paused) {
-        if (sessionStorage.getItem('tw_music_t') === null) {
-          try { robotRock.currentTime = 0; } catch (e) {}
-        }
-        robotRock.play().catch(e => console.warn('robot rock play blocked:', e));
-      }
+      robotRock.play().catch(e => console.warn('robot rock play blocked:', e));
       window.dispatchEvent(new CustomEvent('tw:music-sync'));
     }
   }, T.iconClick);
@@ -961,6 +984,7 @@ async function startEverything() {
   // Background music becomes audible only at the animated thrill_wave.elf click,
   // matching the desktop sequence.
   try { await initAudio(); } catch (e) { console.warn('audio init failed:', e); }
+  primeMusicForIOS();
   // wait for the gate to fade out before kicking off the boot
   setTimeout(() => runSequence(), 600);
   setTimeout(() => welcomeGate.remove(), 1000);
@@ -1612,11 +1636,12 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function updateMusicButton() {
     if (!bgAudio || !audioToggleBtn) return;
-    audioToggleBtn.innerHTML = bgAudio.paused
-      ? '<span class="audio-glyph">▶</span> music'
-      : '<span class="audio-glyph">⏸</span> pause';
-    if (audioViz) audioViz.classList.toggle('active', !(bgAudio.paused || bgAudio.muted));
-    if ((bgAudio.paused || bgAudio.muted) && vizBars.length) vizBars.forEach(b => b.style.height = '2px');
+    const effectivelyPlaying = !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0);
+    audioToggleBtn.innerHTML = effectivelyPlaying
+      ? '<span class="audio-glyph">⏸</span> pause'
+      : '<span class="audio-glyph">▶</span> music';
+    if (audioViz) audioViz.classList.toggle('active', effectivelyPlaying);
+    if (!effectivelyPlaying && vizBars.length) vizBars.forEach(b => b.style.height = '2px');
   }
   window.addEventListener('tw:music-sync', updateMusicButton);
   if (bgAudio) {
@@ -1774,6 +1799,24 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   document.addEventListener('click', e => {
+    const menuLink = e.target.closest('#side-menu a.menu-item');
+    if (menuLink) {
+      const href = menuLink.getAttribute('href');
+      if (href) {
+        const u = new URL(href, location.href);
+        if (u.origin === location.origin) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          setMenu(false);
+          loadPage(u.href).catch(err => {
+            console.warn('menu navigation failed, falling back:', err);
+            location.href = href;
+          });
+          return;
+        }
+      }
+    }
+
     const a = e.target.closest('a');
     if (!a) return;
     const href = a.getAttribute('href');
