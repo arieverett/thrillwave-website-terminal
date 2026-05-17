@@ -665,8 +665,9 @@ const T = {
   desktopShow:  7450,  // desktop UI appears once frame is set (hard cut)
   pointerMove:  7900,  // pointer appears and moves to icon
   iconClick:    8700,  // pointer clicks the thrill_wave.elf icon
-  termOpen:     9700,  // terminal window opens after a longer launch beat
-  done:         11000  // sequence complete
+  termOpen:     9700,  // terminal window begins after a longer launch beat
+  musicStart:   10150, // Robot Rock starts after the terminal reveal has begun
+  done:         11150  // sequence complete
 };
 
 // --- references ---
@@ -929,43 +930,13 @@ async function runSequence() {
     }, 80);
   }, T.pointerMove);
 
-  // PHASE 7: click animation + Robot Rock starts
+  // PHASE 7: click animation only. Do not start music here.
+  // The launch should breathe for a beat first, then the window reveal and
+  // music hit together like an app opening.
   schedule(() => {
     desktopIcon.classList.add('clicked');
     setTimeout(() => desktopIcon.classList.remove('clicked'), 140);
     sndLaunch();
-    // start Robot Rock — the music kicks in as the terminal app opens.
-    // If music was already restored from a previous page navigation
-    // (it's playing or about to play), don't reset it.
-    if (robotRock) {
-      const wasPrimed = robotRock.dataset.primed === '1';
-      // If mobile primed the track silently at the first tap, rewind here so
-      // the audible music still begins exactly at the .elf click.
-      if (wasPrimed || sessionStorage.getItem('tw_music_t') === null) {
-        try { robotRock.currentTime = 0; } catch (e) {}
-      }
-      robotRock.dataset.priming = '0';
-      robotRock.volume = 0.4;
-      robotRock.muted = false;
-      robotRock.dataset.primed = '0';
-      // Commit to music-on state only after the .elf launch actually starts playback.
-      // This prevents the button from showing pause when iOS has the element in
-      // a weird allowed-but-silent state.
-      const p = robotRock.play();
-      if (p && p.then) {
-        p.then(() => {
-          sessionStorage.setItem('tw_music_on', '1');
-          window.dispatchEvent(new CustomEvent('tw:music-sync'));
-        }).catch(e => {
-          console.warn('robot rock play blocked:', e);
-          sessionStorage.removeItem('tw_music_on');
-          window.dispatchEvent(new CustomEvent('tw:music-sync'));
-        });
-      } else {
-        sessionStorage.setItem('tw_music_on', '1');
-        window.dispatchEvent(new CustomEvent('tw:music-sync'));
-      }
-    }
   }, T.iconClick);
 
   // PHASE 7b: terminal opens (the terminal-open animation itself is fine —
@@ -977,6 +948,34 @@ async function runSequence() {
     termWindow.classList.add('opening');
     pointer.classList.remove('visible');
   }, T.termOpen);
+
+  // PHASE 7c: start Robot Rock after the terminal reveal is underway.
+  // This keeps the .elf click from feeling like it instantly triggers music.
+  schedule(() => {
+    if (!robotRock) return;
+    const wasPrimed = robotRock.dataset.primed === '1';
+    if (wasPrimed || sessionStorage.getItem('tw_music_t') === null) {
+      try { robotRock.currentTime = 0; } catch (e) {}
+    }
+    robotRock.dataset.priming = '0';
+    robotRock.volume = 0.4;
+    robotRock.muted = false;
+    robotRock.dataset.primed = '0';
+    const p = robotRock.play();
+    if (p && p.then) {
+      p.then(() => {
+        sessionStorage.setItem('tw_music_on', '1');
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      }).catch(e => {
+        console.warn('robot rock play blocked:', e);
+        sessionStorage.removeItem('tw_music_on');
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      });
+    } else {
+      sessionStorage.setItem('tw_music_on', '1');
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    }
+  }, T.musicStart);
 
   // PHASE 8: boot is done — swap from boot overlay to live site.
   // The boot term-window is now at full size (560x700) matching the site's

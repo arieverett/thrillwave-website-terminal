@@ -534,8 +534,8 @@ html, body {
   box-shadow: 0 0 40px rgba(93,208,104,0.1);
 }
 
- .boot-term-window.opening {
-  animation: term-open 0.68s cubic-bezier(0.18, 0.86, 0.18, 1) forwards;
+.boot-term-window.opening {
+  animation: term-open 0.58s cubic-bezier(0.16, 0.88, 0.18, 1) forwards;
 }
 
 .boot-term-window::before {
@@ -568,7 +568,7 @@ html, body {
 
 .boot-term-window.opening::before,
 .boot-term-window.opening::after {
-  animation: boot-chrome-in 0.68s ease forwards;
+  animation: boot-chrome-in 0.58s ease forwards;
 }
 
 @keyframes boot-chrome-in {
@@ -580,20 +580,20 @@ html, body {
   0% {
     top: var(--boot-origin-y, 50%);
     left: var(--boot-origin-x, 50%);
-    width: 48px;
-    height: 26px;
+    width: 34px;
+    height: 24px;
     opacity: 0;
-    transform: translate(-50%, -50%) scaleX(0.36) scaleY(0.72);
+    transform: translate(-50%, -50%) scale(0.72);
     box-shadow: 0 0 0 rgba(93,208,104,0);
   }
-  14% {
+  12% {
     top: var(--boot-origin-y, 50%);
     left: var(--boot-origin-x, 50%);
-    width: 170px;
-    height: 30px;
+    width: 210px;
+    height: 28px;
     opacity: 1;
-    transform: translate(-50%, -50%) scaleX(1);
-    box-shadow: 0 0 16px rgba(93,208,104,0.16);
+    transform: translate(-50%, -50%) scale(1);
+    box-shadow: 0 0 18px rgba(93,208,104,0.14);
   }
   38% {
     top: calc(50% - (var(--term-h) / 2));
@@ -602,7 +602,16 @@ html, body {
     height: 46px;
     opacity: 1;
     transform: translateX(-50%);
-    box-shadow: 0 0 24px rgba(93,208,104,0.12);
+    box-shadow: 0 0 30px rgba(93,208,104,0.13);
+  }
+  72% {
+    top: calc(50% - (var(--term-h) / 2));
+    left: 50%;
+    width: var(--term-w);
+    height: calc(var(--term-h) * 0.72);
+    opacity: 1;
+    transform: translateX(-50%);
+    box-shadow: 0 0 38px rgba(93,208,104,0.11);
   }
   100% {
     top: calc(50% - (var(--term-h) / 2));
