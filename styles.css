@@ -2533,3 +2533,27 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
     margin-left: 0.18em !important;
   }
 }
+
+/* === TW mobile polish: subtle inner breathing room inside outer frame === */
+@media (max-width: 720px) {
+  :root {
+    --term-w: min(calc(100vw - 24px), 458px);
+    --menu-w: min(calc(100vw - 28px), 368px);
+  }
+
+  .content {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+}
+
+@media (max-width: 390px) {
+  :root {
+    --term-w: calc(100vw - 22px);
+  }
+
+  .content {
+    padding-left: 11px;
+    padding-right: 11px;
+  }
+}
