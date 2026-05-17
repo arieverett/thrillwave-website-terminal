@@ -437,6 +437,16 @@
     }
   } catch (e) { /* older browsers — best effort */ }
 
+  const params = new URLSearchParams(location.search);
+  const replayHomeIntro = params.has('homeIntro');
+  if (replayHomeIntro) {
+    try {
+      sessionStorage.setItem('tw_intro_played', '1');
+      sessionStorage.removeItem('tw_typing_done');
+    } catch (e) {}
+    try { history.replaceState(null, '', 'index.html'); } catch (e) {}
+  }
+
   const introPlayed = sessionStorage.getItem('tw_intro_played') === '1';
 
   if (!isHome || introPlayed) {
@@ -1579,18 +1589,20 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   const titleBrand = document.getElementById('title-brand');
   const titlePage = document.getElementById('title-page');
-  function restartHomeBoot() {
-    // Clean restart: the brand mark always sends the user home and runs
-    // the full opening animation from frame zero. This avoids overlapping
-    // home typing replays and stale boot states.
+  function restartHomeAnimation() {
+    // Brand click restarts the HOME page/lander typing animation only.
+    // It should not replay the full opening boot sequence.
     try {
-      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.setItem('tw_intro_played', '1');
       sessionStorage.removeItem('tw_typing_done');
-      sessionStorage.removeItem('tw_music_on');
-      sessionStorage.removeItem('tw_music_t');
-      sessionStorage.removeItem('tw_music_ts');
     } catch (e) {}
-    window.location.assign('index.html?boot=' + Date.now());
+
+    const onIndex = location.pathname === '/' || location.pathname.endsWith('/') || location.pathname.endsWith('/index.html');
+    if (onIndex && typeof resetAndReplayHome === 'function') {
+      resetAndReplayHome();
+    } else {
+      window.location.assign('index.html?homeIntro=' + Date.now());
+    }
   }
 
   function scrollCurrentPageTop() {
@@ -1603,12 +1615,14 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   if (titleBrand) {
     titleBrand.addEventListener('click', (e) => {
       e.preventDefault();
-      restartHomeBoot();
+      e.stopImmediatePropagation();
+      restartHomeAnimation();
     });
   }
   if (titlePage) {
     titlePage.addEventListener('click', (e) => {
       e.preventDefault();
+      e.stopImmediatePropagation();
       scrollCurrentPageTop();
     });
   }
@@ -1938,15 +1952,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   window.twNavigateMenuLink = navigateMenuLink;
   window.twLoadPage = loadPage;
 
-  function restartHomeBootFromShell() {
+  function restartHomeAnimationFromShell() {
     try {
-      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.setItem('tw_intro_played', '1');
       sessionStorage.removeItem('tw_typing_done');
-      sessionStorage.removeItem('tw_music_on');
-      sessionStorage.removeItem('tw_music_t');
-      sessionStorage.removeItem('tw_music_ts');
     } catch (e) {}
-    window.location.assign('index.html?boot=' + Date.now());
+
+    const onIndex = location.pathname === '/' || location.pathname.endsWith('/') || location.pathname.endsWith('/index.html');
+    if (onIndex && typeof window.twResetAndReplayHome === 'function') {
+      setMenu(false);
+      window.twResetAndReplayHome();
+    } else {
+      window.location.assign('index.html?homeIntro=' + Date.now());
+    }
   }
 
   function scrollShellPageTop() {
@@ -1961,7 +1979,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (brandRestart) {
       e.preventDefault();
       e.stopImmediatePropagation();
-      restartHomeBootFromShell();
+      restartHomeAnimationFromShell();
       return;
     }
 

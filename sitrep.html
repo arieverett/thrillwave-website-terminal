@@ -485,7 +485,7 @@
 
 
 <script>
-// TW title/chrome behavior: brand restarts the full home boot; page label scrolls top.
+// TW title/chrome behavior: brand restarts the home page animation; page label scrolls top.
 (function(){
   function restartHomeBoot(e){
     if (e) {
@@ -493,13 +493,10 @@
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
     }
     try {
-      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.setItem('tw_intro_played', '1');
       sessionStorage.removeItem('tw_typing_done');
-      sessionStorage.removeItem('tw_music_on');
-      sessionStorage.removeItem('tw_music_t');
-      sessionStorage.removeItem('tw_music_ts');
     } catch (_) {}
-    window.location.assign('index.html?boot=' + Date.now());
+    window.location.assign('index.html?homeIntro=' + Date.now());
   }
   function scrollTopOnly(e){
     if (e) e.preventDefault();

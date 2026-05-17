@@ -745,7 +745,7 @@ body::before {
 .frame-label--br { bottom: -7px; right: 22px; }
 
 a.frame-label { transition: color 120ms ease; }
-a.frame-label:hover { color: var(--fg); }
+a.frame-label:hover, a.frame-label:focus-visible { color: var(--accent); outline: none; }
 
 .frame-label .blink {
   display: inline-block;
@@ -920,6 +920,7 @@ body.menu-open .topbar {
 
 .below-bar {
   width: var(--term-w);
+  padding-inline: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2459,4 +2460,24 @@ body::before,
 .menu-item:focus-visible .num,
 .menu-item:focus-visible .name {
   color: var(--accent) !important;
+}
+
+
+/* === TW polish: brand links + footer fit === */
+a.frame-label:hover,
+a.frame-label:focus-visible {
+  color: var(--accent) !important;
+  outline: none;
+}
+
+.below-bar {
+  padding-left: 10px !important;
+  padding-right: 10px !important;
+}
+
+@media (max-width: 720px) {
+  .below-bar {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
 }
