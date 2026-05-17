@@ -3135,445 +3135,254 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
   }
 }
 
-/* === TW opening handoff polish: exact border match + clipped green scan ===
-   Keeps the opening desktop mockup aligned with the real static website frame,
-   and confines the green transition sweep to the inside of that frame. */
-.desktop {
-  inset: 24px !important;
-  border: 1px solid var(--rule) !important;
-  border-radius: 4px !important;
-  background: #000 !important;
-  overflow: visible !important;
+
+/* ============================================================
+   FINAL SHIP PATCH — opening handoff, clipped scanline, power modal
+   ============================================================ */
+:root {
+  --tw-frame-inset: 24px;
+  --tw-frame-label-x: 22px;
+  --tw-frame-label-y: -7px;
 }
 
+/* Opening desktop mock should match the real static chrome exactly. */
+.desktop {
+  inset: var(--tw-frame-inset) !important;
+  border-color: var(--rule) !important;
+  border-radius: 4px !important;
+  background: #000 !important;
+}
 .desktop-brand,
 .desktop-clock,
-.desktop-page {
+.desktop-page,
+.frame-label {
+  background: #000 !important;
+  line-height: 1.2 !important;
   font-size: 10.5px !important;
   letter-spacing: 2.5px !important;
-  line-height: 1 !important;
   font-weight: 500 !important;
-  color: var(--muted) !important;
-  background: #000 !important;
   padding: 0 10px !important;
   text-transform: none !important;
 }
-
-.desktop-brand {
-  top: -7px !important;
-  left: 22px !important;
+.desktop-brand,
+.frame-label--tl {
+  top: var(--tw-frame-label-y) !important;
+  left: var(--tw-frame-label-x) !important;
+}
+.desktop-clock,
+.frame-label--bl {
+  bottom: var(--tw-frame-label-y) !important;
+  left: var(--tw-frame-label-x) !important;
+}
+.desktop-page,
+.frame-label--br {
+  bottom: var(--tw-frame-label-y) !important;
+  right: var(--tw-frame-label-x) !important;
 }
 
-.desktop-clock {
-  bottom: -7px !important;
-  left: 22px !important;
-}
-
-.desktop-page {
-  bottom: -7px !important;
-  right: 22px !important;
-}
-
-#boot-root.clean-desktop .desktop-brand,
-#boot-root.clean-desktop .desktop-clock,
-#boot-root.clean-desktop .desktop-page {
-  line-height: 1 !important;
-  text-transform: none !important;
-}
-
-#boot-root.clean-desktop .desktop-brand {
-  top: -7px !important;
-}
-
-#boot-root.clean-desktop .desktop-clock,
-#boot-root.clean-desktop .desktop-page {
-  bottom: -7px !important;
-}
-
-/* Clip the green transition to the same rectangle as the outer website chrome,
-   so it reads like the terminal field is scanning on instead of the whole
-   browser window flashing. */
-.green-flash {
-  inset: 24px !important;
-  overflow: hidden !important;
-  border-radius: 4px !important;
-}
-
-.green-flash::before {
+/* Keep the green desktop→terminal scanline inside the outer frame and above the terminal. */
+.radial-flash {
+  z-index: 140 !important;
   left: 0 !important;
-  width: 100% !important;
+  right: 0 !important;
+  width: 100vw !important;
+  clip-path: inset(var(--tw-frame-inset) var(--tw-frame-inset) var(--tw-frame-inset) var(--tw-frame-inset) round 4px) !important;
+}
+.boot-term-window {
+  z-index: 100 !important;
+}
+#boot-root.clean-desktop .desktop.visible {
+  z-index: 42 !important;
 }
 
-.green-flash::after {
-  inset: 0 !important;
-  border-radius: 4px !important;
+/* The real outer power control: green hover, themed confirmation modal. */
+.frame-label--tl {
+  cursor: pointer;
 }
-
-@media (max-width: 720px) {
-  .desktop,
-  .green-flash {
-    inset: 14px !important;
-  }
-
-  .desktop-brand,
-  .desktop-clock,
-  .desktop-page {
-    font-size: 8.8px !important;
-    letter-spacing: 1.15px !important;
-    padding: 0 6px !important;
-    line-height: 1.25 !important;
-  }
-
-  .desktop-brand {
-    top: -6px !important;
-    left: 12px !important;
-  }
-
-  .desktop-clock {
-    bottom: -6px !important;
-    left: 12px !important;
-  }
-
-  .desktop-page {
-    bottom: -6px !important;
-    right: 12px !important;
-    max-width: 58vw !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
-    text-align: right !important;
-  }
-}
-
-@media (max-width: 390px) {
-  .desktop,
-  .green-flash {
-    inset: 12px !important;
-  }
-
-  .desktop-brand,
-  .desktop-clock,
-  .desktop-page {
-    font-size: 8.2px !important;
-    letter-spacing: 0.85px !important;
-    padding: 0 5px !important;
-  }
-
-  .desktop-brand,
-  .desktop-clock {
-    left: 9px !important;
-  }
-
-  .desktop-page {
-    right: 9px !important;
-    max-width: 55vw !important;
-  }
-}
-
-
-/* === TW final ship: power confirmation, pre-BIOS white ignition, mobile frame balance === */
-
-/* Opening: before BIOS finishes, the screen ignition should be neutral/white.
-   Green is reserved for the post-BIOS desktop/terminal transitions. */
-#boot-root:not(.clean-desktop) .boot-frame {
-  border-color: var(--fg) !important;
-  box-shadow: 0 0 0 rgba(245, 245, 245, 0) !important;
-}
-#boot-root:not(.clean-desktop) .boot-frame.dot {
-  background: var(--fg) !important;
-  border-color: var(--fg) !important;
-  box-shadow: 0 0 12px 2px rgba(245, 245, 245, 0.72) !important;
-}
-#boot-root:not(.clean-desktop) .boot-frame.expanded {
-  border-color: var(--fg) !important;
-  box-shadow: 0 0 24px rgba(245, 245, 245, 0.18) !important;
-}
-#boot-root:not(.clean-desktop) .boot-frame.expanded.cool {
-  border-color: var(--rule) !important;
-  box-shadow: 0 0 0 transparent !important;
-}
-
-/* Keep post-BIOS ignition green. */
-#boot-root.clean-desktop .boot-frame {
-  border-color: var(--accent);
-}
-#boot-root.clean-desktop .boot-frame.dot {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 12px 2px rgba(93, 208, 104, 0.8);
-}
-#boot-root.clean-desktop .boot-frame.expanded {
-  box-shadow: 0 0 24px rgba(93, 208, 104, 0.25);
-}
-
-/* The top-left chrome is now a soft power control. */
-.frame-label--tl.power-reset-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-/* Cohesive power confirmation modal. */
-.power-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 20000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(3px);
+.frame-label--tl:hover,
+.frame-label--tl:focus-visible {
+  color: var(--accent) !important;
+  outline: none;
 }
 
 .power-modal {
-  width: min(430px, calc(100vw - 42px));
-  background: #000;
+  position: fixed;
+  inset: 0;
+  z-index: 100000;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.72);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 160ms ease, visibility 160ms ease;
+}
+.power-modal.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.power-modal__panel {
+  width: min(420px, calc(100vw - 44px));
   border: 1px solid var(--rule);
   border-radius: 4px;
-  padding: 22px 24px 20px;
+  background: #000;
   color: var(--fg);
+  box-shadow: 0 0 0 1px rgba(93, 208, 104, 0.1), 0 18px 60px rgba(0,0,0,0.7);
+  padding: 18px 18px 16px;
   font-family: var(--font);
-  box-shadow: 0 0 0 1px rgba(93, 208, 104, 0.08), 0 18px 60px rgba(0, 0, 0, 0.65);
 }
-
-.power-modal-kicker {
-  margin-bottom: 14px;
+.power-modal__title {
   color: var(--accent);
-  font-size: 10px;
-  letter-spacing: 1.8px;
-  text-transform: lowercase;
-}
-
-.power-modal h2 {
-  margin: 0 0 12px;
-  font-size: 18px;
-  line-height: 1.2;
-  letter-spacing: 0.3px;
-  text-transform: lowercase;
-}
-
-.power-modal p {
-  margin: 0 0 22px;
-  color: var(--muted);
   font-size: 12px;
+  letter-spacing: 1.6px;
+  margin-bottom: 12px;
+  text-transform: lowercase;
+}
+.power-modal__copy {
+  color: var(--muted);
+  font-size: 11px;
   line-height: 1.65;
+  margin-bottom: 16px;
 }
-
-.power-modal-actions {
+.power-modal__actions {
   display: flex;
-  justify-content: flex-end;
   gap: 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
 }
-
-.power-modal-btn {
+.power-modal__btn {
   appearance: none;
   border: 1px solid var(--rule);
+  border-radius: 4px;
   background: transparent;
   color: var(--muted);
-  border-radius: 4px;
-  padding: 8px 12px;
   font-family: var(--font);
-  font-size: 11px;
+  font-size: 10px;
   letter-spacing: 1.2px;
-  text-transform: lowercase;
+  padding: 8px 11px;
   cursor: pointer;
+  text-transform: lowercase;
 }
-
-.power-modal-btn:hover,
-.power-modal-btn:focus-visible {
+.power-modal__btn:hover,
+.power-modal__btn:focus-visible {
   color: var(--accent);
   border-color: var(--accent);
   outline: none;
 }
-
-.power-modal-confirm {
+.power-modal__btn--confirm:hover,
+.power-modal__btn--confirm:focus-visible {
   color: var(--fg);
+  border-color: var(--accent);
 }
 
-/* Mobile: more outside top/bottom air around the outer chrome, while keeping
-   the controls/terminal tucked closer inside that frame. */
 @media (max-width: 720px) {
+  :root {
+    --tw-frame-inset: 10px;
+    --tw-frame-label-x: 10px;
+    --tw-frame-label-y: -6px;
+    --term-w: min(calc(100vw - 22px), 462px);
+    --menu-w: min(calc(100vw - 26px), 372px);
+  }
   .frame,
-  .desktop,
-  .green-flash {
-    inset: 14px 5px !important;
+  .desktop {
+    inset: 12px 6px !important;
   }
-
   .content {
-    padding-top: 25px !important;
-    padding-bottom: 25px !important;
+    padding: 23px 7px 22px !important;
   }
-
-  .stage-wrap {
-    gap: 7px !important;
+  .desktop-brand,
+  .desktop-clock,
+  .desktop-page,
+  .frame-label {
+    font-size: 8.5px !important;
+    letter-spacing: 0.95px !important;
+    padding: 0 5px !important;
+    line-height: 1.25 !important;
   }
-
+  .desktop-brand,
+  .frame-label--tl {
+    top: -6px !important;
+    left: 10px !important;
+  }
+  .desktop-clock,
+  .frame-label--bl {
+    bottom: -6px !important;
+    left: 10px !important;
+  }
+  .desktop-page,
+  .frame-label--br {
+    bottom: -6px !important;
+    right: 10px !important;
+    max-width: 58vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .radial-flash {
+    clip-path: inset(12px 6px 12px 6px round 4px) !important;
+    z-index: 140 !important;
+  }
+  .boot-term-window {
+    z-index: 100 !important;
+  }
   .below-bar {
-    padding-left: 6px !important;
-    padding-right: 6px !important;
-  }
-
-  .power-modal {
-    width: min(360px, calc(100vw - 44px));
-    padding: 20px 18px 18px;
-  }
-
-  .power-modal-actions {
-    justify-content: space-between;
+    padding-left: 7px !important;
+    padding-right: 7px !important;
   }
 }
 
 @media (max-width: 390px) {
+  :root {
+    --term-w: calc(100vw - 20px);
+  }
   .frame,
-  .desktop,
-  .green-flash {
-    inset: 13px 5px !important;
+  .desktop {
+    inset: 11px 5px !important;
   }
-
   .content {
-    padding-top: 24px !important;
-    padding-bottom: 24px !important;
+    padding: 22px 6px 21px !important;
+  }
+  .radial-flash {
+    clip-path: inset(11px 5px 11px 5px round 4px) !important;
   }
 }
 
-/* === TW final opening scanline mask/layer fix ===
-   The desktop-to-terminal green scan should behave like it lives inside the
-   outer chrome, not across the full browser window. Keep the sweep clipped to
-   the border and above the terminal reveal on desktop + mobile. */
+
+/* FINAL correction: animate the scanline itself inside the frame dimensions instead of full-viewport. */
 .radial-flash {
-  position: fixed !important;
-  inset: 24px !important;
+  top: var(--tw-frame-inset) !important;
+  left: var(--tw-frame-inset) !important;
+  right: var(--tw-frame-inset) !important;
   width: auto !important;
-  height: auto !important;
-  opacity: 1 !important;
-  overflow: hidden !important;
-  pointer-events: none !important;
-  z-index: 180 !important;
-  border-radius: 4px !important;
-  background: transparent !important;
-  box-shadow: none !important;
-  transform: none !important;
-  margin: 0 !important;
-  mix-blend-mode: screen !important;
+  clip-path: none !important;
 }
-
-.radial-flash::before {
-  content: '' !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  top: -34px !important;
-  height: 8px !important;
-  opacity: 0 !important;
-  transform: translateY(0) !important;
-  pointer-events: none !important;
-  background:
-    repeating-linear-gradient(
-      to right,
-      rgba(0, 0, 0, 0.55) 0 1px,
-      transparent 1px 3px
-    ),
-    linear-gradient(to bottom,
-      rgba(93, 208, 104, 0) 0%,
-      rgba(93, 208, 104, 0.92) 20%,
-      rgba(255, 255, 255, 0.98) 48%,
-      rgba(255, 255, 255, 0.98) 52%,
-      rgba(93, 208, 104, 0.92) 80%,
-      rgba(93, 208, 104, 0) 100%) !important;
-  background-blend-mode: multiply, normal !important;
-  box-shadow:
-    0 0 24px rgba(93, 208, 104, 0.95),
-    0 0 80px rgba(93, 208, 104, 0.55),
-    0 0 140px rgba(93, 208, 104, 0.25) !important;
-}
-
-.radial-flash::after {
-  content: '' !important;
-  position: absolute !important;
-  left: 0 !important;
-  right: 0 !important;
-  top: -72px !important;
-  height: 72px !important;
-  opacity: 0 !important;
-  transform: translateY(0) !important;
-  pointer-events: none !important;
-  filter: blur(10px) !important;
-  background: linear-gradient(to bottom,
-    rgba(93, 208, 104, 0) 0%,
-    rgba(93, 208, 104, 0.38) 50%,
-    rgba(93, 208, 104, 0) 100%) !important;
-}
-
 .radial-flash.fire {
-  animation: none !important;
+  animation: tw-frame-scanline-sweep 0.44s cubic-bezier(0.42, 0.1, 0.6, 1) forwards !important;
 }
-
-.radial-flash.fire::before {
-  animation: tw-clipped-scanline 0.58s cubic-bezier(0.42, 0.1, 0.6, 1) forwards !important;
+@keyframes tw-frame-scanline-sweep {
+  0%   { opacity: 0;    transform: translateY(-12px); }
+  6%   { opacity: 1;    transform: translateY(0); }
+  16%  { opacity: 0.35; transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.14)); }
+  24%  { opacity: 1;    transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.24)); }
+  38%  { opacity: 0.5;  transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.40)); }
+  50%  { opacity: 1;    transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.54)); }
+  64%  { opacity: 0.3;  transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.70)); }
+  78%  { opacity: 1;    transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.86)); }
+  92%  { opacity: 0.7;  transform: translateY(calc((100vh - (var(--tw-frame-inset) * 2)) * 0.98)); }
+  100% { opacity: 0;    transform: translateY(calc(100vh - (var(--tw-frame-inset) * 2) + 12px)); }
 }
-
-.radial-flash.fire::after {
-  animation: tw-clipped-scanline-trail 0.58s cubic-bezier(0.42, 0.1, 0.6, 1) forwards !important;
-}
-
-@keyframes tw-clipped-scanline {
-  0%   { opacity: 0;    transform: translateY(0); }
-  6%   { opacity: 1;    transform: translateY(18px); }
-  16%  { opacity: 0.35; transform: translateY(calc((100dvh - 48px) * 0.16)); }
-  24%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.25)); }
-  38%  { opacity: 0.5;  transform: translateY(calc((100dvh - 48px) * 0.42)); }
-  52%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.58)); }
-  66%  { opacity: 0.34; transform: translateY(calc((100dvh - 48px) * 0.76)); }
-  82%  { opacity: 1;    transform: translateY(calc((100dvh - 48px) * 0.94)); }
-  100% { opacity: 0;    transform: translateY(calc(100dvh - 48px + 76px)); }
-}
-
-@keyframes tw-clipped-scanline-trail {
-  0%   { opacity: 0;    transform: translateY(0); }
-  8%   { opacity: 0.75; transform: translateY(18px); }
-  82%  { opacity: 0.7;  transform: translateY(calc((100dvh - 48px) * 0.94)); }
-  100% { opacity: 0;    transform: translateY(calc(100dvh - 48px + 76px)); }
-}
-
-/* Keep the scan above the boot terminal during the whole handoff, especially
-   on iPhone where the terminal was appearing before the sweep crossed it. */
-.boot-term-window {
-  z-index: 120 !important;
-}
-
-.radial-flash,
-.green-flash.fire {
-  z-index: 180 !important;
-}
-
 @media (max-width: 720px) {
   .radial-flash {
-    inset: 14px 5px !important;
-  }
-
-  @keyframes tw-clipped-scanline {
-    0%   { opacity: 0;    transform: translateY(0); }
-    6%   { opacity: 1;    transform: translateY(18px); }
-    16%  { opacity: 0.35; transform: translateY(calc((100dvh - 28px) * 0.16)); }
-    24%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.25)); }
-    38%  { opacity: 0.5;  transform: translateY(calc((100dvh - 28px) * 0.42)); }
-    52%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.58)); }
-    66%  { opacity: 0.34; transform: translateY(calc((100dvh - 28px) * 0.76)); }
-    82%  { opacity: 1;    transform: translateY(calc((100dvh - 28px) * 0.94)); }
-    100% { opacity: 0;    transform: translateY(calc(100dvh - 28px + 76px)); }
-  }
-
-  @keyframes tw-clipped-scanline-trail {
-    0%   { opacity: 0;    transform: translateY(0); }
-    8%   { opacity: 0.75; transform: translateY(18px); }
-    82%  { opacity: 0.7;  transform: translateY(calc((100dvh - 28px) * 0.94)); }
-    100% { opacity: 0;    transform: translateY(calc(100dvh - 28px + 76px)); }
+    top: 12px !important;
+    left: 6px !important;
+    right: 6px !important;
   }
 }
-
 @media (max-width: 390px) {
   .radial-flash {
-    inset: 13px 5px !important;
+    top: 11px !important;
+    left: 5px !important;
+    right: 5px !important;
   }
 }

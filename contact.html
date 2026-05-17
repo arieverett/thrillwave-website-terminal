@@ -80,9 +80,19 @@
 <body>
 
 <div class="frame" aria-hidden="true">
-  <a href="index.html" class="frame-label frame-label--tl power-reset-link" aria-label="power off and replay opening">⏻ thrill_wave</a>
+  <a href="index.html" class="frame-label frame-label--tl">⏻ thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
   <div class="frame-label frame-label--br">contact &nbsp;&middot;&nbsp; 06 / 06</div>
+</div>
+<div class="power-modal" id="power-modal" aria-hidden="true">
+  <div class="power-modal__panel" role="dialog" aria-modal="true" aria-labelledby="power-modal-title">
+    <div class="power-modal__title" id="power-modal-title">turn off thrill_wave?</div>
+    <div class="power-modal__copy">This will reset the system and start the opening sequence from the beginning.</div>
+    <div class="power-modal__actions">
+      <button class="power-modal__btn power-modal__btn--confirm" type="button" data-power-confirm>yes, reset</button>
+      <button class="power-modal__btn" type="button" data-power-cancel>cancel</button>
+    </div>
+  </div>
 </div>
 
 <audio id="bg-audio" loop preload="auto">
@@ -549,18 +559,6 @@
     } catch (_) {}
     window.location.assign('index.html?homeIntro=' + Date.now());
   }
-  function powerResetSite(e){
-    if (e) {
-      e.preventDefault();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    }
-    try {
-      Object.keys(sessionStorage).forEach(function(k){
-        if (k.indexOf('tw_') === 0) sessionStorage.removeItem(k);
-      });
-    } catch (_) {}
-    window.location.assign('index.html?boot=' + Date.now());
-  }
   function scrollTopOnly(e){
     if (e) e.preventDefault();
     var body = document.getElementById('terminal-body');
@@ -568,8 +566,6 @@
     try { history.replaceState(null, '', location.pathname.split('/').pop() || 'index.html'); } catch (_) {}
   }
   window.addEventListener('click', function(e){
-    var power = e.target && e.target.closest ? e.target.closest('.frame-label--tl') : null;
-    if (power) return powerResetSite(e);
     var brand = e.target && e.target.closest ? e.target.closest('#title-brand') : null;
     if (brand) return restartHomeBoot(e);
     var page = e.target && e.target.closest ? e.target.closest('#title-page') : null;
@@ -654,63 +650,49 @@
 
 
 <script>
-(function () {
-  function clearThrillWaveSession() {
+// TW power control: confirm before resetting the full site/opening sequence.
+(function(){
+  function modal(){ return document.getElementById('power-modal'); }
+  function openPowerModal(e){
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+    var m = modal();
+    if (!m) return;
+    m.classList.add('is-open');
+    m.setAttribute('aria-hidden', 'false');
+    var cancel = m.querySelector('[data-power-cancel]');
+    if (cancel) setTimeout(function(){ cancel.focus(); }, 40);
+  }
+  function closePowerModal(e){
+    if (e) e.preventDefault();
+    var m = modal();
+    if (!m) return;
+    m.classList.remove('is-open');
+    m.setAttribute('aria-hidden', 'true');
+  }
+  function confirmPowerOff(e){
+    if (e) e.preventDefault();
     try {
-      Object.keys(sessionStorage).forEach(function (key) {
-        if (key.indexOf('tw_') === 0) sessionStorage.removeItem(key);
-      });
-    } catch (e) {}
+      sessionStorage.removeItem('tw_intro_played');
+      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.removeItem('tw_music_on');
+      sessionStorage.removeItem('tw_music_t');
+    } catch (_) {}
+    window.location.assign('index.html?power=' + Date.now());
   }
-
-  function closePowerModal() {
-    const modal = document.getElementById('power-confirm-modal');
-    if (modal) modal.remove();
-    document.body.classList.remove('power-modal-open');
-  }
-
-  function openPowerModal() {
-    if (document.getElementById('power-confirm-modal')) return;
-    const modal = document.createElement('div');
-    modal.id = 'power-confirm-modal';
-    modal.className = 'power-modal-backdrop';
-    modal.innerHTML = `
-      <div class="power-modal" role="dialog" aria-modal="true" aria-labelledby="power-modal-title">
-        <div class="power-modal-kicker">system command</div>
-        <h2 id="power-modal-title">turn off thrill_wave?</h2>
-        <p>this will reset the session and replay the opening from the beginning.</p>
-        <div class="power-modal-actions">
-          <button type="button" class="power-modal-btn power-modal-cancel">cancel</button>
-          <button type="button" class="power-modal-btn power-modal-confirm">power off</button>
-        </div>
-      </div>
-    `;
-    document.body.appendChild(modal);
-    document.body.classList.add('power-modal-open');
-
-    const cancel = modal.querySelector('.power-modal-cancel');
-    const confirm = modal.querySelector('.power-modal-confirm');
-
-    cancel.addEventListener('click', closePowerModal);
-    modal.addEventListener('click', function (event) {
-      if (event.target === modal) closePowerModal();
-    });
-    confirm.addEventListener('click', function () {
-      clearThrillWaveSession();
-      window.location.href = 'index.html?power=' + Date.now();
-    });
-    setTimeout(function () { cancel.focus(); }, 40);
-  }
-
-  document.addEventListener('click', function (event) {
-    const link = event.target.closest('.power-reset-link');
-    if (!link) return;
-    event.preventDefault();
-    openPowerModal();
+  document.addEventListener('click', function(e){
+    var power = e.target && e.target.closest ? e.target.closest('.frame-label--tl') : null;
+    if (power) return openPowerModal(e);
+    if (e.target && e.target.closest && e.target.closest('[data-power-cancel]')) return closePowerModal(e);
+    if (e.target && e.target.closest && e.target.closest('[data-power-confirm]')) return confirmPowerOff(e);
+    var m = modal();
+    if (m && m.classList.contains('is-open') && e.target === m) return closePowerModal(e);
   }, true);
-
-  document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape') closePowerModal();
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closePowerModal(e);
   });
 })();
 </script>
