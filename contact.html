@@ -80,7 +80,7 @@
 <body>
 
 <div class="frame" aria-hidden="true">
-  <a href="index.html" class="frame-label frame-label--tl">⏻ thrill_wave</a>
+  <a href="index.html" class="frame-label frame-label--tl power-reset-link" aria-label="power off and replay opening">⏻ thrill_wave</a>
   <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
   <div class="frame-label frame-label--br">contact &nbsp;&middot;&nbsp; 06 / 06</div>
 </div>
@@ -649,6 +649,69 @@
     bindCleanToggles();
   }
   window.twBindCleanCascades = bindCleanToggles;
+})();
+</script>
+
+
+<script>
+(function () {
+  function clearThrillWaveSession() {
+    try {
+      Object.keys(sessionStorage).forEach(function (key) {
+        if (key.indexOf('tw_') === 0) sessionStorage.removeItem(key);
+      });
+    } catch (e) {}
+  }
+
+  function closePowerModal() {
+    const modal = document.getElementById('power-confirm-modal');
+    if (modal) modal.remove();
+    document.body.classList.remove('power-modal-open');
+  }
+
+  function openPowerModal() {
+    if (document.getElementById('power-confirm-modal')) return;
+    const modal = document.createElement('div');
+    modal.id = 'power-confirm-modal';
+    modal.className = 'power-modal-backdrop';
+    modal.innerHTML = `
+      <div class="power-modal" role="dialog" aria-modal="true" aria-labelledby="power-modal-title">
+        <div class="power-modal-kicker">system command</div>
+        <h2 id="power-modal-title">turn off thrill_wave?</h2>
+        <p>this will reset the session and replay the opening from the beginning.</p>
+        <div class="power-modal-actions">
+          <button type="button" class="power-modal-btn power-modal-cancel">cancel</button>
+          <button type="button" class="power-modal-btn power-modal-confirm">power off</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    document.body.classList.add('power-modal-open');
+
+    const cancel = modal.querySelector('.power-modal-cancel');
+    const confirm = modal.querySelector('.power-modal-confirm');
+
+    cancel.addEventListener('click', closePowerModal);
+    modal.addEventListener('click', function (event) {
+      if (event.target === modal) closePowerModal();
+    });
+    confirm.addEventListener('click', function () {
+      clearThrillWaveSession();
+      window.location.href = 'index.html?power=' + Date.now();
+    });
+    setTimeout(function () { cancel.focus(); }, 40);
+  }
+
+  document.addEventListener('click', function (event) {
+    const link = event.target.closest('.power-reset-link');
+    if (!link) return;
+    event.preventDefault();
+    openPowerModal();
+  }, true);
+
+  document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape') closePowerModal();
+  });
 })();
 </script>
 
