@@ -3226,7 +3226,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function blocked(target) {
     if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, iframe, input, textarea, select');
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, .cascade-content, .cascade-video, iframe, input, textarea, select');
   }
 
   function snap(direction) {
@@ -3252,10 +3252,13 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (document.body.classList.contains('menu-open')) return;
     if (blocked(e.target)) return;
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-    e.preventDefault();
-    e.stopPropagation();
+    // During cooldown, let native scroll pass through — tall cascade sections
+    // need to be scrollable after snap. Only intercept when ready to snap.
+    if (Date.now() < cooldownUntil) return;
     var threshold = e.deltaMode === 1 ? 1 : 20;
     if (Math.abs(e.deltaY) >= threshold) {
+      e.preventDefault();
+      e.stopPropagation();
       snap(e.deltaY > 0 ? 1 : -1);
     }
   }, { passive: false, capture: true });
