@@ -5300,3 +5300,96 @@ section.page .next-link button.tw-page-link:focus-visible,
 #loop > .section-end {
   display: none !important;
 }
+
+
+/* ============================================================
+   TW MICRO PASS — requested 2026-05-17
+   ============================================================ */
+
+/* Homepage 04: subsection labels are green again; company links stay white with green hover. */
+#who_we_work_with .page-content.terminal-copy .accent {
+  color: var(--accent) !important;
+}
+#who_we_work_with .page-content.terminal-copy a,
+#who_we_work_with .page-content.terminal-copy a:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+#who_we_work_with .page-content.terminal-copy a:hover,
+#who_we_work_with .page-content.terminal-copy a:focus-visible {
+  color: var(--accent) !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* About 02C: keep every philosophy line flush left. */
+#philosophy .page-content.terminal-copy .line,
+#philosophy .philosophy-copy .line {
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+  margin-left: 0 !important;
+}
+
+/* Non-floating work handoff: green at rest, white on hover. */
+#landing .work-intel-next,
+#landing .work-intel-next button.tw-page-link,
+section#landing .work-intel-next button.tw-page-link {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+#landing .work-intel-next button.tw-page-link:hover,
+#landing .work-intel-next button.tw-page-link:focus-visible,
+section#landing .work-intel-next button.tw-page-link:hover,
+section#landing .work-intel-next button.tw-page-link:focus-visible {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* Floating click-for-next prompts stay white at rest, green on hover on every page. */
+.section-end,
+.section-end:visited,
+#next-step .section-end,
+#loop .section-end {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+.section-end:hover,
+.section-end:focus-visible,
+#next-step .section-end:hover,
+#next-step .section-end:focus-visible,
+#loop .section-end:hover,
+#loop .section-end:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 6px rgba(93,208,104,0.4)) !important;
+}
+
+/* Re-enable the floating home prompt on the contact page. */
+#loop > .section-end {
+  display: inline-block !important;
+}
+
+/* Footer contact/social row: left edge of terminal, normal spacing. */
+.below-bar {
+  justify-content: flex-start !important;
+  gap: 0 !important;
+  padding-inline: 8px !important;
+  overflow: visible !important;
+}
+.below-bar .sep {
+  margin: 0 7px !important;
+}
+@media (max-width: 720px) {
+  .below-bar {
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+    row-gap: 2px !important;
+  }
+  .below-bar .sep {
+    margin: 0 5px !important;
+  }
+}
