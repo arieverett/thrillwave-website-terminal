@@ -374,7 +374,7 @@
 <div class="power-modal__bar terminal-bar">
 <span class="power-modal__bar-title">thrill_wave — power</span>
 <div aria-hidden="true" class="terminal-dots">
-<span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+<span class="dot"></span><span class="dot"></span><span aria-label="cancel" class="dot live" role="button" tabindex="0" title="cancel"></span>
 </div>
 </div>
 <div class="power-modal__body">
@@ -398,7 +398,6 @@
     }
     var modal = getModal();
     if (!modal) return false;
-    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('power-modal-open');
@@ -414,7 +413,6 @@
     }
     var modal = getModal();
     if (!modal) return false;
-    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('power-modal-open');
@@ -465,6 +463,7 @@
     if (target.closest('[data-power-control]')) return openModal(event);
     if (target.closest('[data-power-cancel]')) return closeModal(event);
     if (target.closest('[data-power-confirm]')) return confirmShutdown(event);
+    if (target.closest('.power-modal__bar .dot')) return closeModal(event);
     var modal = getModal();
     if (modal && modal.classList.contains('is-open') && target === modal) return closeModal(event);
   }, true);
@@ -477,16 +476,16 @@
 // General haptic click sound — fires on any meaningful click
 // (skips dead areas: bare frame, scrollable containers, iframes)
 (function twClickSound(){
-  // pointerdown fires before click and before any stopImmediatePropagation
-  // from other click handlers — reliably covers all links, buttons, social links.
+  // pointerdown fires before click and can't be stopped by stopImmediatePropagation
+  // from click handlers — covers every button, link, dot reliably.
   document.addEventListener('pointerdown', function(e){
     if (!e.isTrusted) return;
     var t = e.target;
     if (!t || !t.closest) return;
-    var interactive = t.closest('button,a,[role="button"],.cascade-toggle,.section-jump,.section-end,.dot');
+    var interactive = t.closest('button,a,[role="button"],.cascade-toggle,.section-jump,.section-end,.dot.live');
     if (!interactive) return;
-    // Skip elements with their own explicit sounds
-    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,.audio-btn,#menu-btn,[data-power-control],[data-power-cancel],[data-power-confirm]')) return;
+    // Only skip things with a different explicit sound or no desired sound
+    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
     if (window.twUI) window.twUI.sndClick();
   }, true);
 }());
@@ -3330,7 +3329,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     locked = true;
     // Sound: use optional override (e.g. click for Enter key) or scroll whoosh
     var play = (typeof snd === 'function') ? snd
-             : (window.twUI && typeof window.twUI.sndScroll === 'function') ? window.twUI.sndScroll
+             : (window.twUI && typeof window.twUI.sndClick === 'function') ? window.twUI.sndClick
              : null;
     if (play) try { play(); } catch (_) {}
 
@@ -3392,7 +3391,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     else if (e.key === 'Enter') {
       e.preventDefault();
       // Button-press sound for Enter, distinct from scroll whoosh
-      snap(1, window.twUI && window.twUI.sndClick);
+      snap(1); // default is already sndClick
     }
   });
 })();

@@ -7531,3 +7531,26 @@ button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
   color: var(--fg) !important;
   border-color: var(--fg) !important;
 }
+
+/* ── Power modal traffic light ─────────────────────────────────────────────
+   Green at rest (modal is open/active). Red on hover — signals dismiss/cancel,
+   matching the terminal window's minimize-dot pattern exactly.
+   Clicking closes the modal (wired in JS to closeModal).               */
+.power-modal__bar .dot.live {
+  cursor: pointer;
+  pointer-events: auto;
+  background: var(--accent) !important;
+  box-shadow: 0 0 4px rgba(93,208,104,0.55) !important;
+  transition: background-color 150ms ease, box-shadow 150ms ease, transform 150ms ease;
+}
+.power-modal__bar .dot.live:hover,
+.power-modal__bar .dot.live:focus-visible {
+  background: #ff5f56 !important;
+  box-shadow: 0 0 5px rgba(255,95,86,0.75), 0 0 12px rgba(255,95,86,0.32) !important;
+  transform: scale(1.12);
+}
+.power-modal__bar .dot.live:active {
+  background: #ff5f56 !important;
+  box-shadow: 0 0 3px rgba(255,95,86,0.6) !important;
+  transform: scale(0.94);
+}
