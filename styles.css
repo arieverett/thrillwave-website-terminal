@@ -3550,15 +3550,10 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
   padding: 9px 17px !important;
 }
 
-/* The green full-frame scanline is retired for this version. The transition
-   is now handled by the .elf → terminal launch, which makes the handoff less
-   busy and easier to match to the static homepage. */
-.radial-flash,
-.radial-flash.fire {
-  display: none !important;
-  animation: none !important;
-  opacity: 0 !important;
-}
+/* The gritty scanline transition is back. It's already clipped to the
+   outer frame border by the .radial-flash rules earlier in this file
+   (clip-path: inset(var(--tw-frame-inset)) round 4px), so the sweep
+   stays inside the 24px-inset frame instead of bleeding to viewport edge. */
 
 /* Match the opening terminal's final landing spot to the real homepage
    terminal. The real terminal sits slightly below exact vertical center
@@ -4057,69 +4052,16 @@ body.booting.handoff-show-live > main.content {
 
 /* Clipped frame-wide top-to-bottom green scan. It uses the real outer frame
    dimensions instead of viewport dimensions. */
-.green-flash.frame-scan {
-  position: fixed !important;
-  inset: 24px !important;
-  z-index: 99999 !important;
-  overflow: hidden !important;
-  border-radius: 4px !important;
-  pointer-events: none !important;
-  background: transparent !important;
-  clip-path: none !important;
-}
-
-.green-flash.frame-scan::before {
-  content: '' !important;
-  position: absolute !important;
-  left: 0 !important;
-  top: 0 !important;
-  width: 100% !important;
-  height: 26px !important;
-  opacity: 0 !important;
-  transform: translateY(-120%) !important;
-  background: linear-gradient(
-    to bottom,
-    rgba(93,208,104,0),
-    rgba(93,208,104,0.28) 18%,
-    rgba(93,208,104,0.95) 48%,
-    rgba(255,255,255,0.84) 52%,
-    rgba(93,208,104,0.65) 64%,
-    rgba(93,208,104,0)
-  ) !important;
-  box-shadow:
-    0 0 22px rgba(93,208,104,0.9),
-    0 0 74px rgba(93,208,104,0.38) !important;
-  animation: tw-frame-scan-reveal 1.12s cubic-bezier(0.16,0.78,0.2,1) both !important;
-}
-
+/* The duplicate green-flash.frame-scan reveal has been retired. The
+   handoff scan is now provided by body.tw-frame-scan::after (see below)
+   which is the cool gritty version. Keep .green-flash itself for the
+   BIOS→desktop blink. */
+.green-flash.frame-scan,
+.green-flash.frame-scan::before,
 .green-flash.frame-scan::after {
-  content: '' !important;
-  position: absolute !important;
-  inset: 0 !important;
+  animation: none !important;
   opacity: 0 !important;
-  background:
-    linear-gradient(to bottom,
-      rgba(93,208,104,0.00) 0%,
-      rgba(93,208,104,0.08) 42%,
-      rgba(93,208,104,0.18) 50%,
-      rgba(93,208,104,0.06) 58%,
-      rgba(93,208,104,0.00) 100%),
-    radial-gradient(circle at 50% 18%, rgba(93,208,104,0.18), rgba(93,208,104,0) 48%) !important;
-  animation: tw-frame-scan-glow 1.12s cubic-bezier(0.16,0.78,0.2,1) both !important;
-}
-
-@keyframes tw-frame-scan-reveal {
-  0%   { opacity: 0; transform: translateY(-120%); }
-  8%   { opacity: 1; }
-  78%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(calc(100vh - 48px + 120%)); }
-}
-
-@keyframes tw-frame-scan-glow {
-  0%   { opacity: 0; }
-  18%  { opacity: 0.26; }
-  62%  { opacity: 0.18; }
-  100% { opacity: 0; }
+  display: none !important;
 }
 
 body.booting.handoff-show-live .terminal.main,
@@ -4248,38 +4190,59 @@ body.menu-open .terminal.side {
 
 /* Hard, visible phosphor scan beam clipped to the same inset as the real
    outer border. This replaces the fragile boot-root-only scan layer. */
+/* The kinetic elf→terminal handoff scan. A short, gritty horizontal
+   scanline sweeps from the top of the inner frame to the bottom, with
+   a glowing green halo trailing behind it and a hot-white core. The
+   bar has subtle CRT raster banding (see ::before-like effect via the
+   gradient stops), and the box-shadow is wide enough to "reflect"
+   against the surrounding background as it travels. */
 body.tw-frame-scan::after {
   content: '';
   position: fixed;
   left: 24px;
   right: 24px;
   top: 24px;
-  height: 30px;
+  height: 6px;
   z-index: 100000;
   pointer-events: none;
   opacity: 0;
-  border-radius: 999px;
-  background: linear-gradient(
-    to bottom,
-    rgba(93,208,104,0) 0%,
-    rgba(93,208,104,0.24) 20%,
-    rgba(93,208,104,0.96) 46%,
-    rgba(255,255,255,0.92) 50%,
-    rgba(93,208,104,0.72) 58%,
-    rgba(93,208,104,0) 100%
-  );
+  border-radius: 0;
+  /* hard horizontal bar with white-hot core and accent-green edges */
+  background:
+    repeating-linear-gradient(to right,
+      rgba(0, 0, 0, 0.45) 0 1px,
+      transparent 1px 3px),
+    linear-gradient(to bottom,
+      rgba(93, 208, 104, 0) 0%,
+      rgba(93, 208, 104, 0.95) 18%,
+      rgba(255, 255, 255, 0.98) 48%,
+      rgba(255, 255, 255, 0.98) 52%,
+      rgba(93, 208, 104, 0.9) 82%,
+      rgba(93, 208, 104, 0) 100%);
+  /* multi-stop bloom — the wide outer shadow is what gives the
+     "reflecting against the background" look as the bar passes */
   box-shadow:
-    0 0 18px rgba(93,208,104,0.95),
-    0 0 54px rgba(93,208,104,0.58),
-    0 0 110px rgba(93,208,104,0.26);
+    0 0 22px rgba(93, 208, 104, 1),
+    0 0 80px rgba(93, 208, 104, 0.55),
+    0 0 160px rgba(93, 208, 104, 0.22);
+  mix-blend-mode: screen;
   animation: tw-reliable-frame-scan 1.34s cubic-bezier(0.12,0.82,0.18,1) both;
 }
 
 @keyframes tw-reliable-frame-scan {
-  0%   { opacity: 0; transform: translateY(-42px) scaleY(0.75); }
-  6%   { opacity: 1; }
-  72%  { opacity: 1; }
-  100% { opacity: 0; transform: translateY(calc(100vh - 48px)) scaleY(0.9); }
+  /* Sweep with brightness flickers (CRT stutter) along the travel.
+     Range: -42px → (100vh - 48px) so the bar starts just above the
+     top frame edge and exits just past the bottom frame edge. */
+  0%   { opacity: 0;    transform: translateY(-42px) scaleY(0.75); }
+  6%   { opacity: 1;    transform: translateY(0) scaleY(1); }
+  18%  { opacity: 0.42; transform: translateY(calc((100vh - 48px) * 0.15)) scaleY(1); }
+  26%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.24)) scaleY(1); }
+  42%  { opacity: 0.5;  transform: translateY(calc((100vh - 48px) * 0.42)) scaleY(1); }
+  54%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.56)) scaleY(1); }
+  68%  { opacity: 0.35; transform: translateY(calc((100vh - 48px) * 0.72)) scaleY(1); }
+  82%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.88)) scaleY(1); }
+  92%  { opacity: 0.7;  transform: translateY(calc((100vh - 48px) * 0.97)) scaleY(0.95); }
+  100% { opacity: 0;    transform: translateY(calc(100vh - 48px)) scaleY(0.9); }
 }
 
 /* Slow green system-wake reflection. It drifts down the actual interface for
