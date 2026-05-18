@@ -427,6 +427,7 @@
     if (document.body.classList.contains('tw-powering-down')) return false;
     var modal = getModal();
     document.body.classList.add('tw-powering-down');
+    sndShutdown();
     if (modal) modal.classList.add('is-shutting-down');
     try {
       sessionStorage.removeItem('tw_intro_played');
@@ -458,6 +459,23 @@
     if (event.key === 'Escape') closeModal(event);
   }, true);
 })();
+
+// General haptic click sound — fires on any meaningful click
+// (skips dead areas: bare frame, scrollable containers, iframes)
+(function twClickSound(){
+  var DEAD = '#frame,body,.content,.stage-wrap,.terminal-body,section.page,iframe';
+  document.addEventListener('click', function(e){
+    if (!e.isTrusted) return;
+    var t = e.target;
+    if (!t || !t.closest) return;
+    // Skip if the click target itself IS a dead area with no interactive ancestor
+    var interactive = t.closest('button,a,[role="button"],[tabindex],label,input,select,textarea,.cascade-toggle,.audio-btn,.viz-bar,.section-jump,.section-end,.dot');
+    if (!interactive) return;
+    // Skip certain noisy repeated interactions already handled by other snd* calls
+    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar')) return;
+    if (typeof sndMouseClick === 'function') sndMouseClick();
+  }, true);
+}());
 </script>
 <audio id="bg-audio" loop="" playsinline="" preload="auto" webkit-playsinline="">
 <source src="assets/audio/robot_rock.mp3" type="audio/mpeg"/>
@@ -996,6 +1014,21 @@ async function initAudio() {
       volume: -16
     }).toDestination();
 
+    // 11) Shutdown — descending membrane thump + short noise decay.
+    //     A quick power-off thud that feels mechanical, not musical.
+    SND.shutdownThump = new Tone.MembraneSynth({
+      pitchDecay: 0.14,
+      octaves: 5,
+      oscillator: { type: 'sine' },
+      envelope: { attack: 0.004, decay: 0.45, sustain: 0, release: 0.25 },
+      volume: -10
+    }).toDestination();
+    SND.shutdownHiss = new Tone.NoiseSynth({
+      noise: { type: 'brown' },
+      envelope: { attack: 0.002, decay: 0.38, sustain: 0, release: 0.20 },
+      volume: -20
+    }).toDestination();
+
     audioReady = true;
   } catch (e) {
     console.warn('audio init error:', e);
@@ -1159,6 +1192,15 @@ function sndHumOff() {
     setTimeout(() => {
       safe(() => { SND.hum.stop(); SND.humHi.stop(); });
     }, 700);
+  });
+}
+
+function sndShutdown() {
+  if (!audioReady) return;
+  safe(() => {
+    const now = Tone.now();
+    SND.shutdownThump.triggerAttackRelease('A1', 0.4, now);
+    SND.shutdownHiss.triggerAttackRelease(0.35, now + 0.04);
   });
 }
 
@@ -1538,51 +1580,46 @@ async function runSequence() {
       document.body.classList.remove('tw-frame-scan', 'tw-system-wake');
     }, 5200);
 
-    // Wake the logo + wordmark brandmark using the Web Animations API.
-    // WAAPI lives above the CSS cascade entirely — no !important fight needed.
-    // The peak is calibrated to be dramatically brighter than the resting glow
-    // so the scan hit is unmistakably visible.
+    // ── Brandmark wake glow ──────────────────────────────────────────
+    // Uses a position:fixed overlay div so it can NEVER be clipped by
+    // any parent overflow or stacking context. Also hits the button's
+    // own filter via WAAPI for a combined "lit up" effect.
     (function wakeBrandmark() {
       const bm = document.querySelector('.tw-logo-orb.tw-brandmark');
       if (!bm) return;
-      const logoGlyph     = bm.querySelector('.tw-logo-glyph--orb');
-      const wordmarkGlyph = bm.querySelector('.tw-wordmark-glyph--orb');
 
-      const D = 5000; // total duration ms
+      // 1) Overlay div — positioned over the brandmark, unclippable
+      const ov = document.createElement('div');
+      ov.setAttribute('aria-hidden', 'true');
+      ov.style.cssText = 'position:fixed;pointer-events:none;z-index:9998;border-radius:6px;box-sizing:border-box;';
+      document.body.appendChild(ov);
+      const r = bm.getBoundingClientRect(), p = 10;
+      ov.style.left   = (r.left - p) + 'px';
+      ov.style.top    = (r.top  - p) + 'px';
+      ov.style.width  = (r.width  + p * 2) + 'px';
+      ov.style.height = (r.height + p * 2) + 'px';
 
-      // --- Button: border + box-shadow + brightness spike ---
-      // Resting box-shadow is ~0 0 18px rgba(93,208,104,0.22). We spike to
-      // 0 0 70px at 0.65 opacity so the hit is unmistakably obvious.
-      const bmAnim = bm.animate([
-        { borderColor: '#2a2a2a',      boxShadow: '0 0 0px rgba(93,208,104,0)',     filter: 'brightness(0.88)', offset: 0    },
-        { borderColor: '#5dd068',      boxShadow: '0 0 70px rgba(93,208,104,0.65), 0 0 130px rgba(93,208,104,0.35), inset 0 0 30px rgba(93,208,104,0.18)', filter: 'brightness(1.7)', offset: 0.10 },
-        { borderColor: 'rgba(93,208,104,0.55)', boxShadow: '0 0 80px rgba(93,208,104,0.45), 0 0 150px rgba(93,208,104,0.22)', filter: 'brightness(1.28)', offset: 0.30 },
-        { borderColor: 'rgba(93,208,104,0.28)', boxShadow: '0 0 40px rgba(93,208,104,0.20)', filter: 'brightness(1.08)', offset: 0.62 },
-        { borderColor: '#2a2a2a',      boxShadow: '0 0 0px rgba(93,208,104,0)',     filter: 'brightness(1)',    offset: 1    }
-      ], { duration: D, easing: 'ease', fill: 'both', composite: 'replace' });
+      ov.animate([
+        { border: '1px solid rgba(93,208,104,0)',    boxShadow: '0 0 0px rgba(93,208,104,0)',    opacity: 0,    offset: 0    },
+        { border: '1px solid rgba(93,208,104,0.92)', boxShadow: '0 0 55px rgba(93,208,104,0.65), 0 0 110px rgba(93,208,104,0.35), inset 0 0 24px rgba(93,208,104,0.14)', opacity: 1, offset: 0.10 },
+        { border: '1px solid rgba(93,208,104,0.52)', boxShadow: '0 0 70px rgba(93,208,104,0.44), 0 0 140px rgba(93,208,104,0.20)', opacity: 0.82, offset: 0.32 },
+        { border: '1px solid rgba(93,208,104,0.20)', boxShadow: '0 0 32px rgba(93,208,104,0.14)', opacity: 0.45, offset: 0.68 },
+        { border: '1px solid rgba(93,208,104,0)',    boxShadow: '0 0 0px rgba(93,208,104,0)',    opacity: 0,    offset: 1    },
+      ], { duration: 5000, easing: 'ease', fill: 'both' });
 
-      // --- Glyph + wordmark: filter flare spike ---
-      // The glyphs already have a green drop-shadow at rest; we drive them
-      // to fully saturated + white-hot core so they visibly flare.
-      const glyphKF = [
-        { filter: 'drop-shadow(0 0 5px rgba(93,208,104,0.86)) drop-shadow(0 0 15px rgba(93,208,104,0.38))',  offset: 0    },
-        { filter: 'drop-shadow(0 0 14px rgba(93,208,104,1.0)) drop-shadow(0 0 40px rgba(93,208,104,0.85)) drop-shadow(0 0 8px rgba(255,255,255,0.65))', offset: 0.14 },
-        { filter: 'drop-shadow(0 0 9px rgba(93,208,104,0.9)) drop-shadow(0 0 28px rgba(93,208,104,0.58))',  offset: 0.40 },
-        { filter: 'drop-shadow(0 0 5px rgba(93,208,104,0.72)) drop-shadow(0 0 15px rgba(93,208,104,0.32))', offset: 1    }
-      ];
-      const lgOpts  = { duration: D - 200, delay: 60,  easing: 'ease', fill: 'both', composite: 'replace' };
-      const wgOpts  = { duration: D - 200, delay: 120, easing: 'ease', fill: 'both', composite: 'replace' };
-      const lgAnim  = logoGlyph?.animate(glyphKF, lgOpts);
-      const wgAnim  = wordmarkGlyph?.animate(glyphKF, wgOpts);
+      // 2) WAAPI brightness spike directly on the button
+      bm.animate([
+        { filter: 'brightness(0.88)', offset: 0    },
+        { filter: 'brightness(1.90)', offset: 0.10 },
+        { filter: 'brightness(1.35)', offset: 0.30 },
+        { filter: 'brightness(1.08)', offset: 0.65 },
+        { filter: 'brightness(1.00)', offset: 1    },
+      ], { duration: 5000, easing: 'ease', fill: 'both', composite: 'replace' });
 
-      // Cancel WAAPI animations once the wake window closes so CSS takes back over
       window.clearTimeout(window.twBrandmarkWakeTimer);
-      window.twBrandmarkWakeTimer = window.setTimeout(() => {
-        bmAnim?.cancel();
-        lgAnim?.cancel();
-        wgAnim?.cancel();
-      }, D + 200);
+      window.twBrandmarkWakeTimer = window.setTimeout(() => ov.remove(), 5300);
     })();
+
     if (greenFlash) {
       greenFlash.classList.remove('fire', 'frame-scan');
       void greenFlash.offsetWidth;
@@ -3255,6 +3292,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     lastDir = direction;
     animatingUntil = now + 760;
 
+    sndSweep();
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
 
     if (list[next].id && window.history && window.history.replaceState) {
