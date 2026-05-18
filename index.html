@@ -815,6 +815,8 @@
 (function bootIntro() {
   'use strict';
 
+  let scrollFilter = null; // set in initAudio, used by sndScroll
+
   const path = location.pathname;
   const isHome = path === '/' || path.endsWith('/') || path.endsWith('/index.html') || path === '/index.html';
 
@@ -1032,6 +1034,19 @@ async function initAudio() {
       envelope: { attack: 0.005, decay: 0.18, sustain: 0, release: 0.06 },
       volume: -16
     }).toDestination();
+
+    // 12) Scroll whoosh — brown noise through a sweeping bandpass filter.
+    //     The filter cutoff animates low→high→low to create the "air movement"
+    //     quality of a genuine whoosh. Much lower and more physical than the
+    //     boot sweep tone.
+    scrollFilter = new Tone.Filter({
+      type: 'bandpass', frequency: 300, Q: 1.2, rolloff: -24
+    }).toDestination();
+    SND.scrollWoosh = new Tone.NoiseSynth({
+      noise: { type: 'brown' },
+      envelope: { attack: 0.006, decay: 0.20, sustain: 0, release: 0.09 },
+      volume: -1
+    }).connect(scrollFilter);
 
     audioReady = true;
   } catch (e) {
@@ -1853,16 +1868,18 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   // Tone.Destination.mute (set by the audio button) silences all of these
   // automatically, so mute/unmute works without any extra wiring.
 
-  // Low-pitch scroll swoosh: sawtooth descending 220→48 Hz in 250ms.
-  // Distinct from the boot sweep (which goes 1100→160 Hz at high pitch).
+  // Scroll whoosh: brown noise → bandpass filter sweeping 100→500→160 Hz.
+  // The filter cutoff ramp is what gives whoosh its characteristic shape —
+  // rising then falling, like air moving through a space.
   function sndScroll() {
-    if (!audioReady) return;
+    if (!audioReady || !scrollFilter) return;
     safe(() => {
       const now = Tone.now();
-      SND.sweepTone.frequency.cancelScheduledValues(now);
-      SND.sweepTone.frequency.setValueAtTime(220, now);
-      SND.sweepTone.frequency.exponentialRampToValueAtTime(48, now + 0.24);
-      SND.sweepTone.triggerAttackRelease(220, 0.24, now);
+      scrollFilter.frequency.cancelScheduledValues(now);
+      scrollFilter.frequency.setValueAtTime(100, now);
+      scrollFilter.frequency.exponentialRampToValueAtTime(520, now + 0.09);
+      scrollFilter.frequency.exponentialRampToValueAtTime(160, now + 0.24);
+      SND.scrollWoosh.triggerAttackRelease(0.22, now);
     });
   }
 
@@ -3267,14 +3284,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 <script>
 // ============================================================
 // TW SECTION SNAP CONTROLLER
-// Simple, reliable: one scroll gesture = one section snap.
+// Desktop: gesture-aware — snaps only on the FIRST event of each new
+// deliberate gesture. Trackpad momentum (continuous event stream) can
+// never trigger a second snap; the user must pause 200ms and re-swipe.
+// Mouse: each wheel notch is a separate gesture → one snap per notch.
 // ============================================================
 (function twSectionSnapControllerV5(){
   var terminalBody = document.getElementById('terminal-body');
   if (!terminalBody || window.__twSectionSnapControllerV5) return;
   window.__twSectionSnapControllerV5 = true;
 
-  var cooldownUntil = 0;
+  var cooldownUntil = 0;  // no snap during cooldown
+  var inGesture = false;  // true while wheel events are continuous
+  var gestureTimer = null;// resets inGesture after 200ms quiet period
   var touch = { active: false, x: 0, y: 0, at: 0 };
 
   function sections() {
@@ -3302,7 +3324,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var current = nearestIndex(list);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return;
-    cooldownUntil = Date.now() + 850;
+    cooldownUntil = Date.now() + 900;
     if (window.twUI) window.twUI.sndScroll();
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
     var page = (window.location.pathname.split('/').pop() || 'index.html') || 'index.html';
@@ -3311,17 +3333,25 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     }
   }
 
-  // Wheel: threshold of 20px (pixel mode) or 1 line (line mode).
-  // One notch of a physical mouse = instant snap. Trackpad momentum is
-  // handled by the 850ms cooldown — once snapped, extra events are ignored.
   terminalBody.addEventListener('wheel', function(e) {
     if (document.body.classList.contains('menu-open')) return;
     if (blocked(e.target)) return;
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
-    // During cooldown, let native scroll pass through — tall cascade sections
-    // need to be scrollable after snap. Only intercept when ready to snap.
-    if (Date.now() < cooldownUntil) return;
-    var threshold = e.deltaMode === 1 ? 1 : 20;
+
+    // Track gesture continuity: any wheel event resets the idle timer.
+    // When events stop for 200ms, inGesture flips false — next event is fresh.
+    var wasInGesture = inGesture;
+    inGesture = true;
+    clearTimeout(gestureTimer);
+    gestureTimer = setTimeout(function() { inGesture = false; }, 200);
+
+    if (Date.now() < cooldownUntil) return; // snap animation in progress
+
+    // Only fire on the FIRST event of a new gesture.
+    // Subsequent events in the same continuous stream are momentum — skip them.
+    if (wasInGesture) return;
+
+    var threshold = e.deltaMode === 1 ? 1 : 12;
     if (Math.abs(e.deltaY) >= threshold) {
       e.preventDefault();
       e.stopPropagation();
