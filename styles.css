@@ -4879,3 +4879,87 @@ section.page a:focus-visible,
     line-height: 1.52 !important;
   }
 }
+
+
+/* ============================================================
+   TW ABOUT PAGE REFINEMENT PASS — terminal copy + operator roster
+   ============================================================ */
+#hero .page-content.terminal-copy {
+  margin-bottom: 0;
+}
+
+.about-signal {
+  margin-top: 0;
+  color: var(--fg) !important;
+}
+
+.about-signal pre {
+  margin: 0;
+  color: var(--fg) !important;
+  line-height: 1.58;
+  white-space: pre;
+  overflow-x: auto;
+}
+
+#origin .origin-copy,
+#team .team-bio-copy,
+#philosophy .philosophy-copy,
+#next-step .page-content.terminal-copy {
+  max-width: 78ch;
+}
+
+#origin .split-block,
+#origin .split-copy,
+#origin .stat-stack,
+#philosophy .principle-list {
+  display: none !important;
+}
+
+#team .about-team-grid {
+  margin: 4px 0 20px;
+}
+
+#team .team-card,
+#team .team-card * {
+  text-align: left !important;
+}
+
+#team .team-caption {
+  font: inherit !important;
+  font-size: inherit !important;
+  line-height: 1.58 !important;
+  color: var(--fg) !important;
+  letter-spacing: 0 !important;
+  margin-top: 10px;
+}
+
+#team .team-caption::before {
+  content: "> ";
+  color: var(--tw-prompt) !important;
+}
+
+#next-step .next-link,
+#next-step .next-link a,
+#next-step .cta-link,
+#next-step .section-end {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.section-end {
+  color: var(--accent) !important;
+}
+
+@media (max-width: 720px) {
+  .about-signal pre {
+    line-height: 1.52;
+    font-size: 11px;
+  }
+
+  #team .about-team-grid {
+    margin-top: 2px;
+    margin-bottom: 14px;
+  }
+}
