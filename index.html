@@ -586,10 +586,10 @@
 <span class="line">came out the other side.</span>
 <span class="line"></span>
 </div>
-<div class="cascade work-cascade" data-expanded="false">
-<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_01</span><span class="toggle-mark"></span></span>
+<div class="cascade work-cascade" data-expanded="true">
+<span aria-expanded="true" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_01</span><span class="toggle-mark"></span></span>
 <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
-<iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank"></iframe>
+<iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0"></iframe>
 </div></div></div>
 </div>
 <div class="cascade work-cascade" data-expanded="false">
@@ -2481,20 +2481,47 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   function initCascades() {
+    function group(c) {
+      if (c.classList.contains('work-cascade')) return 'work-cascade';
+      if (c.classList.contains('intel-cascade')) return 'intel-cascade';
+      return '';
+    }
+    function loadFrames(c, opening) {
+      c.querySelectorAll('iframe[data-src]').forEach(frame => {
+        if (opening) {
+          if (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank') frame.setAttribute('src', frame.dataset.src);
+        } else if (c.classList.contains('work-cascade')) {
+          frame.setAttribute('src', 'about:blank');
+        }
+      });
+    }
+    function closeSiblings(c) {
+      const g = group(c);
+      if (!g) return;
+      terminalBody.querySelectorAll('.' + g + '[data-expanded="true"]').forEach(other => {
+        if (other === c) return;
+        other.dataset.expanded = 'false';
+        const ot = other.querySelector('.cascade-toggle');
+        if (ot) ot.setAttribute('aria-expanded', 'false');
+        if (g === 'work-cascade') loadFrames(other, false);
+      });
+    }
+    terminalBody.querySelectorAll('.cascade[data-expanded="true"]').forEach(c => {
+      const t = c.querySelector('.cascade-toggle');
+      if (t) t.setAttribute('aria-expanded', 'true');
+      loadFrames(c, true);
+    });
     terminalBody.querySelectorAll('.cascade-toggle').forEach(tg => {
       if (tg.dataset.pjaxBound === '1') return;
       tg.dataset.pjaxBound = '1';
       tg.addEventListener('click', () => {
         const c = tg.closest('.cascade');
         if (!c) return;
-        const open = c.dataset.expanded === 'true';
-        c.dataset.expanded = open ? 'false' : 'true';
-        tg.setAttribute('aria-expanded', open ? 'false' : 'true');
-        if (!open) {
-          c.querySelectorAll('iframe[data-src]').forEach(frame => {
-            if (frame.getAttribute('src') === 'about:blank') frame.setAttribute('src', frame.dataset.src);
-          });
-        }
+        const opening = c.dataset.expanded !== 'true';
+        if (opening) closeSiblings(c);
+        c.dataset.expanded = opening ? 'true' : 'false';
+        tg.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        loadFrames(c, opening);
       });
       tg.addEventListener('keydown', e => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tg.click(); }
@@ -2642,6 +2669,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     setChrome(page);
     initCascades();
+    if (typeof window.twBindCleanCascades === 'function') window.twBindCleanCascades();
     initReveals();
     initSectionIndicators();
     initHashSync();
@@ -2954,8 +2982,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 <script>
 // ============================================================
 // CASCADE HARD RESET — desktop + mobile
-// Removes older stacked listeners by replacing each cascade toggle once, then
-// binds one clean controller. This keeps [+]/[-] reliable across every page.
+// One clean controller. Work films and Intel articles use mutual exclusion.
 // ============================================================
 (function cascadeHardReset(){
   function resetIframes(cascade, opening){
@@ -2970,14 +2997,23 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     });
   }
 
-  function closeOtherWorkCascades(current){
-    if (!current.classList.contains('work-cascade')) return;
-    document.querySelectorAll('.work-cascade[data-expanded="true"]').forEach(function(other){
+  function cascadeGroup(cascade){
+    if (cascade.classList.contains('work-cascade')) return 'work-cascade';
+    if (cascade.classList.contains('intel-cascade')) return 'intel-cascade';
+    return '';
+  }
+
+  function closeSiblingCascades(current){
+    var group = cascadeGroup(current);
+    if (!group) return;
+    document.querySelectorAll('.' + group + '[data-expanded="true"]').forEach(function(other){
       if (other === current) return;
       other.dataset.expanded = 'false';
       var otherToggle = other.querySelector('.cascade-toggle');
       if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
-      other.querySelectorAll('iframe[data-src]').forEach(function(frame){ frame.setAttribute('src', 'about:blank'); });
+      if (group === 'work-cascade') {
+        other.querySelectorAll('iframe[data-src]').forEach(function(frame){ frame.setAttribute('src', 'about:blank'); });
+      }
     });
   }
 
@@ -2985,10 +3021,18 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var cascade = toggle && toggle.closest ? toggle.closest('.cascade') : null;
     if (!cascade) return;
     var opening = cascade.dataset.expanded !== 'true';
-    if (opening) closeOtherWorkCascades(cascade);
+    if (opening) closeSiblingCascades(cascade);
     cascade.dataset.expanded = opening ? 'true' : 'false';
     toggle.setAttribute('aria-expanded', opening ? 'true' : 'false');
     resetIframes(cascade, opening);
+  }
+
+  function initOpenCascades(){
+    document.querySelectorAll('.cascade[data-expanded="true"]').forEach(function(cascade){
+      var toggle = cascade.querySelector('.cascade-toggle');
+      if (toggle) toggle.setAttribute('aria-expanded', 'true');
+      resetIframes(cascade, true);
+    });
   }
 
   function bindCleanToggles(){
@@ -3012,6 +3056,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       });
       toggle.replaceWith(clean);
     });
+    initOpenCascades();
   }
 
   if (document.readyState === 'loading') {
@@ -3079,21 +3124,22 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
 <script>
 // ============================================================
-// TW SECTION SNAP CONTROLLER V3
-// One physical wheel/swipe gesture = one section, even with hard
-// MacBook trackpad momentum. The gesture lock stays alive until
-// wheel momentum goes quiet, so a single flick cannot skip sections.
+// TW SECTION SNAP CONTROLLER V4
+// Easier to trigger than V3, but still limits a single hard
+// trackpad flick to one section unless there is a real quiet gap.
 // ============================================================
-(function twSectionSnapControllerV3(){
+(function twSectionSnapControllerV4(){
   var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody || window.__twSectionSnapControllerV3) return;
-  window.__twSectionSnapControllerV3 = true;
+  if (!terminalBody || window.__twSectionSnapControllerV4) return;
+  window.__twSectionSnapControllerV4 = true;
 
-  var snapLockUntil = 0;
-  var wheelGestureLocked = false;
-  var wheelIdleTimer = null;
+  var animatingUntil = 0;
   var wheelAccum = 0;
-  var touch = { active:false, vertical:false, fired:false, x:0, y:0, top:0, at:0 };
+  var lastWheelAt = 0;
+  var lastSnapAt = 0;
+  var lastSnapDir = 0;
+  var idleTimer = null;
+  var touch = { active:false, vertical:false, x:0, y:0, at:0 };
 
   function sections(){
     return Array.prototype.slice.call(terminalBody.querySelectorAll('section.page'));
@@ -3120,17 +3166,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, iframe, input, textarea, select');
   }
 
-  function resetWheelAfterMomentum(){
-    window.clearTimeout(wheelIdleTimer);
-    wheelIdleTimer = window.setTimeout(function(){
-      wheelGestureLocked = false;
-      wheelAccum = 0;
-    }, 520);
-  }
-
   function snap(direction){
     var now = Date.now();
-    if (now < snapLockUntil) return false;
+    if (now < animatingUntil) return false;
 
     var list = sections();
     if (list.length < 2) return false;
@@ -3139,7 +3177,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return false;
 
-    snapLockUntil = now + 1200;
+    animatingUntil = now + 620;
+    lastSnapAt = now;
+    lastSnapDir = direction;
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
 
     if (list[next].id && window.history && window.history.replaceState) {
@@ -3154,50 +3194,58 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) * 1.05) return;
 
     e.preventDefault();
-    resetWheelAfterMomentum();
 
-    // If this is trackpad momentum from the same flick, swallow it.
-    if (wheelGestureLocked) return;
+    var now = Date.now();
+    var quietGap = (now - lastWheelAt) > 170;
+    var dir = e.deltaY > 0 ? 1 : -1;
+    lastWheelAt = now;
+
+    window.clearTimeout(idleTimer);
+    idleTimer = window.setTimeout(function(){ wheelAccum = 0; }, 170);
+
+    // Swallow momentum from the same physical flick, but allow a new flick
+    // after a short quiet gap even if it happens quickly.
+    if (!quietGap && dir === lastSnapDir && (now - lastSnapAt) < 1050) {
+      wheelAccum = 0;
+      return;
+    }
+    if (now < animatingUntil) {
+      wheelAccum = 0;
+      return;
+    }
+    if (quietGap) wheelAccum = 0;
 
     wheelAccum += e.deltaY;
-    var threshold = Math.max(34, Math.min(90, terminalBody.clientHeight * 0.075));
+    var threshold = e.deltaMode === 1 ? 2 : Math.max(18, Math.min(48, terminalBody.clientHeight * 0.032));
+    var impulse = Math.abs(e.deltaY) > threshold * 1.25;
 
-    if (Math.abs(wheelAccum) < threshold) return;
-
-    wheelGestureLocked = true;
-    snap(wheelAccum > 0 ? 1 : -1);
-    wheelAccum = 0;
+    if (Math.abs(wheelAccum) >= threshold || impulse) {
+      snap(dir);
+      wheelAccum = 0;
+    }
   }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchstart', function(e){
     if (!e.touches || e.touches.length !== 1) return;
     if (document.body.classList.contains('menu-open')) return;
     if (blocked(e.target)) return;
-
     touch.active = true;
     touch.vertical = false;
-    touch.fired = false;
     touch.x = e.touches[0].clientX;
     touch.y = e.touches[0].clientY;
-    touch.top = terminalBody.scrollTop;
     touch.at = Date.now();
   }, { passive:true, capture:true });
 
   terminalBody.addEventListener('touchmove', function(e){
     if (!touch.active || !e.touches || e.touches.length !== 1) return;
-
     var dx = e.touches[0].clientX - touch.x;
     var dy = e.touches[0].clientY - touch.y;
-
-    if (!touch.vertical && Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx) * 1.15) {
-      touch.vertical = true;
-    }
-
+    if (!touch.vertical && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx) * 1.05) touch.vertical = true;
     if (touch.vertical) e.preventDefault();
   }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchend', function(e){
-    if (!touch.active || touch.fired) return;
+    if (!touch.active) return;
     touch.active = false;
     if (!e.changedTouches || !e.changedTouches.length) return;
 
@@ -3205,12 +3253,11 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var dx = touch.x - e.changedTouches[0].clientX;
     var dt = Math.max(1, Date.now() - touch.at);
     var velocity = Math.abs(dy) / dt;
-    var threshold = Math.min(86, Math.max(38, terminalBody.clientHeight * 0.06));
+    var threshold = Math.min(64, Math.max(24, terminalBody.clientHeight * 0.045));
 
-    if (Math.abs(dx) > Math.abs(dy) * 0.85) return;
-    if (Math.abs(dy) < threshold && velocity < 0.17) return;
+    if (Math.abs(dx) > Math.abs(dy) * 0.9) return;
+    if (Math.abs(dy) < threshold && velocity < 0.12) return;
 
-    touch.fired = true;
     snap(dy > 0 ? 1 : -1);
   }, { passive:false, capture:true });
 })();

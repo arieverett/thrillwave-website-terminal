@@ -5872,3 +5872,220 @@ section.page {
     height: 300px !important;
   }
 }
+
+
+/* ============================================================
+   TW final interaction/content polish pass
+   ============================================================ */
+
+/* Let JS own snapping so native CSS momentum never double-snaps. */
+.terminal-body {
+  scroll-snap-type: none !important;
+  scroll-padding-top: 0 !important;
+  overscroll-behavior-y: contain !important;
+}
+section.page {
+  scroll-snap-align: none !important;
+  scroll-snap-stop: normal !important;
+}
+
+/* Show-film and show-intro toggles stay white on hover. */
+.work-cascade .cascade-toggle,
+.work-cascade .cascade-toggle:hover,
+.work-cascade .cascade-toggle:focus-visible,
+.work-cascade .cascade-toggle .cmd-action,
+.work-cascade .cascade-toggle .cmd-name,
+.intro-cascade .cascade-toggle,
+.intro-cascade .cascade-toggle:hover,
+.intro-cascade .cascade-toggle:focus-visible,
+.intro-cascade .cascade-toggle .cmd-action,
+.intro-cascade .cascade-toggle .cmd-name {
+  color: var(--fg) !important;
+}
+.work-cascade .cascade-toggle .toggle-mark,
+.intro-cascade .cascade-toggle .toggle-mark {
+  color: var(--muted) !important;
+}
+
+/* Sitrep 03A/03B/03C: one tile should match a single tile from the 03 triptych. */
+#ingest .single-tile,
+#process .single-tile,
+#output .single-tile {
+  display: flex !important;
+  gap: 8px !important;
+  width: calc((100% - 16px) / 3) !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 10px 0 12px !important;
+}
+#ingest .single-tile .tile,
+#process .single-tile .tile,
+#output .single-tile .tile {
+  flex: 1 1 auto !important;
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  padding: 11px 9px 10px !important;
+}
+#ingest .single-tile .tile-graphic,
+#process .single-tile .tile-graphic,
+#output .single-tile .tile-graphic {
+  height: 26px !important;
+  font-size: 16px !important;
+  gap: 6px !important;
+  margin: 4px 0 8px !important;
+}
+#ingest .single-tile .tile-title,
+#process .single-tile .tile-title,
+#output .single-tile .tile-title {
+  font-size: 10px !important;
+  letter-spacing: 2.5px !important;
+  margin-bottom: 6px !important;
+}
+#ingest .single-tile .tile-list,
+#process .single-tile .tile-list,
+#output .single-tile .tile-list {
+  font-size: 10px !important;
+  line-height: 1.38 !important;
+}
+
+/* Intel feed: one-open-at-a-time articles with terminal-line spacing. */
+#feed .intel-cascade {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .intel-cascade + .intel-cascade {
+  margin-top: 0.12em !important;
+}
+#feed .intel-cascade .cascade-toggle {
+  display: block !important;
+  line-height: 1.5 !important;
+  min-height: 1.5em !important;
+  padding: 0 !important;
+}
+#feed .intel-cascade[data-expanded="true"] .cascade-content,
+#feed .intel-cascade .cascade-content {
+  margin: 0.08em 0 0.2em 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .rss-copy {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .rss-copy .line {
+  min-height: 1.5em !important;
+  line-height: 1.5 !important;
+}
+#feed .read-more-copy {
+  margin-top: 0.12em !important;
+}
+
+/* Contact cascade triggers should match body terminal size on mobile too. */
+.contact-cascade,
+.contact-cascade .cascade-toggle {
+  font-size: 1em !important;
+  line-height: inherit !important;
+}
+
+/* Phone landscape: wider terminal, consistent type, overlay menu so it always appears. */
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 980px) {
+  :root {
+    --term-w: calc(100vw - 12px) !important;
+    --term-h: calc(100dvh - 48px) !important;
+    --menu-w: min(330px, calc(100vw - 28px)) !important;
+  }
+  .frame,
+  .desktop { inset: 3px !important; }
+  .content { padding: 18px 6px 12px !important; align-items: center !important; }
+  .stage-wrap,
+  .topbar,
+  .stage,
+  .terminal.main,
+  .below-bar { width: var(--term-w) !important; max-width: var(--term-w) !important; }
+  .stage { position: relative !important; gap: 0 !important; }
+  .terminal-bar { min-height: 28px !important; padding: 6px 10px !important; }
+  .terminal-body,
+  .page-content.terminal-copy,
+  .page-content.terminal-copy .line,
+  .cascade-toggle,
+  .next-link,
+  .section-header {
+    font-size: 10.5px !important;
+    line-height: 1.42 !important;
+  }
+  .page-content.terminal-copy { padding-left: 2ch !important; }
+  .page-content.terminal-copy .line { min-height: 1.42em !important; }
+  section.page { padding: 10px 16px 34px !important; min-height: 100% !important; }
+  .section-header { margin-bottom: 7px !important; }
+  .below-bar { justify-content: center !important; gap: 7px !important; font-size: 8px !important; line-height: 1.2 !important; }
+  body.menu-open .topbar { width: var(--term-w) !important; }
+  .terminal.side {
+    position: absolute !important;
+    top: 34px !important;
+    right: 8px !important;
+    width: var(--menu-w) !important;
+    height: auto !important;
+    max-height: 0 !important;
+    z-index: 50 !important;
+    visibility: hidden !important;
+    clip-path: inset(0 0 100% 0) !important;
+    opacity: 0 !important;
+  }
+  body.menu-open .terminal.side {
+    width: var(--menu-w) !important;
+    max-height: calc(100dvh - 58px) !important;
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  body.menu-open .terminal.side .terminal-body {
+    max-height: calc(100dvh - 92px) !important;
+    overflow-y: auto !important;
+    padding: 12px !important;
+  }
+  .menu-list { gap: 0 !important; }
+  .menu-item { font-size: 10.5px !important; line-height: 1.45 !important; padding: 6px 0 !important; }
+  .triptych { gap: 5px !important; margin: 8px 0 !important; }
+  .tile { padding: 8px 5px 7px !important; }
+  .tile-graphic { height: 20px !important; font-size: 12px !important; margin: 3px 0 5px !important; }
+  .tile-title { font-size: 7.8px !important; letter-spacing: 1px !important; margin-bottom: 4px !important; }
+  .tile-list { font-size: 7.8px !important; line-height: 1.2 !important; }
+}
+
+@media (max-width: 720px) {
+  #ingest .single-tile,
+  #process .single-tile,
+  #output .single-tile {
+    width: calc((100% - 10px) / 3) !important;
+    max-width: none !important;
+    margin: 8px 0 10px !important;
+  }
+  #ingest .single-tile .tile,
+  #process .single-tile .tile,
+  #output .single-tile .tile {
+    padding: 9px 5px 8px !important;
+  }
+  #ingest .single-tile .tile-graphic,
+  #process .single-tile .tile-graphic,
+  #output .single-tile .tile-graphic {
+    height: 22px !important;
+    font-size: 13px !important;
+    margin: 4px 0 7px !important;
+  }
+  #ingest .single-tile .tile-title,
+  #process .single-tile .tile-title,
+  #output .single-tile .tile-title {
+    font-size: 8px !important;
+    letter-spacing: 1px !important;
+  }
+  #ingest .single-tile .tile-list,
+  #process .single-tile .tile-list,
+  #output .single-tile .tile-list {
+    font-size: 8px !important;
+    line-height: 1.3 !important;
+  }
+  .contact-cascade,
+  .contact-cascade .cascade-toggle {
+    font-size: 1em !important;
+    line-height: inherit !important;
+  }
+}
