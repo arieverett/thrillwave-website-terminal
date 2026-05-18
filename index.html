@@ -3317,7 +3317,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, iframe, input, textarea, select');
   }
 
-  function snap(direction) {
+  function snap(direction, snd) {
     if (Date.now() < cooldownUntil) return;
     var list = sections();
     if (list.length < 2) return;
@@ -3325,7 +3325,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return;
     cooldownUntil = Date.now() + 900;
-    if (window.twUI) window.twUI.sndScroll();
+    // snd is an optional override; defaults to scroll whoosh
+    var play = snd || (window.twUI && window.twUI.sndScroll);
+    if (play) try { play(); } catch(e) {}
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
     var page = (window.location.pathname.split('/').pop() || 'index.html') || 'index.html';
     if (list[next].id && window.history && window.history.replaceState) {
@@ -3338,23 +3340,26 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (blocked(e.target)) return;
     if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
 
-    // Track gesture continuity: any wheel event resets the idle timer.
-    // When events stop for 200ms, inGesture flips false — next event is fresh.
-    var wasInGesture = inGesture;
-    inGesture = true;
+    // ALWAYS prevent native scroll first — if we let any event through,
+    // CSS scroll-snap-type takes over and fights our programmatic scrollTo,
+    // causing the "doesn't snap to anchors" bug. We own all scroll here.
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Gesture boundary: events arriving within 150ms of each other are the
+    // same continuous gesture (trackpad momentum). When events stop for 150ms,
+    // gestureActive resets — the next event is a fresh deliberate gesture.
+    var wasActive = gestureActive;
+    gestureActive = true;
     clearTimeout(gestureTimer);
-    gestureTimer = setTimeout(function() { inGesture = false; }, 200);
+    gestureTimer = setTimeout(function() { gestureActive = false; }, 150);
 
     if (Date.now() < cooldownUntil) return; // snap animation in progress
+    if (wasActive) return;                  // momentum — not a new gesture
 
-    // Only fire on the FIRST event of a new gesture.
-    // Subsequent events in the same continuous stream are momentum — skip them.
-    if (wasInGesture) return;
-
-    var threshold = e.deltaMode === 1 ? 1 : 12;
+    // First event of a fresh gesture: fire one snap.
+    var threshold = e.deltaMode === 1 ? 1 : 15;
     if (Math.abs(e.deltaY) >= threshold) {
-      e.preventDefault();
-      e.stopPropagation();
       snap(e.deltaY > 0 ? 1 : -1);
     }
   }, { passive: false, capture: true });
@@ -3397,6 +3402,11 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); snap(1); }
     else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); snap(-1); }
+    else if (e.key === 'Enter') {
+      e.preventDefault();
+      // Button-press sound for Enter — distinct from the scroll whoosh
+      snap(1, window.twUI && window.twUI.sndClick);
+    }
   }, false);
 })();
 </script>

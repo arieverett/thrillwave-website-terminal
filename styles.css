@@ -7525,3 +7525,9 @@ button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
   transform: none !important;
   outline: none;
 }
+
+/* ── click-to-start: white on :active (click), green on hover, white at rest ── */
+.welcome-btn:active {
+  color: var(--fg) !important;
+  border-color: var(--fg) !important;
+}
