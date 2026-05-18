@@ -177,16 +177,16 @@
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">best for</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="check-columns">
               <div>
-                &gt;   + launching a campaign<br>
-                &gt;   + entering a new market<br>
-                &gt;   + repositioning a brand<br>
-                &gt;   + explaining complex work
+                &gt;     launching a campaign<br>
+                &gt;     entering a new market<br>
+                &gt;     repositioning a brand<br>
+                &gt;     explaining complex work
               </div>
               <div>
-                &gt;   + sales enablement<br>
-                &gt;   + recruitment stories<br>
-                &gt;   + founder narratives<br>
-                &gt;   + content that needs to matter
+                &gt;     sales enablement<br>
+                &gt;     recruitment stories<br>
+                &gt;     founder narratives<br>
+                &gt;     content that needs to matter
               </div>
             </div>
           </section>
@@ -196,8 +196,8 @@
             <div class="page-content">&gt; send us the mission.
 &gt; we will come back with a read on the room.
 &gt; 
-&gt; <a href="contact.html" class="cta-link">request a sitrep &rarr;</a></div>
-            <div class="next-link reveal">&gt; <a href="work.html">next: work &rarr;</a></div>
+&gt; <a href="contact.html" class="cta-link">request a sitrep</a></div>
+            <div class="next-link reveal">&gt; <a href="work.html">next: work</a></div>
           </section>
 </div>
       </div>
@@ -244,28 +244,6 @@
 </main>
 
 <script>
-// TW hard fix: menu items are real links. Register first, in capture phase,
-// so no later terminal/PJAX/homepage handlers can steal the click.
-(function(){
-  function routeMenuLink(e){
-    var target = e.target;
-    if (!target || !target.closest) return;
-    var link = target.closest('#side-menu a.menu-item');
-    if (!link) return;
-    var href = link.href || link.getAttribute('href') || 'index.html';
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    document.body.classList.remove('menu-open');
-    window.location.assign(href);
-  }
-  window.addEventListener('pointerdown', routeMenuLink, true);
-  window.addEventListener('touchstart', routeMenuLink, true);
-  window.addEventListener('click', routeMenuLink, true);
-})();
-</script>
-
-<script>
 (function() {
   const NEXT_PAGE = 'work.html';
 
@@ -284,6 +262,7 @@
   tick(); setInterval(tick, 1000);
   // ---------- bg audio player (cross-page persistence via sessionStorage) ----------
   const bgAudio = document.getElementById('bg-audio');
+  if (bgAudio) bgAudio.volume = 0.4;
   const audioToggleBtn = document.getElementById('audio-toggle-btn');
   const MUSIC_KEY = 'tw_music_on';
   const MUTE_KEY  = 'tw_audio_muted';
@@ -311,6 +290,7 @@
   audioToggleBtn.addEventListener('click', () => {
     if (bgAudio.paused || bgAudio.muted) {
       bgAudio.muted = false;
+      bgAudio.volume = 0.4;
       sessionStorage.setItem(MUTE_KEY, '0');
       applyToneMute(false);
       bgAudio.play().then(() => sessionStorage.setItem(MUSIC_KEY, '1')).catch(() => {});
@@ -418,6 +398,7 @@
   // time since the last save (modulo track duration for looped audio).
   function restoreMusic() {
     function applyTimeAndMaybePlay() {
+      bgAudio.volume = 0.4;
       const savedTime = parseFloat(sessionStorage.getItem(MUSIC_TIME_KEY));
       const savedTs   = parseInt(sessionStorage.getItem(MUSIC_TS_KEY), 10);
       const wasOn     = sessionStorage.getItem(MUSIC_KEY) === '1';
@@ -544,7 +525,7 @@
         const end = document.createElement('a');
         end.href = 'work.html';
         end.className = 'section-end';
-        end.textContent = 'end - next page →';
+        end.textContent = 'end - next page';
         sec.appendChild(end);
       }
     });
@@ -564,7 +545,7 @@
       history.replaceState(null, '', '#' + next.id);
       terminalBody.scrollTo({ top: next.offsetTop, behavior: 'smooth' });
     } else {
-      window.location.href = NEXT_PAGE;
+      if (typeof window.twSoftLoadPage === 'function') { window.twSoftLoadPage(NEXT_PAGE).catch(function(){ window.location.href = NEXT_PAGE; }); } else { window.location.href = NEXT_PAGE; }
     }
   });
 })();
@@ -601,6 +582,82 @@
 </script>
 
 
+
+<script>
+// TW persistent navigation shim — keeps the single audio element alive on this page.
+(function(){
+  const PAGE_ORDER = ['index.html','about.html','sitrep.html','work.html','intel.html','contact.html'];
+  const PAGE_LABELS = {'index.html':'home','about.html':'about','sitrep.html':'sitrep','work.html':'work','intel.html':'intel','contact.html':'contact'};
+  let currentPage = 'sitrep.html';
+  const terminalBody = document.getElementById('terminal-body');
+  const titlePage = document.getElementById('title-page');
+  const body = document.body;
+  const sideMenu = document.getElementById('side-menu');
+  const menuBtn = document.getElementById('menu-btn');
+  if (!terminalBody) return;
+
+  function normalizePage(href){
+    try {
+      const u = new URL(href, location.href);
+      const n = u.pathname.split('/').pop() || 'index.html';
+      return PAGE_LABELS[n] ? n : null;
+    } catch(e) { return null; }
+  }
+  function closeMenu(){
+    body.classList.remove('menu-open');
+    if (menuBtn) { menuBtn.setAttribute('aria-expanded','false'); menuBtn.textContent='menu'; menuBtn.classList.remove('active'); }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden','true');
+  }
+  function reinit(){
+    if (titlePage) titlePage.textContent = PAGE_LABELS[currentPage] || currentPage.replace('.html','');
+    if (typeof initSectionIndicators === 'function') initSectionIndicators();
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(function(entries){
+        entries.forEach(function(entry){ if (entry.isIntersecting) { entry.target.classList.add('is-in'); io.unobserve(entry.target); } });
+      }, { threshold: 0.2, root: terminalBody });
+      terminalBody.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+    } else {
+      terminalBody.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-in'); });
+    }
+    terminalBody.scrollTo({ top: 0, behavior: 'auto' });
+  }
+  async function softLoad(href, replace){
+    const u = new URL(href, location.href);
+    const page = normalizePage(u.href);
+    if (!page) { window.location.href = href; return; }
+    if (page === 'index.html') { window.location.href = u.href; return; }
+    closeMenu();
+    const res = await fetch(page, { cache: 'no-cache' });
+    if (!res.ok) throw new Error('Could not load ' + page);
+    const html = await res.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const incoming = doc.getElementById('terminal-body');
+    if (!incoming) throw new Error(page + ' missing #terminal-body');
+    terminalBody.innerHTML = incoming.innerHTML;
+    currentPage = page;
+    reinit();
+    if (replace) history.replaceState({page: page}, '', page + (u.hash || ''));
+    else history.pushState({page: page}, '', page + (u.hash || ''));
+    if (u.hash) {
+      const target = terminalBody.querySelector(u.hash);
+      if (target) terminalBody.scrollTo({ top: target.offsetTop, behavior: 'auto' });
+    }
+  }
+  window.twSoftLoadPage = softLoad;
+  window.addEventListener('click', function(e){
+    const a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (!a) return;
+    const href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || a.target === '_blank') return;
+    const page = normalizePage(href);
+    if (!page) return;
+    e.preventDefault();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    softLoad(href).catch(function(err){ console.warn('soft navigation failed:', err); window.location.href = href; });
+  }, true);
+  window.addEventListener('popstate', function(){ softLoad(location.href, true).catch(function(){}); });
+})();
+</script>
 
 <script>
 // ============================================================

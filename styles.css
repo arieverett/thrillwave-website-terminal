@@ -4616,3 +4616,93 @@ body.tw-system-wake .terminal.main {
     height: 64px;
   }
 }
+
+
+/* ============================================================
+   TW STRICT TERMINAL REGIME — cohesive copy/format pass
+   Every terminal line uses white prompts, no icon bullets, no underlined end links.
+   ============================================================ */
+:root { --tw-prompt: #f4f3e8; }
+
+.page-content,
+.prompt,
+.boot-term-prompt,
+.section-jump,
+.section-end,
+.cascade-toggle .prompt,
+.power-modal-line .prompt,
+.data-cell p::before,
+.flowline p::before,
+.principle-list p::before,
+.terminal-form p::before,
+.contact-grid em::before,
+.stat-label::before,
+.tile-list li::before,
+.check-columns div::before,
+.case-row::before,
+.team-name::before,
+.team-role::before,
+.label-line::before {
+  color: var(--tw-prompt) !important;
+}
+
+section.page,
+section.page * { text-align: left; }
+
+section.page a,
+section.page a:visited,
+section.page a:hover,
+section.page a:focus-visible,
+.section-end,
+.section-end:hover,
+.section-end:focus-visible {
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+.section-end {
+  display: inline-block !important;
+  color: var(--tw-prompt) !important;
+  left: 26px !important;
+  text-transform: none !important;
+  letter-spacing: 0.08em !important;
+}
+.section-end::before { content: '> '; color: var(--tw-prompt) !important; }
+
+.data-cell p::before,
+.flowline p::before,
+.principle-list p::before,
+.terminal-form p::before,
+.contact-grid em::before,
+.stat-label::before,
+.tile-list li::before {
+  content: '> ' !important;
+  color: var(--tw-prompt) !important;
+}
+
+.check-columns div::before,
+.case-row::before,
+.team-name::before,
+.team-role::before,
+.label-line::before {
+  content: '> ';
+  color: var(--tw-prompt) !important;
+}
+
+.check-columns div,
+.case-row,
+.team-name,
+.team-role,
+.label-line,
+.data-cell p,
+.flowline p,
+.principle-list p,
+.terminal-form p,
+.contact-grid em,
+.stat-label,
+.tile-list li { color: var(--fg) !important; }
+
+ul.tile-list,
+ul.tile-list li { list-style: none !important; margin-left: 0 !important; padding-left: 0 !important; }
+.cta-link { color: var(--fg) !important; }
