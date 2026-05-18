@@ -5156,3 +5156,147 @@ button.cta-link.tw-page-link:focus-visible {
 #side-menu button.menu-item.tw-page-link .name {
   pointer-events: none;
 }
+
+
+/* ============================================================
+   TW BIG CONTENT PASS — section-specific refinements
+   ============================================================ */
+
+/* Homepage who-we-work-with: white at rest, green on hover, no tabbed indentation. */
+#who_we_work_with .page-content.terminal-copy .accent,
+#who_we_work_with .page-content.terminal-copy a,
+#who_we_work_with .page-content.terminal-copy a:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+#who_we_work_with .page-content.terminal-copy a:hover,
+#who_we_work_with .page-content.terminal-copy a:focus-visible {
+  color: var(--accent) !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* Flashing and footer next-page prompts: white at rest, green on hover across pages. */
+.next-link,
+.next-link button.tw-page-link,
+section.page .next-link button.tw-page-link,
+.section-end,
+.section-end:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+.next-link button.tw-page-link:hover,
+.next-link button.tw-page-link:focus-visible,
+section.page .next-link button.tw-page-link:hover,
+section.page .next-link button.tw-page-link:focus-visible,
+.section-end:hover,
+.section-end:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 6px rgba(93,208,104,0.4)) !important;
+}
+
+/* About 02D: make the in-copy sitrep command green; leave the flashing prompt white. */
+#next-step .page-content.terminal-copy button.cta-link.tw-page-link {
+  color: var(--accent) !important;
+}
+#next-step .page-content.terminal-copy button.cta-link.tw-page-link:hover,
+#next-step .page-content.terminal-copy button.cta-link.tw-page-link:focus-visible {
+  color: var(--fg) !important;
+}
+
+/* Sitrep 03D company links are intentionally white, with green hover. */
+#best-for a,
+#best-for a:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+#best-for a:hover,
+#best-for a:focus-visible {
+  color: var(--accent) !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* Work page: keep selected-file cascades tight and allow the landing copy to use full width. */
+#selected .selected-copy { margin-bottom: 0 !important; }
+#selected .work-cascade {
+  margin: 0 !important;
+  line-height: 1.58 !important;
+}
+#selected .work-cascade .cascade-toggle {
+  line-height: 1.58 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+#landing .wide-copy,
+#landing .page-content.terminal-copy {
+  max-width: none !important;
+  width: 100% !important;
+}
+#what-we-make .make-copy .accent {
+  color: var(--accent) !important;
+}
+
+/* Intel feed: terminal RSS style. */
+.intel-cascade {
+  margin: 4px 0 !important;
+  line-height: 1.58;
+}
+.intel-cascade .cascade-toggle { display: inline-block; }
+.intel-cascade .cmd-action { color: var(--fg); margin-right: 1ch; }
+.intel-cascade .cmd-name { color: var(--accent) !important; }
+.intel-cascade .cascade-content {
+  margin: 6px 0 12px 2ch;
+}
+.rss-copy {
+  max-width: 86ch;
+}
+.newsletter-card pre {
+  color: var(--fg) !important;
+}
+
+/* Contact terminal widgets. */
+.contact-cascade {
+  margin: 6px 0 10px !important;
+  line-height: 1.58;
+}
+.contact-cascade .cmd-action { color: var(--fg); margin-right: 1ch; }
+.contact-cascade .cmd-name { color: var(--accent) !important; }
+.embed-frame {
+  width: 100%;
+  max-width: 980px;
+  margin: 10px 0 18px 2ch;
+  border: 1px solid rgba(93,208,104,0.35);
+  box-shadow: 0 0 22px rgba(93,208,104,0.12);
+  background: rgba(0,0,0,0.35);
+}
+.embed-frame iframe {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: #050705;
+}
+.calendly-frame iframe { min-height: 660px; }
+.map-frame iframe { min-height: 390px; filter: grayscale(1) contrast(1.05) brightness(0.85); }
+
+@media (max-width: 720px) {
+  #selected .work-cascade,
+  #selected .work-cascade .cascade-toggle,
+  .intel-cascade,
+  .contact-cascade {
+    line-height: 1.52 !important;
+  }
+  .embed-frame {
+    margin-left: 0;
+    max-width: 100%;
+  }
+  .calendly-frame iframe { min-height: 620px; }
+  .map-frame iframe { min-height: 330px; }
+}
+
+/* Contact page should not show an automatic next-page/home prompt. */
+#loop > .section-end {
+  display: none !important;
+}
