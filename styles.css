@@ -6906,3 +6906,122 @@ button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
     height: 15.5px !important;
   }
 }
+
+/* ============================================================
+   TW final logo HUD polish — no spin/sweep/banding; green <-> muted gray pulse only
+   ============================================================ */
+
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark {
+  color: var(--accent) !important;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(93, 208, 104, 0.16), rgba(93, 208, 104, 0.045) 48%, rgba(0,0,0,0) 72%),
+    rgba(0, 0, 0, 0.18) !important;
+  animation: twBrandmarkMutedPulse 8.8s ease-in-out infinite !important;
+  transition: border-color 160ms ease, transform 160ms ease !important;
+}
+
+/* No sweep, scanline, banding, rotation, shimmer, or stripe overlay on the HUD mark. */
+.tw-logo-orb.tw-brandmark::before,
+.tw-logo-orb.tw-brandmark::after,
+button.tw-logo-orb.tw-brandmark::before,
+button.tw-logo-orb.tw-brandmark::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  color: currentColor !important;
+  background: currentColor !important;
+  opacity: 0.96 !important;
+  transform: none !important;
+  mix-blend-mode: normal !important;
+  animation: twBrandmarkGlyphMutedPulse 8.8s ease-in-out infinite !important;
+  filter:
+    drop-shadow(0 0 4px rgba(93,208,104,0.58))
+    drop-shadow(0 0 13px rgba(93,208,104,0.24)) !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover,
+.tw-logo-orb.tw-brandmark:focus-visible,
+button.tw-logo-orb.tw-brandmark:hover,
+button.tw-logo-orb.tw-brandmark:focus-visible {
+  border-color: currentColor !important;
+  transform: translateY(-1px) !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb {
+  filter:
+    drop-shadow(0 0 4px rgba(93,208,104,0.58))
+    drop-shadow(0 0 13px rgba(93,208,104,0.24)) !important;
+}
+
+/* Keep the control-table glow synced to green <-> muted gray, not white. */
+.topbar-right::before {
+  animation: twControlGlowMutedPulse 8.8s ease-in-out infinite !important;
+}
+
+@keyframes twBrandmarkMutedPulse {
+  0%, 100% {
+    color: var(--accent);
+    background:
+      radial-gradient(circle at 50% 45%, rgba(93, 208, 104, 0.17), rgba(93, 208, 104, 0.045) 48%, rgba(0,0,0,0) 72%),
+      rgba(0, 0, 0, 0.18);
+    box-shadow:
+      inset 0 0 11px rgba(93,208,104,0.11),
+      0 0 13px rgba(93,208,104,0.14),
+      0 0 30px rgba(93,208,104,0.07) !important;
+  }
+  50% {
+    color: var(--muted);
+    background:
+      radial-gradient(circle at 50% 45%, rgba(119,119,119,0.20), rgba(119,119,119,0.06) 48%, rgba(0,0,0,0) 72%),
+      rgba(0, 0, 0, 0.18);
+    box-shadow:
+      inset 0 0 10px rgba(119,119,119,0.14),
+      0 0 12px rgba(119,119,119,0.15),
+      0 0 28px rgba(119,119,119,0.08) !important;
+  }
+}
+
+@keyframes twBrandmarkGlyphMutedPulse {
+  0%, 100% {
+    color: var(--accent);
+    opacity: 0.98;
+    filter:
+      drop-shadow(0 0 4px rgba(93,208,104,0.58))
+      drop-shadow(0 0 13px rgba(93,208,104,0.24));
+  }
+  50% {
+    color: var(--muted);
+    opacity: 0.94;
+    filter:
+      drop-shadow(0 0 3px rgba(119,119,119,0.58))
+      drop-shadow(0 0 12px rgba(119,119,119,0.25));
+  }
+}
+
+@keyframes twControlGlowMutedPulse {
+  0%, 100% {
+    opacity: 0.58;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(93, 208, 104, 0.22), rgba(93, 208, 104, 0.075) 48%, rgba(0,0,0,0) 74%);
+  }
+  50% {
+    opacity: 0.46;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(119,119,119,0.24), rgba(119,119,119,0.075) 48%, rgba(0,0,0,0) 74%);
+  }
+}
