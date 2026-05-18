@@ -459,7 +459,7 @@
 <div class="stage-wrap">
 <div class="topbar">
 <div class="topbar-left">
-<div aria-label="thrill wave signal" class="tw-logo-orb" role="img"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--orb"></span></div>
+<button aria-label="restart home animation" class="tw-logo-orb tw-home-restart" type="button"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--orb"></span></button>
 </div>
 <div class="topbar-right">
 <div class="audio-viz" id="audio-viz">
@@ -3268,6 +3268,112 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     snap(dy > 0 ? 1 : -1);
   }, { passive:false, capture:true });
+})();
+</script>
+
+
+<script>
+// ============================================================
+// TW LOGO HOME RESTART + TRAFFIC-LIGHT MINIMIZE EASTER EGG
+// ============================================================
+(function twLogoAndMinimizeEgg(){
+  if (window.__twLogoAndMinimizeEgg) return;
+  window.__twLogoAndMinimizeEgg = true;
+
+  function closeMenu(){
+    document.body.classList.remove('menu-open');
+    var menuBtn = document.getElementById('menu-btn');
+    var sideMenu = document.getElementById('side-menu');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.textContent = 'menu';
+      menuBtn.classList.remove('active');
+    }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+  }
+
+  function restartHomeTyping(){
+    try {
+      sessionStorage.setItem('tw_intro_played', '1');
+      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.removeItem('tw_home_complete');
+    } catch (e) {}
+
+    closeMenu();
+    document.body.classList.remove('tw-terminal-minimized');
+
+    var onHome = !!document.querySelector('#terminal-body #hero');
+    if (onHome && typeof window.twResetAndReplayHome === 'function') {
+      window.twResetAndReplayHome();
+      return;
+    }
+
+    var loader = null;
+    if (typeof window.twLoadPage === 'function') loader = window.twLoadPage;
+    else if (typeof window.twSoftLoadPage === 'function') loader = window.twSoftLoadPage;
+
+    if (loader && typeof window.twResetAndReplayHome === 'function') {
+      Promise.resolve(loader('index.html')).then(function(){
+        window.setTimeout(function(){
+          window.twResetAndReplayHome();
+        }, 80);
+      }).catch(function(){
+        window.location.assign('index.html?homeIntro=' + Date.now());
+      });
+      return;
+    }
+
+    window.location.assign('index.html?homeIntro=' + Date.now());
+  }
+
+  function toggleTerminalMinimize(){
+    closeMenu();
+    document.body.classList.toggle('tw-terminal-minimized');
+  }
+
+  document.addEventListener('click', function(e){
+    var logo = e.target && e.target.closest ? e.target.closest('.tw-home-restart') : null;
+    if (logo) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      restartHomeTyping();
+      return;
+    }
+
+    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .dot.live') : null;
+    if (greenDot) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      toggleTerminalMinimize();
+    }
+  }, true);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var logo = e.target && e.target.closest ? e.target.closest('.tw-home-restart') : null;
+    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .dot.live') : null;
+    if (!logo && !greenDot) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    if (logo) restartHomeTyping();
+    else toggleTerminalMinimize();
+  }, true);
+
+  function prepDots(){
+    document.querySelectorAll('.terminal.main .terminal-bar .dot.live').forEach(function(dot){
+      dot.setAttribute('role', 'button');
+      dot.setAttribute('tabindex', '0');
+      dot.setAttribute('aria-label', 'minimize terminal');
+      dot.setAttribute('title', 'minimize terminal');
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepDots);
+  else prepDots();
 })();
 </script>
 
