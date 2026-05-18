@@ -501,14 +501,26 @@
   // Registered here (early, capture phase) so it fires BEFORE any navigation
   // handler that calls stopImmediatePropagation — keyboard never triggers pointerdown.
   document.addEventListener('keydown', function(e){
-    if (e.key !== 'Enter' && e.key !== ' ') return;
     if (!e.isTrusted) return;
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (document.body.classList.contains('menu-open')) return;
     var t = e.target;
     if (!t || !t.closest) return;
+    var tag = t.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
     var interactive = t.closest('button,a,[role="button"],.dot.live');
-    if (!interactive) return;
-    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
-    if (window.twUI) window.twUI.sndClick();
+    if (interactive) {
+      // Focused button/link — play sound for that element
+      if (!t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) {
+        if (window.twUI) window.twUI.sndClick();
+      }
+      return;
+    }
+
+    // No focused button = Enter used for section navigation.
+    // Play the click sound here — registered so early that nothing can stop it.
+    if (e.key === 'Enter' && window.twUI) window.twUI.sndClick();
   }, true);
 }());
 </script>
@@ -883,17 +895,10 @@
     // initAudio() only fires on the welcome-gate click during full boot.
     // When boot is skipped, audio never initialises — schedule it on the
     // first real user interaction so Tone.js AudioContext can start.
-    (function scheduleAudioInit() {
-      function onFirstGesture() {
-        document.removeEventListener('click',      onFirstGesture, true);
-        document.removeEventListener('keydown',    onFirstGesture, true);
-        document.removeEventListener('touchstart', onFirstGesture, true);
-        if (typeof initAudio === 'function') initAudio();
-      }
-      document.addEventListener('click',      onFirstGesture, true);
-      document.addEventListener('keydown',    onFirstGesture, true);
-      document.addEventListener('touchstart', onFirstGesture, true);
-    })();
+    // Call initAudio immediately — synths created without needing a gesture.
+    // Tone.Destination.mute controls audibility; safe() resumes the
+    // AudioContext on first sound play (click, scroll, etc.).
+    initAudio();
     return;
   }
 
@@ -925,7 +930,9 @@ async function initAudio() {
     return;
   }
   try {
-    await Tone.start();
+    // Create all synths first — works even with a suspended AudioContext.
+    // audioReady = true is set before Tone.start() so sounds work immediately
+    // in the skip-boot path (where safe() handles context resumption).
 
     // 1) Boot beep — short CRT-power tone
     SND.beep = new Tone.Oscillator({
@@ -1066,6 +1073,10 @@ async function initAudio() {
     }).toDestination();
 
     audioReady = true;
+
+    // Best-effort context start — succeeds from a user gesture, no-ops
+    // otherwise. safe() handles resumption on first sound play.
+    Tone.start().catch(function() {});
   } catch (e) {
     console.warn('audio init error:', e);
   }
@@ -3419,10 +3430,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); snap(-1); }
     else if (e.key === 'Enter') {
       e.preventDefault();
-      // Play click sound directly here — guaranteed to fire regardless of
-      // what other handlers do. Only play if not locked (nothing to navigate).
-      if (!locked && window.twUI) try { window.twUI.sndClick(); } catch(_) {}
-      snap(1, 'silent'); // 'silent' = snap skips its own sound (we played it)
+      // Sound already played by twClickSound keydown (registered earlier).
+      snap(1, 'silent');
     }
   }, true); // capture phase
 })();
