@@ -7369,3 +7369,62 @@ body.tw-system-wake .tw-logo-orb.tw-brandmark {
   animation: tw-neon-brandmark-wake 5.0s ease 0.18s both !important;
 }
 
+
+/* ── Clockwise traveling neon glow on terminal + frame borders ──
+   terminal.main::before does a full CW loop in the first 8s of a 16s cycle,
+   then rests for 8s. frame::before starts 8s later (animation-delay: 8s)
+   so it runs exactly when the terminal rests — seamless alternation.
+   Each loop: top → right → bottom → left → top.                        */
+
+.terminal.main { position: relative; }
+
+.terminal.main::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: -1;
+  animation: twTerminalBorderTravel 16s linear 0s infinite;
+}
+
+.frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: -1;
+  animation: twFrameBorderTravel 16s linear 8s infinite;
+}
+
+@keyframes twTerminalBorderTravel {
+  0%    { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.00); }
+  3%    { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.50); }
+  12.5% { box-shadow: 14px  0  30px 0 rgba(93,208,104,0.50); }
+  25%   { box-shadow: 0  14px 30px 0 rgba(93,208,104,0.50); }
+  37.5% { box-shadow: -14px 0  30px 0 rgba(93,208,104,0.50); }
+  47%   { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.50); }
+  50%   { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.00); }
+  50.1%, 100% { box-shadow: none; }
+}
+
+@keyframes twFrameBorderTravel {
+  0%    { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.00); }
+  3%    { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.38); }
+  12.5% { box-shadow: 16px  0  34px 0 rgba(93,208,104,0.38); }
+  25%   { box-shadow: 0  16px 34px 0 rgba(93,208,104,0.38); }
+  37.5% { box-shadow: -16px 0  34px 0 rgba(93,208,104,0.38); }
+  47%   { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.38); }
+  50%   { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.00); }
+  50.1%, 100% { box-shadow: none; }
+}
+
+/* Hide during boot and power-down */
+body.booting .terminal.main::before,
+body.booting .frame::before,
+body.tw-powering-down .terminal.main::before,
+body.tw-powering-down .frame::before {
+  animation: none !important;
+  box-shadow: none !important;
+}

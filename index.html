@@ -437,6 +437,14 @@
       sessionStorage.removeItem('tw_home_complete');
     } catch (_) {}
     window.setTimeout(function(){
+      // Hard-stop all audio before navigating so music doesn't bleed through reload
+      try {
+        var bg = document.getElementById('bg-audio');
+        if (bg) { bg.pause(); bg.currentTime = 0; bg.src = ''; }
+      } catch (_) {}
+      if (typeof Tone !== 'undefined') {
+        try { Tone.Transport.stop(); Tone.getDestination().volume.value = -Infinity; } catch (_) {}
+      }
       window.location.href = 'index.html?power=' + Date.now();
     }, 760);
     return false;
@@ -2167,9 +2175,11 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   function escAll(s) { return s.split('').map(escHtml).join(''); }
 
   function typeLines(targetEl, lines, done) {
+    const myGen = (window.twTypingGen = (window.twTypingGen || 0));
     let html = '';
     let idx = 0;
     function next() {
+      if (window.twTypingGen !== myGen) return; // aborted by reset
       if (idx >= lines.length) {
         targetEl.innerHTML = html + '<span class="cursor"></span>';
         if (done) done();
@@ -2185,6 +2195,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       }
       let j = 0;
       function ch() {
+        if (window.twTypingGen !== myGen) return; // aborted by reset
         if (j < line.t.length) {
           const c = line.t[j];
           html += escHtml(c);
@@ -2308,6 +2319,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   function resetAndReplayHome() {
+    // Cancel any in-flight typeLines callbacks by bumping the generation
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
     // Explicit user request to replay — clear the typing-done flag and the
     // running guard so the typing animation kicks off fresh.
     sessionStorage.removeItem('tw_typing_done');
@@ -3226,7 +3239,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function blocked(target) {
     if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, .cascade-content, .cascade-video, iframe, input, textarea, select');
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, iframe, input, textarea, select');
   }
 
   function snap(direction) {
