@@ -428,7 +428,7 @@
     var modal = getModal();
     document.body.classList.add('tw-powering-down');
     // Use the existing sweep synth — proven to work, reads as a power-off whoosh
-    try { sndSweep(); } catch(e) {}
+    try { if (window.twUI) window.twUI.sndSweep(); } catch(e) {}
     if (modal) modal.classList.add('is-shutting-down');
     try {
       sessionStorage.removeItem('tw_intro_played');
@@ -478,7 +478,7 @@
     if (!interactive) return;
     // Skip certain noisy repeated interactions already handled by other snd* calls
     if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar')) return;
-    if (typeof sndMouseClick === 'function') sndMouseClick();
+    if (window.twUI) window.twUI.sndClick();
   }, true);
 }());
 </script>
@@ -1846,6 +1846,15 @@ document.addEventListener('keydown', (e) => {
 document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
 
+
+  // Expose sound functions to other script blocks — they're closure-private
+  // inside this IIFE so external callers (snap controller, click handler,
+  // power modal) can't reach them directly. window.twUI is the bridge.
+  // Tone.Destination.mute (set by the audio button) silences all of these
+  // automatically, so mute/unmute works without any extra wiring.
+  window.twUI = window.twUI || {};
+  window.twUI.sndSweep = sndSweep;
+  window.twUI.sndClick = sndMouseClick;
 
   // kick off welcome typing once DOM is ready
   if (document.readyState === 'loading') {
@@ -3262,7 +3271,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return;
     cooldownUntil = Date.now() + 850;
-    if (typeof sndSweep === 'function') sndSweep();
+    if (window.twUI) window.twUI.sndSweep();
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
     var page = (window.location.pathname.split('/').pop() || 'index.html') || 'index.html';
     if (list[next].id && window.history && window.history.replaceState) {
