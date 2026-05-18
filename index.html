@@ -2179,7 +2179,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     let html = '';
     let idx = 0;
     function next() {
-      if (window.twTypingGen !== myGen) return; // aborted by reset
+      if ((window.twTypingGen || 0) !== myGen) return; // aborted by reset
       if (idx >= lines.length) {
         targetEl.innerHTML = html + '<span class="cursor"></span>';
         if (done) done();
@@ -2195,7 +2195,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       }
       let j = 0;
       function ch() {
-        if (window.twTypingGen !== myGen) return; // aborted by reset
+        if ((window.twTypingGen || 0) !== myGen) return; // aborted by reset
         if (j < line.t.length) {
           const c = line.t[j];
           html += escHtml(c);
@@ -2230,7 +2230,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     let html = '';
     let i = 0;
     function type() {
-      if (window.twTypingGen !== gen) return; // aborted by reset
+      if ((window.twTypingGen || 0) !== gen) return; // aborted by reset
       if (i >= plain.length) {
         // Done — replace plain with styled HTML; CSS handles [+]/[-] via ::before
         toggle.innerHTML = '<span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
@@ -2271,32 +2271,33 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     // Guard against overlapping calls — typing already running, ignore.
     if (window.twIntroRunning) return;
     window.twIntroRunning = true;
-    // Snapshot the generation at launch. Every async step checks this.
-    // resetAndReplayHome() increments twTypingGen, which causes every
-    // pending callback to bail out rather than writing to the DOM.
-    const myGen = window.twTypingGen || 0;
+    // Ensure the generation counter is initialized before we snapshot it.
+    // If undefined (first ever run), treat as 0. resetAndReplayHome()
+    // increments this; every async step checks it and bails if it changed.
+    window.twTypingGen = window.twTypingGen || 0;
+    const myGen = window.twTypingGen;
     document.body.classList.remove('home-intro-complete');
     document.body.classList.add('home-intro-running');
     const preEl = document.getElementById('intro-pre');
     const postEl = document.getElementById('intro-post');
     preEl.innerHTML = '<span class="cursor"></span>';
     setTimeout(() => {
-      if (window.twTypingGen !== myGen) { window.twIntroRunning = false; return; }
+      if ((window.twTypingGen || 0) !== myGen) { window.twIntroRunning = false; return; }
       typeLines(preEl, introPreLines, () => {
-        if (window.twTypingGen !== myGen) return;
+        if ((window.twTypingGen || 0) !== myGen) return;
         preEl.innerHTML = preEl.innerHTML.replace('<span class="cursor"></span>', '');
         typeCascadeToggle(myGen, () => {
-          if (window.twTypingGen !== myGen) return;
+          if ((window.twTypingGen || 0) !== myGen) return;
           expandCascadeContent();
           setTimeout(() => {
-            if (window.twTypingGen !== myGen) return;
+            if ((window.twTypingGen || 0) !== myGen) return;
             typeLines(postEl, introPostLines, () => {
-              if (window.twTypingGen !== myGen) return;
+              if ((window.twTypingGen || 0) !== myGen) return;
               sessionStorage.setItem('tw_typing_done', '1');
               window.twIntroRunning = false;
               document.body.classList.remove('home-intro-running');
               setTimeout(() => {
-                if (window.twTypingGen !== myGen) return;
+                if ((window.twTypingGen || 0) !== myGen) return;
                 document.body.classList.add('home-intro-complete');
               }, 2050);
             });
