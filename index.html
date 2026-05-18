@@ -3354,9 +3354,31 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       sessionStorage.removeItem('tw_typing_done');
       sessionStorage.removeItem('tw_home_complete');
     } catch (e) {}
-    // Full-page reload: works from any page, no flash, no PJAX branching.
-    // tw_intro_played skips the boot so only the home typing animation replays.
-    window.location.assign('index.html?homeIntro=' + Date.now());
+
+    closeMenu();
+    document.body.classList.remove('tw-terminal-minimized');
+
+    // PJAX keeps the <audio> element alive — no music skip.
+    // Full-page reload (location.assign) is only used as a last-resort fallback.
+    var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
+                : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
+                : null;
+
+    if (!loader) {
+      window.location.assign('index.html?homeIntro=' + Date.now());
+      return;
+    }
+
+    // skipPrefill: don't flash static text before animation clears + replays.
+    loader('index.html', { skipPrefill: true })
+      .then(function(){
+        if (typeof window.twResetAndReplayHome === 'function') {
+          window.twResetAndReplayHome();
+        }
+      })
+      .catch(function(){
+        window.location.assign('index.html?homeIntro=' + Date.now());
+      });
   }
 
   function toggleTerminalMinimize(){
