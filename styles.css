@@ -7470,19 +7470,16 @@ body.menu-open #menu-btn:focus-visible {
   outline: none;
 }
 
-/* ── Thrillwave glyphs: momentary reset on click via data-just-clicked ──
-   blur() removes :focus immediately so :focus:not(:focus-visible) never sticks,
-   but :hover persists while the mouse is over the button. data-just-clicked
-   overrides the hover glyph filter for 350ms so the colors reset on click.   */
-.tw-logo-orb.tw-brandmark[data-just-clicked],
-button.tw-logo-orb.tw-brandmark[data-just-clicked] {
+/* ── Thrillwave button: green on hover, gray on :active (click), green on release ── */
+.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-brandmark:active {
   border-color: var(--rule) !important;
   transform: none !important;
 }
-.tw-logo-orb.tw-brandmark[data-just-clicked] .tw-logo-glyph--orb,
-.tw-logo-orb.tw-brandmark[data-just-clicked] .tw-wordmark-glyph--orb,
-button.tw-logo-orb.tw-brandmark[data-just-clicked] .tw-logo-glyph--orb,
-button.tw-logo-orb.tw-brandmark[data-just-clicked] .tw-wordmark-glyph--orb {
-  filter: drop-shadow(0 0 3px rgba(140,140,140,0.30)) drop-shadow(0 0 7px rgba(140,140,140,0.12)) !important;
+.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb {
+  filter: drop-shadow(0 0 2px rgba(130,130,130,0.28)) !important;
   color: #7a7a7a !important;
 }

@@ -2773,7 +2773,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     initHashSync();
     updateMusicButton();
 
-    if (page === 'index.html' && typeof window.twPrefillHome === 'function') {
+    if (page === 'index.html' && typeof window.twPrefillHome === 'function' && !opts.skipPrefill) {
       requestAnimationFrame(() => {
         try { window.twPrefillHome(); } catch (e) { console.warn('home prefill failed:', e); }
       });
@@ -3358,14 +3358,21 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     closeMenu();
     document.body.classList.remove('tw-terminal-minimized');
 
-    // Always navigate to home first (loadPage handles "already on home" too),
-    // then replay the animation. One path — no onHome branching.
+    // Already on home — replay directly, no PJAX needed (avoids DOM flash)
+    var onHome = !!document.querySelector('#terminal-body #hero');
+    if (onHome && typeof window.twResetAndReplayHome === 'function') {
+      window.twResetAndReplayHome();
+      return;
+    }
+
+    // On another page — load home via PJAX with skipPrefill so the static
+    // text isn't flash-rendered before the animation clears and replays it.
     var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
                 : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
                 : null;
 
     if (loader) {
-      loader('index.html').then(function(){
+      loader('index.html', { skipPrefill: true }).then(function(){
         window.setTimeout(function(){
           if (typeof window.twResetAndReplayHome === 'function') {
             window.twResetAndReplayHome();
@@ -3391,8 +3398,6 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
       logo.blur();
-      logo.dataset.justClicked = '1';
-      setTimeout(function(){ delete logo.dataset.justClicked; }, 350);
       restartHomeTyping();
       return;
     }
