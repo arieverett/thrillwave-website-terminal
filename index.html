@@ -414,6 +414,7 @@
     }
     var modal = getModal();
     if (!modal) return false;
+    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
     modal.classList.remove('is-open');
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('power-modal-open');
@@ -428,8 +429,16 @@
     if (document.body.classList.contains('tw-powering-down')) return false;
     var modal = getModal();
     document.body.classList.add('tw-powering-down');
-    try { if (window.twUI) window.twUI.sndShutdown(); } catch(e) {}
     if (modal) modal.classList.add('is-shutting-down');
+
+    // Kill music immediately so the shutdown thud is heard clearly
+    try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e) {}
+
+    // Play thud after 50ms — brief silence makes the hit land harder
+    window.setTimeout(function() {
+      try { if (window.twUI) window.twUI.sndShutdown(); } catch(e) {}
+    }, 50);
+
     try {
       sessionStorage.removeItem('tw_intro_played');
       sessionStorage.removeItem('tw_typing_done');
@@ -437,13 +446,13 @@
       sessionStorage.removeItem('tw_music_t');
       sessionStorage.removeItem('tw_home_complete');
     } catch (_) {}
+
+    // Navigate after animation (680ms) + sound tail — 900ms total
     window.setTimeout(function(){
-      // Kill audio system so the new boot starts clean
-      try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e){}
       try { if (window.twUI) window.twUI.killAudio(); } catch(e) {}
       window.__twResetting = true;
       window.location.href = 'index.html?' + Date.now();
-    }, 760);
+    }, 900);
     return false;
   }
   window.twPowerConfirm = openModal;
@@ -468,16 +477,16 @@
 // General haptic click sound — fires on any meaningful click
 // (skips dead areas: bare frame, scrollable containers, iframes)
 (function twClickSound(){
-  var DEAD = '#frame,body,.content,.stage-wrap,.terminal-body,section.page,iframe';
-  document.addEventListener('click', function(e){
+  // pointerdown fires before click and before any stopImmediatePropagation
+  // from other click handlers — reliably covers all links, buttons, social links.
+  document.addEventListener('pointerdown', function(e){
     if (!e.isTrusted) return;
     var t = e.target;
     if (!t || !t.closest) return;
-    // Skip if the click target itself IS a dead area with no interactive ancestor
-    var interactive = t.closest('button,a,[role="button"],[tabindex],label,input,select,textarea,.cascade-toggle,.audio-btn,.viz-bar,.section-jump,.section-end,.dot');
+    var interactive = t.closest('button,a,[role="button"],.cascade-toggle,.section-jump,.section-end,.dot');
     if (!interactive) return;
-    // Skip certain noisy repeated interactions already handled by other snd* calls
-    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar')) return;
+    // Skip elements with their own explicit sounds
+    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,.audio-btn,#menu-btn,[data-power-control],[data-power-cancel],[data-power-confirm]')) return;
     if (window.twUI) window.twUI.sndClick();
   }, true);
 }());
@@ -1035,12 +1044,15 @@ async function initAudio() {
       volume: -16
     }).toDestination();
 
-    // 12) Scroll whoosh — brown noise through a sweeping bandpass filter.
-    scrollFilter = new Tone.Filter({
-      type: 'bandpass', frequency: 300, Q: 1.2, rolloff: -24
-    }).toDestination();
-    // NOTE: .connect() returns the destination, not the source.
-    // Store the NoiseSynth reference explicitly so triggerAttackRelease works.
+    audioReady = true;
+  } catch (e) {
+    console.warn('audio init error:', e);
+  }
+
+  // Scroll whoosh — in its own try/catch AFTER audioReady is set.
+  // If this fails (filter/noise init issue) it doesn't break any other sound.
+  try {
+    scrollFilter = new Tone.Filter({ type: 'bandpass', frequency: 300, Q: 1.2 }).toDestination();
     var _scrollNoise = new Tone.NoiseSynth({
       noise: { type: 'brown' },
       envelope: { attack: 0.006, decay: 0.20, sustain: 0, release: 0.09 },
@@ -1048,10 +1060,8 @@ async function initAudio() {
     });
     _scrollNoise.connect(scrollFilter);
     SND.scrollWoosh = _scrollNoise;
-
-    audioReady = true;
-  } catch (e) {
-    console.warn('audio init error:', e);
+  } catch (e2) {
+    console.warn('scroll whoosh init failed:', e2);
   }
 }
 
