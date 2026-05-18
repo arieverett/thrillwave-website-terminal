@@ -5652,3 +5652,74 @@ section#landing .work-intel-next button.tw-page-link:focus-visible {
     margin: 8px 0 !important;
   }
 }
+
+
+/* ============================================================
+   TW prompt rail + snap corrective pass
+   Fixes the runaway prompt column and restores clean section snap.
+   ============================================================ */
+.page-content.terminal-copy {
+  position: relative !important;
+  display: block !important;
+  overflow: hidden !important;
+  padding-left: 2.05ch !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  line-height: 1.58 !important;
+  text-align: left !important;
+}
+
+.page-content.terminal-copy::before {
+  content: ">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>" !important;
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  display: block !important;
+  width: 1ch !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  overflow: hidden !important;
+  white-space: pre !important;
+  line-height: inherit !important;
+  font: inherit !important;
+  color: var(--tw-prompt) !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.page-content.terminal-copy .line {
+  position: relative !important;
+  z-index: 1 !important;
+  display: block !important;
+  min-height: 1.58em !important;
+  line-height: inherit !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  white-space: normal !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+}
+
+/* Keep terminal sections predictable: CSS handles snap alignment; JS below handles one-gesture moves. */
+.terminal-body {
+  scroll-snap-type: y mandatory !important;
+  scroll-padding-top: 0 !important;
+  overscroll-behavior-y: contain !important;
+}
+section.page {
+  scroll-snap-align: start !important;
+  scroll-snap-stop: always !important;
+}
+
+@media (max-width: 720px) {
+  .page-content.terminal-copy {
+    line-height: 1.54 !important;
+    padding-left: 2.05ch !important;
+  }
+  .page-content.terminal-copy .line {
+    min-height: 1.54em !important;
+  }
+}

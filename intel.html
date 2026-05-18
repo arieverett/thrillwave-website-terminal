@@ -1178,42 +1178,22 @@
 
 <script>
 // ============================================================
-// MOBILE ONE-SWIPE SECTION SNAP
-// Mobile Safari sometimes lets nested scroll-snap containers drift before
-// snapping, which makes a visitor swipe twice. This detects a real vertical
-// swipe inside the terminal and advances exactly one section from where the
-// swipe started.
+// TW SECTION SNAP CONTROLLER V2
+// One real wheel/swipe gesture = one terminal section. Prevents the old
+// native/custom snap handlers from fighting and making scroll feel sticky.
 // ============================================================
-(function mobileOneSwipeSectionSnap(){
-  if (window.twMobileOneSwipeSectionSnapInstalled) return;
-  window.twMobileOneSwipeSectionSnapInstalled = true;
-
+(function twSectionSnapControllerV2(){
   var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody) return;
+  if (!terminalBody || window.__twSectionSnapControllerV2) return;
+  window.__twSectionSnapControllerV2 = true;
 
-  var startY = 0;
-  var startX = 0;
-  var startTop = 0;
-  var startAt = 0;
-  var tracking = false;
-  var lastSnapAt = 0;
-  var settleTimer = null;
-
-  function isMobile(){
-    return window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
-  }
+  var lockUntil = 0;
+  var wheelAccum = 0;
+  var wheelTimer = null;
+  var touch = { active:false, vertical:false, x:0, y:0, top:0, at:0 };
 
   function sections(){
     return Array.prototype.slice.call(terminalBody.querySelectorAll('section.page'));
-  }
-
-  function indexAt(scrollTop){
-    var list = sections();
-    var idx = 0;
-    for (var i = 0; i < list.length; i++) {
-      if (list[i].offsetTop <= scrollTop + 24) idx = i;
-    }
-    return idx;
   }
 
   function pageName(){
@@ -1221,112 +1201,98 @@
     return p || 'index.html';
   }
 
-  function snapTo(idx){
+  function nearestIndex(list){
+    var y = terminalBody.scrollTop;
+    var best = 0;
+    var bestDist = Infinity;
+    for (var i = 0; i < list.length; i++) {
+      var d = Math.abs(list[i].offsetTop - y);
+      if (d < bestDist) { best = i; bestDist = d; }
+    }
+    return best;
+  }
+
+  function blocked(target){
+    if (!target || !target.closest) return false;
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, .cascade-content, .embed-frame, iframe, input, textarea, select, button, a');
+  }
+
+  function snap(direction){
+    var now = Date.now();
+    if (now < lockUntil) return;
+
     var list = sections();
-    if (!list.length || !list[idx]) return;
-    lastSnapAt = Date.now();
-    terminalBody.scrollTo({ top: list[idx].offsetTop, behavior: 'smooth' });
-    if (list[idx].id && window.history && window.history.replaceState) {
-      window.history.replaceState(window.history.state || {}, '', pageName() + '#' + list[idx].id);
+    if (list.length < 2) return;
+
+    var current = nearestIndex(list);
+    var next = Math.max(0, Math.min(list.length - 1, current + direction));
+    if (next === current) return;
+
+    lockUntil = now + 760;
+    terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
+
+    if (list[next].id && window.history && window.history.replaceState) {
+      window.history.replaceState(window.history.state || {}, '', pageName() + '#' + list[next].id);
     }
   }
 
-  function shouldIgnoreTarget(target){
-    if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, .cascade-content, .embed-frame, iframe, input, textarea, select');
-  }
+  terminalBody.addEventListener('wheel', function(e){
+    if (document.body.classList.contains('menu-open')) return;
+    if (blocked(e.target)) return;
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+
+    e.preventDefault();
+    wheelAccum += e.deltaY;
+    window.clearTimeout(wheelTimer);
+    wheelTimer = window.setTimeout(function(){ wheelAccum = 0; }, 180);
+
+    if (Math.abs(wheelAccum) < 18) return;
+    snap(wheelAccum > 0 ? 1 : -1);
+    wheelAccum = 0;
+  }, { passive:false });
 
   terminalBody.addEventListener('touchstart', function(e){
-    if (!isMobile() || !e.touches || e.touches.length !== 1) return;
+    if (!e.touches || e.touches.length !== 1) return;
     if (document.body.classList.contains('menu-open')) return;
-    if (shouldIgnoreTarget(e.target)) return;
+    if (blocked(e.target)) return;
 
-    startY = e.touches[0].clientY;
-    startX = e.touches[0].clientX;
-    startTop = terminalBody.scrollTop;
-    startAt = Date.now();
-    tracking = true;
+    touch.active = true;
+    touch.vertical = false;
+    touch.x = e.touches[0].clientX;
+    touch.y = e.touches[0].clientY;
+    touch.top = terminalBody.scrollTop;
+    touch.at = Date.now();
+  }, { passive:true, capture:true });
 
-    if (settleTimer) {
-      clearTimeout(settleTimer);
-      settleTimer = null;
+  terminalBody.addEventListener('touchmove', function(e){
+    if (!touch.active || !e.touches || e.touches.length !== 1) return;
+
+    var dx = e.touches[0].clientX - touch.x;
+    var dy = e.touches[0].clientY - touch.y;
+
+    if (!touch.vertical && Math.abs(dy) > 10 && Math.abs(dy) > Math.abs(dx) * 1.15) {
+      touch.vertical = true;
     }
-  }, { passive: true, capture: true });
+
+    if (touch.vertical) e.preventDefault();
+  }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchend', function(e){
-    if (!tracking || !isMobile()) return;
-    tracking = false;
+    if (!touch.active) return;
+    touch.active = false;
     if (!e.changedTouches || !e.changedTouches.length) return;
 
-    var now = Date.now();
-    if (now - lastSnapAt < 520) return;
-
-    var dy = startY - e.changedTouches[0].clientY;
-    var dx = startX - e.changedTouches[0].clientX;
-    var dt = Math.max(1, now - startAt);
+    var dy = touch.y - e.changedTouches[0].clientY;
+    var dx = touch.x - e.changedTouches[0].clientX;
+    var dt = Math.max(1, Date.now() - touch.at);
     var velocity = Math.abs(dy) / dt;
-    var threshold = Math.min(86, Math.max(42, terminalBody.clientHeight * 0.075));
+    var threshold = Math.min(82, Math.max(34, terminalBody.clientHeight * 0.055));
 
-    if (Math.abs(dx) > Math.abs(dy) * 0.8) return;
-    if (Math.abs(dy) < threshold && velocity < 0.18) return;
+    if (Math.abs(dx) > Math.abs(dy) * 0.85) return;
+    if (Math.abs(dy) < threshold && velocity < 0.16) return;
 
-    var list = sections();
-    if (list.length < 2) return;
-
-    var idx = indexAt(startTop);
-    var nextIdx = dy > 0 ? Math.min(list.length - 1, idx + 1) : Math.max(0, idx - 1);
-    if (nextIdx === idx) return;
-
-    window.requestAnimationFrame(function(){ snapTo(nextIdx); });
-    settleTimer = setTimeout(function(){ snapTo(nextIdx); }, 180);
-  }, { passive: true, capture: true });
-})();
-</script>
-
-<script>
-// TW desktop wheel snap: one mouse/trackpad gesture advances one terminal section.
-(function(){
-  if (window.__twDesktopWheelSnap) return;
-  window.__twDesktopWheelSnap = true;
-  var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody) return;
-  var lastSnap = 0;
-  var accum = 0;
-  var timer = null;
-  function isDesktop(){ return !(window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches); }
-  function sections(){ return Array.prototype.slice.call(document.querySelectorAll('#terminal-body section.page')); }
-  function currentIndex(list){
-    var y = terminalBody.scrollTop;
-    var idx = 0;
-    for (var i=0;i<list.length;i++) if (list[i].offsetTop <= y + 32) idx = i;
-    return idx;
-  }
-  function blocked(target){
-    return target && target.closest && target.closest('#side-menu, #menu-btn, .cascade-content, .embed-frame, iframe, input, textarea, select');
-  }
-  terminalBody.addEventListener('wheel', function(e){
-    if (!isDesktop() || document.body.classList.contains('menu-open')) return;
-    if (blocked(e.target)) return;
-    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
-    var list = sections();
-    if (list.length < 2) return;
-    accum += e.deltaY;
-    clearTimeout(timer);
-    timer = setTimeout(function(){ accum = 0; }, 180);
-    if (Math.abs(accum) < 48) return;
-    e.preventDefault();
-    var now = Date.now();
-    if (now - lastSnap < 560) return;
-    lastSnap = now;
-    var idx = currentIndex(list);
-    var next = accum > 0 ? Math.min(list.length - 1, idx + 1) : Math.max(0, idx - 1);
-    accum = 0;
-    if (next === idx) return;
-    terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
-    if (list[next].id && history && history.replaceState) {
-      history.replaceState(history.state || {}, '', (location.pathname.split('/').pop() || 'index.html') + '#' + list[next].id);
-    }
-  }, { passive: false });
+    snap(dy > 0 ? 1 : -1);
+  }, { passive:false, capture:true });
 })();
 </script>
 
