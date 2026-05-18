@@ -6658,3 +6658,61 @@ body.tw-terminal-minimized .section-end {
 }
 
 .topbar-right { z-index: 0; }
+
+
+/* ============================================================
+   TW minimize + scroll polish patch
+   ============================================================ */
+
+/* Normal state: green dot turns red on hover to hint close/minimize. */
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live {
+  background: var(--accent) !important;
+  box-shadow: 0 0 4px rgba(93,208,104,0.55) !important;
+}
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:hover,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:focus-visible {
+  background: #ff5f56 !important;
+  box-shadow: 0 0 5px rgba(255,95,86,0.75), 0 0 12px rgba(255,95,86,0.32) !important;
+  transform: scale(1.12);
+}
+
+/* Minimized state: red at rest, green on hover to hint restore/open. */
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live {
+  background: #ff5f56 !important;
+  box-shadow: 0 0 5px rgba(255,95,86,0.74), 0 0 13px rgba(255,95,86,0.28) !important;
+  transform: scale(1.05);
+}
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:hover,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:focus-visible {
+  background: var(--accent) !important;
+  box-shadow: 0 0 5px rgba(93,208,104,0.82), 0 0 14px rgba(93,208,104,0.36) !important;
+  transform: scale(1.12);
+}
+
+/* Keep the terminal shell kinetic, but stop the body copy from doing the bouncy transform/fade. */
+.terminal.main .terminal-body {
+  transition: none !important;
+  transform: none !important;
+  filter: none !important;
+}
+body.tw-terminal-minimized .terminal.main .terminal-body {
+  opacity: 0 !important;
+  transform: none !important;
+  filter: none !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+/* Make the contact/social footer visibly ride upward with the minimized terminal. */
+.below-bar {
+  transition: transform 460ms cubic-bezier(.16, 1, .3, 1), opacity 220ms ease !important;
+}
+body.tw-terminal-minimized .below-bar {
+  transform: translateY(-10px) !important;
+}
+
+@media (max-width: 720px) {
+  body.tw-terminal-minimized .below-bar {
+    transform: translateY(-7px) !important;
+  }
+}

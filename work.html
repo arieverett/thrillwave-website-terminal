@@ -1184,21 +1184,20 @@
 
 <script>
 // ============================================================
-// TW SECTION SNAP CONTROLLER V4
-// Easier to trigger than V3, but still limits a single hard
-// trackpad flick to one section unless there is a real quiet gap.
+// TW SECTION SNAP CONTROLLER V5
+// One physical wheel/trackpad flick = one section snap.
+// Low trigger threshold so it still feels responsive, with a real quiet-gap unlock.
 // ============================================================
-(function twSectionSnapControllerV4(){
+(function twSectionSnapControllerV5(){
   var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody || window.__twSectionSnapControllerV4) return;
-  window.__twSectionSnapControllerV4 = true;
+  if (!terminalBody || window.__twSectionSnapControllerV5) return;
+  window.__twSectionSnapControllerV5 = true;
 
   var animatingUntil = 0;
   var wheelAccum = 0;
-  var lastWheelAt = 0;
-  var lastSnapAt = 0;
-  var lastSnapDir = 0;
-  var idleTimer = null;
+  var wheelLocked = false;
+  var unlockTimer = null;
+  var lastDir = 0;
   var touch = { active:false, vertical:false, x:0, y:0, at:0 };
 
   function sections(){
@@ -1223,7 +1222,16 @@
 
   function blocked(target){
     if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, iframe, input, textarea, select');
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, iframe, input, textarea, select');
+  }
+
+  function unlockAfterQuiet(){
+    window.clearTimeout(unlockTimer);
+    unlockTimer = window.setTimeout(function(){
+      wheelLocked = false;
+      wheelAccum = 0;
+      lastDir = 0;
+    }, 340);
   }
 
   function snap(direction){
@@ -1237,9 +1245,11 @@
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return false;
 
-    animatingUntil = now + 620;
-    lastSnapAt = now;
-    lastSnapDir = direction;
+    wheelLocked = true;
+    wheelAccum = 0;
+    lastDir = direction;
+    animatingUntil = now + 760;
+
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
 
     if (list[next].id && window.history && window.history.replaceState) {
@@ -1254,34 +1264,28 @@
     if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) * 1.05) return;
 
     e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
 
-    var now = Date.now();
-    var quietGap = (now - lastWheelAt) > 170;
+    unlockAfterQuiet();
+
     var dir = e.deltaY > 0 ? 1 : -1;
-    lastWheelAt = now;
+    var abs = Math.abs(e.deltaY);
 
-    window.clearTimeout(idleTimer);
-    idleTimer = window.setTimeout(function(){ wheelAccum = 0; }, 170);
+    if (wheelLocked || Date.now() < animatingUntil) return;
 
-    // Swallow momentum from the same physical flick, but allow a new flick
-    // after a short quiet gap even if it happens quickly.
-    if (!quietGap && dir === lastSnapDir && (now - lastSnapAt) < 1050) {
-      wheelAccum = 0;
-      return;
-    }
-    if (now < animatingUntil) {
-      wheelAccum = 0;
-      return;
-    }
-    if (quietGap) wheelAccum = 0;
-
+    if (lastDir && dir !== lastDir) wheelAccum = 0;
+    lastDir = dir;
     wheelAccum += e.deltaY;
-    var threshold = e.deltaMode === 1 ? 2 : Math.max(18, Math.min(48, terminalBody.clientHeight * 0.032));
-    var impulse = Math.abs(e.deltaY) > threshold * 1.25;
+
+    var threshold = e.deltaMode === 1
+      ? 2
+      : Math.max(18, Math.min(34, terminalBody.clientHeight * 0.03));
+
+    var impulse = abs >= Math.max(32, threshold * 1.35);
 
     if (Math.abs(wheelAccum) >= threshold || impulse) {
       snap(dir);
-      wheelAccum = 0;
     }
   }, { passive:false, capture:true });
 
@@ -1300,8 +1304,12 @@
     if (!touch.active || !e.touches || e.touches.length !== 1) return;
     var dx = e.touches[0].clientX - touch.x;
     var dy = e.touches[0].clientY - touch.y;
-    if (!touch.vertical && Math.abs(dy) > 8 && Math.abs(dy) > Math.abs(dx) * 1.05) touch.vertical = true;
-    if (touch.vertical) e.preventDefault();
+    if (!touch.vertical && Math.abs(dy) > 7 && Math.abs(dy) > Math.abs(dx) * 1.05) touch.vertical = true;
+    if (touch.vertical) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
   }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchend', function(e){
@@ -1313,10 +1321,10 @@
     var dx = touch.x - e.changedTouches[0].clientX;
     var dt = Math.max(1, Date.now() - touch.at);
     var velocity = Math.abs(dy) / dt;
-    var threshold = Math.min(64, Math.max(24, terminalBody.clientHeight * 0.045));
+    var threshold = Math.min(58, Math.max(22, terminalBody.clientHeight * 0.042));
 
     if (Math.abs(dx) > Math.abs(dy) * 0.9) return;
-    if (Math.abs(dy) < threshold && velocity < 0.12) return;
+    if (Math.abs(dy) < threshold && velocity < 0.11) return;
 
     snap(dy > 0 ? 1 : -1);
   }, { passive:false, capture:true });
