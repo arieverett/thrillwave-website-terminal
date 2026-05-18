@@ -262,7 +262,7 @@
 })();
 </script>
 
-<audio id="bg-audio" loop preload="auto">
+<audio id="bg-audio" loop preload="auto" playsinline webkit-playsinline>
   <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
 </audio>
 
@@ -563,23 +563,47 @@
 </main>
 
 <script>
-// TW hard fix: menu items are real links. Register first, in capture phase,
-// so no later terminal/PJAX/homepage handlers can steal the click.
+// TW mobile-safe menu routing. This used to force a hard page load on
+// touchstart, which made mobile audio restart/gap even though desktop PJAX
+// felt smooth. Keep the early capture hook, but route through the persistent
+// shell once it is available.
 (function(){
+  var lastHref = '';
+  var lastAt = 0;
+
+  function absorb(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
   function routeMenuLink(e){
     var target = e.target;
     if (!target || !target.closest) return;
     var link = target.closest('#side-menu a.menu-item');
     if (!link) return;
-    var href = link.href || link.getAttribute('href') || 'index.html';
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    var href = link.getAttribute('href') || link.dataset.page || 'index.html';
+    absorb(e);
+
+    var now = Date.now();
+    if (href === lastHref && now - lastAt < 700) return;
+    lastHref = href;
+    lastAt = now;
+
     document.body.classList.remove('menu-open');
-    window.location.assign(href);
+
+    if (typeof window.twNavigateMenuLink === 'function') {
+      window.twNavigateMenuLink(link);
+    } else if (typeof window.twLoadPage === 'function') {
+      window.twLoadPage(href).catch(function(){ window.location.assign(href); });
+    } else {
+      window.location.assign(href);
+    }
   }
+
   window.addEventListener('pointerdown', routeMenuLink, true);
-  window.addEventListener('touchstart', routeMenuLink, true);
+  window.addEventListener('touchstart', routeMenuLink, { capture: true, passive: false });
   window.addEventListener('click', routeMenuLink, true);
 })();
 </script>

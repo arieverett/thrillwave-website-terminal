@@ -85,7 +85,7 @@
   <div class="frame-label frame-label--br">work &nbsp;&middot;&nbsp; 04 / 06</div>
 </div>
 
-<audio id="bg-audio" loop preload="auto">
+<audio id="bg-audio" loop preload="auto" playsinline webkit-playsinline>
   <source src="assets/audio/robot_rock.mp3" type="audio/mpeg">
 </audio>
 
@@ -544,7 +544,7 @@
       sessionStorage.setItem('tw_intro_played', '1');
       sessionStorage.removeItem('tw_typing_done');
     } catch (_) {}
-    window.location.assign('index.html?homeIntro=' + Date.now());
+    if (typeof window.twSoftLoadPage === 'function') { window.twSoftLoadPage('index.html'); } else { window.location.assign('index.html?homeIntro=' + Date.now()); }
   }
   function scrollTopOnly(e){
     if (e) e.preventDefault();
@@ -564,78 +564,287 @@
 
 
 <script>
-// TW persistent navigation shim — keeps the single audio element alive on this page.
+// TW persistent navigation shim — mobile-safe PJAX shell for standalone pages.
+// Keeps the single #bg-audio element alive on touch navigation instead of
+// allowing mobile Safari/Chrome to perform a hard page load.
 (function(){
   const PAGE_ORDER = ['index.html','about.html','sitrep.html','work.html','intel.html','contact.html'];
   const PAGE_LABELS = {'index.html':'home','about.html':'about','sitrep.html':'sitrep','work.html':'work','intel.html':'intel','contact.html':'contact'};
-  let currentPage = 'work.html';
+  const PAGE_NUMS = {'index.html':'01 / 06','about.html':'02 / 06','sitrep.html':'03 / 06','work.html':'04 / 06','intel.html':'05 / 06','contact.html':'06 / 06'};
+  let currentPage = normalizePage(location.href) || 'work.html';
+
   const terminalBody = document.getElementById('terminal-body');
   const titlePage = document.getElementById('title-page');
   const body = document.body;
   const sideMenu = document.getElementById('side-menu');
   const menuBtn = document.getElementById('menu-btn');
+  const framePage = document.querySelector('.frame-label--br');
   if (!terminalBody) return;
+
+  let lastNavKey = '';
+  let lastNavAt = 0;
 
   function normalizePage(href){
     try {
       const u = new URL(href, location.href);
       const n = u.pathname.split('/').pop() || 'index.html';
       return PAGE_LABELS[n] ? n : null;
-    } catch(e) { return null; }
+    } catch(e) {
+      const n = String(href || '').split('#')[0].split('?')[0].split('/').pop() || 'index.html';
+      return PAGE_LABELS[n] ? n : null;
+    }
   }
+
+  function nextPageName(page){
+    const idx = PAGE_ORDER.indexOf(page);
+    return PAGE_ORDER[(idx + 1 + PAGE_ORDER.length) % PAGE_ORDER.length];
+  }
+
   function closeMenu(){
     body.classList.remove('menu-open');
-    if (menuBtn) { menuBtn.setAttribute('aria-expanded','false'); menuBtn.textContent='menu'; menuBtn.classList.remove('active'); }
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded','false');
+      menuBtn.textContent='menu';
+      menuBtn.classList.remove('active');
+    }
     if (sideMenu) sideMenu.setAttribute('aria-hidden','true');
   }
-  function reinit(){
-    if (titlePage) titlePage.textContent = PAGE_LABELS[currentPage] || currentPage.replace('.html','');
-    if (typeof initSectionIndicators === 'function') initSectionIndicators();
+
+  function setChrome(page){
+    currentPage = page;
+    const label = PAGE_LABELS[page] || page.replace('.html','');
+    if (titlePage) titlePage.textContent = label;
+    if (framePage) framePage.innerHTML = label + ' &nbsp;·&nbsp; ' + (PAGE_NUMS[page] || '');
+    document.title = 'Thrill Wave — ' + (label === 'home' ? 'Intelligence first. Camera second.' : label);
+    document.querySelectorAll('#side-menu a.menu-item').forEach(function(a){
+      const p = normalizePage(a.getAttribute('href') || a.dataset.page || 'index.html');
+      a.classList.toggle('current', p === page);
+    });
+  }
+
+  function bindCascades(){
+    if (typeof window.twBindCleanCascades === 'function') {
+      window.twBindCleanCascades();
+      return;
+    }
+    terminalBody.querySelectorAll('.cascade-toggle').forEach(function(tg){
+      if (tg.dataset.softCascadeBound === '1') return;
+      tg.dataset.softCascadeBound = '1';
+      tg.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        const c = tg.closest('.cascade');
+        if (!c) return;
+        const opening = c.dataset.expanded !== 'true';
+        c.dataset.expanded = opening ? 'true' : 'false';
+        tg.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        c.querySelectorAll('iframe[data-src]').forEach(function(frame){
+          if (opening) {
+            if (!frame.getAttribute('src') || frame.getAttribute('src') === 'about:blank') frame.setAttribute('src', frame.dataset.src);
+          } else if (c.classList.contains('work-cascade')) {
+            frame.setAttribute('src', 'about:blank');
+          }
+        });
+      });
+    });
+  }
+
+  function initReveals(){
     if ('IntersectionObserver' in window) {
       const io = new IntersectionObserver(function(entries){
-        entries.forEach(function(entry){ if (entry.isIntersecting) { entry.target.classList.add('is-in'); io.unobserve(entry.target); } });
+        entries.forEach(function(entry){
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-in');
+            io.unobserve(entry.target);
+          }
+        });
       }, { threshold: 0.2, root: terminalBody });
       terminalBody.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
     } else {
       terminalBody.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('is-in'); });
     }
-    terminalBody.scrollTo({ top: 0, behavior: 'auto' });
   }
+
+  function initSoftSectionIndicators(){
+    const sections = Array.from(terminalBody.querySelectorAll('section.page'));
+    sections.forEach(function(sec, idx){
+      sec.querySelectorAll(':scope > .section-jump, :scope > .section-end').forEach(function(el){ el.remove(); });
+      if (idx < sections.length - 1) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'section-jump';
+        btn.setAttribute('aria-label', 'next section');
+        btn.textContent = '↓';
+        btn.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          const next = sections[idx + 1];
+          if (!next) return;
+          history.replaceState({page: currentPage}, '', currentPage + '#' + next.id);
+          terminalBody.scrollTo({ top: next.offsetTop, behavior: 'smooth' });
+        });
+        sec.appendChild(btn);
+      } else {
+        const end = document.createElement('button');
+        end.type = 'button';
+        end.className = 'section-end';
+        end.setAttribute('aria-label', 'end, next page');
+        end.textContent = 'end - next page';
+        end.addEventListener('click', function(e){
+          e.preventDefault();
+          e.stopPropagation();
+          softLoad(nextPageName(currentPage)).catch(function(err){
+            console.warn('soft next failed:', err);
+            window.location.href = nextPageName(currentPage);
+          });
+        });
+        sec.appendChild(end);
+      }
+    });
+  }
+
+  function prefillHomeShell(){
+    const pre = terminalBody.querySelector('#intro-pre');
+    const post = terminalBody.querySelector('#intro-post');
+    const toggle = terminalBody.querySelector('#intro-cascade-toggle');
+    const cascade = terminalBody.querySelector('#intro-cascade');
+    const iframe = terminalBody.querySelector('#intro-video-iframe');
+    if (pre) pre.innerHTML = `&gt; hi.
+&gt; welcome to thrill wave.
+`;
+    if (toggle) {
+      toggle.innerHTML = '<span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
+      toggle.setAttribute('aria-expanded', 'true');
+    }
+    if (cascade) {
+      cascade.dataset.expanded = 'true';
+      cascade.style.opacity = '1';
+    }
+    if (iframe && iframe.dataset.src) iframe.setAttribute('src', iframe.dataset.src);
+    if (post) post.innerHTML = `&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.
+&gt;
+&gt; press enter or scroll down to go to the next section, or click menu to jump to a page.
+`;
+    body.classList.remove('home-intro-running');
+    body.classList.add('home-intro-complete');
+  }
+
+  function reinit(hash){
+    setChrome(currentPage);
+    if (currentPage === 'index.html') prefillHomeShell();
+    bindCascades();
+    initReveals();
+    initSoftSectionIndicators();
+    terminalBody.scrollTo({ top: 0, behavior: 'auto' });
+    if (hash) {
+      const target = terminalBody.querySelector(hash);
+      if (target) terminalBody.scrollTo({ top: target.offsetTop, behavior: 'auto' });
+    }
+  }
+
   async function softLoad(href, replace){
     const u = new URL(href, location.href);
     const page = normalizePage(u.href);
     if (!page) { window.location.href = href; return; }
-    if (page === 'index.html') { window.location.href = u.href; return; }
     closeMenu();
+
     const res = await fetch(page, { cache: 'no-cache' });
     if (!res.ok) throw new Error('Could not load ' + page);
     const html = await res.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
     const incoming = doc.getElementById('terminal-body');
     if (!incoming) throw new Error(page + ' missing #terminal-body');
+
     terminalBody.innerHTML = incoming.innerHTML;
     currentPage = page;
-    reinit();
-    if (replace) history.replaceState({page: page}, '', page + (u.hash || ''));
-    else history.pushState({page: page}, '', page + (u.hash || ''));
-    if (u.hash) {
-      const target = terminalBody.querySelector(u.hash);
-      if (target) terminalBody.scrollTo({ top: target.offsetTop, behavior: 'auto' });
+    reinit(u.hash || '');
+
+    const nextUrl = page + (u.hash || '');
+    if (replace) history.replaceState({page: page}, '', nextUrl);
+    else history.pushState({page: page}, '', nextUrl);
+  }
+
+  function absorb(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
+  function isInternalPageAnchor(a){
+    if (!a) return false;
+    const href = a.getAttribute('href') || '';
+    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:')) return false;
+    if (a.target && a.target !== '_self') return false;
+    try {
+      const u = new URL(href, location.href);
+      if (u.origin !== location.origin) return false;
+      return !!normalizePage(u.href);
+    } catch(e) { return false; }
+  }
+
+  function routeInternalLink(e){
+    const a = e.target && e.target.closest ? e.target.closest('a') : null;
+    if (!isInternalPageAnchor(a)) return;
+    const href = a.getAttribute('href') || a.dataset.page || 'index.html';
+    const key = href;
+    const now = Date.now();
+    absorb(e);
+    if (key === lastNavKey && now - lastNavAt < 700) return;
+    lastNavKey = key;
+    lastNavAt = now;
+    softLoad(href).catch(function(err){ console.warn('soft navigation failed:', err); window.location.href = href; });
+  }
+
+  function routeMenuTouch(e){
+    const a = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+    if (!a) return;
+    routeInternalLink(e);
+  }
+
+  function getCurrentSection(){
+    const sections = Array.from(terminalBody.querySelectorAll('section.page'));
+    const y = terminalBody.scrollTop;
+    let current = sections[0];
+    sections.forEach(function(sec){
+      if (sec.offsetTop <= y + 20) current = sec;
+    });
+    return current;
+  }
+
+  function routeEnterNavigation(e){
+    if (e.key !== 'Enter') return;
+    const tag = e.target && e.target.tagName;
+    if (tag === 'BUTTON' || tag === 'A' || tag === 'INPUT' || tag === 'TEXTAREA') return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+
+    const sections = Array.from(terminalBody.querySelectorAll('section.page'));
+    const current = getCurrentSection();
+    const idx = sections.indexOf(current);
+    if (idx >= 0 && idx < sections.length - 1) {
+      const next = sections[idx + 1];
+      history.replaceState({page: currentPage}, '', currentPage + '#' + next.id);
+      terminalBody.scrollTo({ top: next.offsetTop, behavior: 'smooth' });
+    } else {
+      softLoad(nextPageName(currentPage)).catch(function(err){
+        console.warn('soft enter navigation failed:', err);
+        window.location.href = nextPageName(currentPage);
+      });
     }
   }
+
   window.twSoftLoadPage = softLoad;
-  window.addEventListener('click', function(e){
-    const a = e.target && e.target.closest ? e.target.closest('a') : null;
-    if (!a) return;
-    const href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('mailto:') || href.startsWith('tel:') || a.target === '_blank') return;
-    const page = normalizePage(href);
-    if (!page) return;
-    e.preventDefault();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    softLoad(href).catch(function(err){ console.warn('soft navigation failed:', err); window.location.href = href; });
-  }, true);
+  window.addEventListener('pointerdown', routeMenuTouch, true);
+  window.addEventListener('touchstart', routeMenuTouch, { capture: true, passive: false });
+  window.addEventListener('click', routeInternalLink, true);
+  window.addEventListener('keydown', routeEnterNavigation, true);
   window.addEventListener('popstate', function(){ softLoad(location.href, true).catch(function(){}); });
+
+  // Replace the older constant NEXT_PAGE indicators with dynamic ones even
+  // before the first soft navigation happens.
+  reinit(location.hash || '');
 })();
 </script>
 
