@@ -6716,3 +6716,145 @@ body.tw-terminal-minimized .below-bar {
     transform: translateY(-7px) !important;
   }
 }
+
+/* ============================================================
+   TW brandmark + minimize refinement pass — 2026-05-18
+   Adds the wordmark to the HUD logo control, removes spin, and
+   cleans up the minimize behavior without involving the footer.
+   ============================================================ */
+
+.tw-wordmark-glyph {
+  --tw-wordmark-url: url('assets/img/tw-wordmark-mask.png');
+  display: inline-block;
+  width: 8.44em;
+  height: 1em;
+  color: currentColor;
+  background: currentColor;
+  -webkit-mask: var(--tw-wordmark-url) center / contain no-repeat;
+  mask: var(--tw-wordmark-url) center / contain no-repeat;
+  flex: 0 0 auto;
+}
+
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark {
+  width: auto !important;
+  min-width: 190px !important;
+  height: 28px !important;
+  padding: 0 10px !important;
+  gap: 8px !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  overflow: hidden !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb {
+  width: 25px !important;
+  height: 18px !important;
+  transform: none !important;
+  transform-origin: center !important;
+  animation: twLogoGlyphColorDrift 8.5s ease-in-out infinite !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  width: 152px !important;
+  height: 18px !important;
+  color: currentColor !important;
+  opacity: 0.96;
+  animation: twLogoGlyphColorDrift 8.5s ease-in-out infinite !important;
+  filter:
+    drop-shadow(0 0 5px rgba(93,208,104,0.72))
+    drop-shadow(0 0 15px rgba(93,208,104,0.32));
+}
+
+.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb {
+  filter:
+    drop-shadow(0 0 5px rgba(255,255,255,0.78))
+    drop-shadow(0 0 16px rgba(255,255,255,0.32)) !important;
+}
+
+/* The footer should no longer have its own kinetic minimize/restore movement. */
+.below-bar {
+  transition: color 160ms ease, opacity 160ms ease !important;
+}
+body.tw-terminal-minimized .below-bar {
+  transform: none !important;
+  opacity: 1 !important;
+}
+
+/* Mobile minimize should collapse from the terminal top instead of recentering the tiny window. */
+@media (max-width: 720px) {
+  body.tw-terminal-minimized .content {
+    align-items: flex-start !important;
+  }
+  body.tw-terminal-minimized .stage-wrap {
+    transform: none !important;
+  }
+  body.tw-terminal-minimized .terminal.main {
+    height: 39px !important;
+    max-height: 39px !important;
+    transform: none !important;
+  }
+  body.tw-terminal-minimized .below-bar {
+    transform: none !important;
+  }
+
+  .tw-logo-orb.tw-brandmark,
+  button.tw-logo-orb.tw-brandmark {
+    min-width: 150px !important;
+    height: 26px !important;
+    padding: 0 8px !important;
+    gap: 6px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb {
+    width: 21px !important;
+    height: 15px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+    width: 116px !important;
+    height: 15px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .tw-logo-orb.tw-brandmark,
+  button.tw-logo-orb.tw-brandmark {
+    min-width: 132px !important;
+    padding: 0 7px !important;
+    gap: 5px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb {
+    width: 19px !important;
+    height: 14px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+    width: 100px !important;
+    height: 14px !important;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 560px) and (max-width: 980px) {
+  .tw-logo-orb.tw-brandmark,
+  button.tw-logo-orb.tw-brandmark {
+    min-width: 146px !important;
+    height: 25px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb {
+    width: 20px !important;
+    height: 14px !important;
+  }
+  .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+    width: 112px !important;
+    height: 14px !important;
+  }
+}
