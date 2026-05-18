@@ -2175,7 +2175,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   function escAll(s) { return s.split('').map(escHtml).join(''); }
 
   function typeLines(targetEl, lines, done) {
-    const myGen = (window.twTypingGen = (window.twTypingGen || 0));
+    const myGen = window.twTypingGen || 0; // read current gen, never mutate
     let html = '';
     let idx = 0;
     function next() {
@@ -2220,7 +2220,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     next();
   }
 
-  function typeCascadeToggle(done) {
+  function typeCascadeToggle(gen, done) {
     const cascade = document.getElementById('intro-cascade');
     const toggle = document.getElementById('intro-cascade-toggle');
     cascade.style.opacity = '1';
@@ -2230,6 +2230,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     let html = '';
     let i = 0;
     function type() {
+      if (window.twTypingGen !== gen) return; // aborted by reset
       if (i >= plain.length) {
         // Done — replace plain with styled HTML; CSS handles [+]/[-] via ::before
         toggle.innerHTML = '<span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
@@ -2270,36 +2271,38 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     // Guard against overlapping calls — typing already running, ignore.
     if (window.twIntroRunning) return;
     window.twIntroRunning = true;
+    // Snapshot the generation at launch. Every async step checks this.
+    // resetAndReplayHome() increments twTypingGen, which causes every
+    // pending callback to bail out rather than writing to the DOM.
+    const myGen = window.twTypingGen || 0;
     document.body.classList.remove('home-intro-complete');
     document.body.classList.add('home-intro-running');
     const preEl = document.getElementById('intro-pre');
     const postEl = document.getElementById('intro-post');
     preEl.innerHTML = '<span class="cursor"></span>';
-    // Let the cursor breathe before typing, both on normal page load and
-    // after the opening finishes. This makes the lander feel intentional.
     setTimeout(() => {
+      if (window.twTypingGen !== myGen) { window.twIntroRunning = false; return; }
       typeLines(preEl, introPreLines, () => {
+        if (window.twTypingGen !== myGen) return;
         preEl.innerHTML = preEl.innerHTML.replace('<span class="cursor"></span>', '');
-      typeCascadeToggle(() => {
-        expandCascadeContent();
-        setTimeout(() => {
-          typeLines(postEl, introPostLines, () => {
-            // typing complete — mark in session so a back-navigation doesn't
-            // replay the animation. Only refresh or thrill_wave/home click
-            // can trigger replay after this.
-            sessionStorage.setItem('tw_typing_done', '1');
-            window.twIntroRunning = false;
-            document.body.classList.remove('home-intro-running');
-            // 2050ms wait before flipping the gate that reveals the
-            // first section-jump arrow. This keeps the hint close to the music without landing too early.
-            // hint shows up.
-            setTimeout(() => {
-              document.body.classList.add('home-intro-complete');
-            }, 2050);
-          });
-        }, 700);
+        typeCascadeToggle(myGen, () => {
+          if (window.twTypingGen !== myGen) return;
+          expandCascadeContent();
+          setTimeout(() => {
+            if (window.twTypingGen !== myGen) return;
+            typeLines(postEl, introPostLines, () => {
+              if (window.twTypingGen !== myGen) return;
+              sessionStorage.setItem('tw_typing_done', '1');
+              window.twIntroRunning = false;
+              document.body.classList.remove('home-intro-running');
+              setTimeout(() => {
+                if (window.twTypingGen !== myGen) return;
+                document.body.classList.add('home-intro-complete');
+              }, 2050);
+            });
+          }, 700);
+        });
       });
-    });
     }, 2000);
   }
 
