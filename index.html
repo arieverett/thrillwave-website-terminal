@@ -3349,11 +3349,15 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (nxt === cur) return;
 
     locked = true;
-    // Sound: use optional override (e.g. click for Enter key) or scroll whoosh
-    var play = (typeof snd === 'function') ? snd
-             : (window.twUI && typeof window.twUI.sndClick === 'function') ? window.twUI.sndClick
-             : null;
-    if (play) try { play(); } catch (_) {}
+    // snd === 'silent': caller already played the sound (e.g. Enter keydown)
+    // snd is a function: use that function
+    // snd is undefined: use default sndClick
+    if (snd !== 'silent') {
+      var play = (typeof snd === 'function') ? snd
+               : (window.twUI && typeof window.twUI.sndClick === 'function') ? window.twUI.sndClick
+               : null;
+      if (play) try { play(); } catch (_) {}
+    }
 
     el.scrollTo({ top: list[nxt].offsetTop, behavior: 'smooth' });
 
@@ -3403,19 +3407,24 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }, { passive: true });
 
   // ── Keyboard ───────────────────────────────────────────────────────
+  // Capture phase so no later handler can stopImmediatePropagation before us.
+  // For Enter: play sound explicitly here — snap() called with 'silent'
+  // so it doesn't double-play. Arrow keys still use snap's default sound.
   document.addEventListener('keydown', function (e) {
     if (document.body.classList.contains('menu-open')) return;
     var tag = document.activeElement && document.activeElement.tagName;
     if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
     if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); snap(1); }
-    else if (e.key === 'ArrowUp'   || e.key === 'PageUp')   { e.preventDefault(); snap(-1); }
+    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); snap(-1); }
     else if (e.key === 'Enter') {
       e.preventDefault();
-      // Button-press sound for Enter, distinct from scroll whoosh
-      snap(1); // default is already sndClick
+      // Play click sound directly here — guaranteed to fire regardless of
+      // what other handlers do. Only play if not locked (nothing to navigate).
+      if (!locked && window.twUI) try { window.twUI.sndClick(); } catch(_) {}
+      snap(1, 'silent'); // 'silent' = snap skips its own sound (we played it)
     }
-  });
+  }, true); // capture phase
 })();
 </script>
 
