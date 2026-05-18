@@ -3358,28 +3358,25 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     closeMenu();
     document.body.classList.remove('tw-terminal-minimized');
 
-    var onHome = !!document.querySelector('#terminal-body #hero');
-    if (onHome && typeof window.twResetAndReplayHome === 'function') {
-      window.twResetAndReplayHome();
-      return;
-    }
+    // Always navigate to home first (loadPage handles "already on home" too),
+    // then replay the animation. One path — no onHome branching.
+    var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
+                : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
+                : null;
 
-    var loader = null;
-    if (typeof window.twLoadPage === 'function') loader = window.twLoadPage;
-    else if (typeof window.twSoftLoadPage === 'function') loader = window.twSoftLoadPage;
-
-    if (loader && typeof window.twResetAndReplayHome === 'function') {
-      Promise.resolve(loader('index.html')).then(function(){
+    if (loader) {
+      loader('index.html').then(function(){
         window.setTimeout(function(){
-          window.twResetAndReplayHome();
+          if (typeof window.twResetAndReplayHome === 'function') {
+            window.twResetAndReplayHome();
+          }
         }, 80);
       }).catch(function(){
         window.location.assign('index.html?homeIntro=' + Date.now());
       });
-      return;
+    } else {
+      window.location.assign('index.html?homeIntro=' + Date.now());
     }
-
-    window.location.assign('index.html?homeIntro=' + Date.now());
   }
 
   function toggleTerminalMinimize(){
@@ -3394,6 +3391,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
       logo.blur();
+      logo.dataset.justClicked = '1';
+      setTimeout(function(){ delete logo.dataset.justClicked; }, 350);
       restartHomeTyping();
       return;
     }
