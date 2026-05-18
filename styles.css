@@ -5723,3 +5723,152 @@ section.page {
     min-height: 1.54em !important;
   }
 }
+
+
+/* ============================================================
+   TW micro-polish pass — tighter content + safer snap feel
+   ============================================================ */
+
+/* Sitrep 03A/03B/03C tiles: keep 1:1, but reduce to the triptych feel. */
+#ingest .single-tile,
+#process .single-tile,
+#output .single-tile {
+  width: min(168px, 42vw) !important;
+  max-width: 168px !important;
+  margin: 0 0 10px !important;
+}
+#ingest .single-tile .tile,
+#process .single-tile .tile,
+#output .single-tile .tile {
+  aspect-ratio: 1 / 1 !important;
+  min-height: 0 !important;
+  padding: 9px 7px 8px !important;
+}
+#ingest .single-tile .tile-graphic,
+#process .single-tile .tile-graphic,
+#output .single-tile .tile-graphic {
+  height: 22px !important;
+  font-size: 13px !important;
+  margin: 3px 0 6px !important;
+}
+#ingest .single-tile .tile-title,
+#process .single-tile .tile-title,
+#output .single-tile .tile-title {
+  font-size: 8.5px !important;
+  letter-spacing: 1.2px !important;
+  margin-bottom: 5px !important;
+}
+#ingest .single-tile .tile-list,
+#process .single-tile .tile-list,
+#output .single-tile .tile-list {
+  font-size: 8.5px !important;
+  line-height: 1.25 !important;
+}
+
+/* Intel feed: article rows should breathe like normal terminal lines, not cards. */
+#feed .intel-cascade {
+  margin: 0 0 0.18em 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .intel-cascade .cascade-toggle {
+  line-height: 1.5 !important;
+  padding: 0 !important;
+}
+#feed .intel-cascade[data-expanded="true"] .cascade-content,
+#feed .intel-cascade .cascade-content {
+  margin: 0.12em 0 0.28em 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .rss-copy {
+  margin: 0 !important;
+  line-height: 1.5 !important;
+}
+#feed .rss-copy .line {
+  min-height: 1.5em !important;
+  line-height: 1.5 !important;
+}
+#feed .read-more-copy {
+  margin-top: 0.35em !important;
+}
+
+/* Intel 05C next prompt: white at rest, green on hover. */
+#next-step .next-link {
+  color: var(--fg) !important;
+}
+#next-step .next-link button.tw-page-link {
+  color: var(--fg) !important;
+}
+#next-step .next-link button.tw-page-link:hover,
+#next-step .next-link button.tw-page-link:focus-visible {
+  color: var(--accent) !important;
+}
+
+/* Contact widgets: smaller embeds so section 06 / 06A fit inside the terminal better. */
+.contact-cascade {
+  margin: 0.25em 0 0.45em !important;
+  font-size: 0.88em !important;
+  line-height: 1.35 !important;
+}
+.contact-cascade[data-expanded="true"] .cascade-content {
+  margin: 0.32em 0 0.55em !important;
+  max-height: none !important;
+}
+.contact-cascade .cascade-toggle {
+  line-height: 1.35 !important;
+}
+.map-cascade .embed-frame,
+.calendly-cascade .embed-frame {
+  width: min(100%, 520px) !important;
+  max-width: 520px !important;
+  margin: 0.35em 0 0 !important;
+  box-shadow: 0 0 14px rgba(93,208,104,0.10) !important;
+}
+.map-cascade .map-frame iframe {
+  min-height: 180px !important;
+  height: 180px !important;
+}
+.calendly-cascade .calendly-frame iframe {
+  min-height: 360px !important;
+  height: 360px !important;
+}
+#loop .page-content.terminal-copy button.cta-link.tw-page-link {
+  color: var(--accent) !important;
+}
+#loop .page-content.terminal-copy button.cta-link.tw-page-link:hover,
+#loop .page-content.terminal-copy button.cta-link.tw-page-link:focus-visible {
+  color: var(--fg) !important;
+}
+
+@media (max-width: 720px) {
+  #ingest .single-tile,
+  #process .single-tile,
+  #output .single-tile {
+    width: min(142px, 45vw) !important;
+    max-width: 142px !important;
+  }
+  #feed .intel-cascade,
+  #feed .intel-cascade .cascade-toggle,
+  #feed .rss-copy,
+  #feed .rss-copy .line {
+    line-height: 1.42 !important;
+  }
+  #feed .rss-copy .line {
+    min-height: 1.42em !important;
+  }
+  .contact-cascade {
+    font-size: 0.82em !important;
+    line-height: 1.3 !important;
+  }
+  .map-cascade .embed-frame,
+  .calendly-cascade .embed-frame {
+    max-width: 100% !important;
+  }
+  .map-cascade .map-frame iframe {
+    min-height: 150px !important;
+    height: 150px !important;
+  }
+  .calendly-cascade .calendly-frame iframe {
+    min-height: 300px !important;
+    height: 300px !important;
+  }
+}

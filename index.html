@@ -3079,19 +3079,21 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
 <script>
 // ============================================================
-// TW SECTION SNAP CONTROLLER V2
-// One real wheel/swipe gesture = one terminal section. Prevents the old
-// native/custom snap handlers from fighting and making scroll feel sticky.
+// TW SECTION SNAP CONTROLLER V3
+// One physical wheel/swipe gesture = one section, even with hard
+// MacBook trackpad momentum. The gesture lock stays alive until
+// wheel momentum goes quiet, so a single flick cannot skip sections.
 // ============================================================
-(function twSectionSnapControllerV2(){
+(function twSectionSnapControllerV3(){
   var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody || window.__twSectionSnapControllerV2) return;
-  window.__twSectionSnapControllerV2 = true;
+  if (!terminalBody || window.__twSectionSnapControllerV3) return;
+  window.__twSectionSnapControllerV3 = true;
 
-  var lockUntil = 0;
+  var snapLockUntil = 0;
+  var wheelGestureLocked = false;
+  var wheelIdleTimer = null;
   var wheelAccum = 0;
-  var wheelTimer = null;
-  var touch = { active:false, vertical:false, x:0, y:0, top:0, at:0 };
+  var touch = { active:false, vertical:false, fired:false, x:0, y:0, top:0, at:0 };
 
   function sections(){
     return Array.prototype.slice.call(terminalBody.querySelectorAll('section.page'));
@@ -3115,42 +3117,57 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function blocked(target){
     if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, .cascade-content, .embed-frame, iframe, input, textarea, select, button, a');
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, iframe, input, textarea, select');
+  }
+
+  function resetWheelAfterMomentum(){
+    window.clearTimeout(wheelIdleTimer);
+    wheelIdleTimer = window.setTimeout(function(){
+      wheelGestureLocked = false;
+      wheelAccum = 0;
+    }, 520);
   }
 
   function snap(direction){
     var now = Date.now();
-    if (now < lockUntil) return;
+    if (now < snapLockUntil) return false;
 
     var list = sections();
-    if (list.length < 2) return;
+    if (list.length < 2) return false;
 
     var current = nearestIndex(list);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
-    if (next === current) return;
+    if (next === current) return false;
 
-    lockUntil = now + 760;
+    snapLockUntil = now + 1200;
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
 
     if (list[next].id && window.history && window.history.replaceState) {
       window.history.replaceState(window.history.state || {}, '', pageName() + '#' + list[next].id);
     }
+    return true;
   }
 
   terminalBody.addEventListener('wheel', function(e){
     if (document.body.classList.contains('menu-open')) return;
     if (blocked(e.target)) return;
-    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX) * 1.05) return;
 
     e.preventDefault();
-    wheelAccum += e.deltaY;
-    window.clearTimeout(wheelTimer);
-    wheelTimer = window.setTimeout(function(){ wheelAccum = 0; }, 180);
+    resetWheelAfterMomentum();
 
-    if (Math.abs(wheelAccum) < 18) return;
+    // If this is trackpad momentum from the same flick, swallow it.
+    if (wheelGestureLocked) return;
+
+    wheelAccum += e.deltaY;
+    var threshold = Math.max(34, Math.min(90, terminalBody.clientHeight * 0.075));
+
+    if (Math.abs(wheelAccum) < threshold) return;
+
+    wheelGestureLocked = true;
     snap(wheelAccum > 0 ? 1 : -1);
     wheelAccum = 0;
-  }, { passive:false });
+  }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchstart', function(e){
     if (!e.touches || e.touches.length !== 1) return;
@@ -3159,6 +3176,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     touch.active = true;
     touch.vertical = false;
+    touch.fired = false;
     touch.x = e.touches[0].clientX;
     touch.y = e.touches[0].clientY;
     touch.top = terminalBody.scrollTop;
@@ -3179,7 +3197,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }, { passive:false, capture:true });
 
   terminalBody.addEventListener('touchend', function(e){
-    if (!touch.active) return;
+    if (!touch.active || touch.fired) return;
     touch.active = false;
     if (!e.changedTouches || !e.changedTouches.length) return;
 
@@ -3187,11 +3205,12 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var dx = touch.x - e.changedTouches[0].clientX;
     var dt = Math.max(1, Date.now() - touch.at);
     var velocity = Math.abs(dy) / dt;
-    var threshold = Math.min(82, Math.max(34, terminalBody.clientHeight * 0.055));
+    var threshold = Math.min(86, Math.max(38, terminalBody.clientHeight * 0.06));
 
     if (Math.abs(dx) > Math.abs(dy) * 0.85) return;
-    if (Math.abs(dy) < threshold && velocity < 0.16) return;
+    if (Math.abs(dy) < threshold && velocity < 0.17) return;
 
+    touch.fired = true;
     snap(dy > 0 ? 1 : -1);
   }, { passive:false, capture:true });
 })();
