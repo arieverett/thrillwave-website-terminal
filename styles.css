@@ -7288,3 +7288,65 @@ body.tw-powering-down .power-down-collapse::after {
   2%, 78% { opacity: 1; background: transparent; }
   100% { opacity: 1; background: #000; }
 }
+
+
+/* ============================================================
+   TW opening handoff update — include new brandmark HUD button
+   The .elf launch scan now catches the wave + wordmark control too.
+   Normal state stays plain gray like the menu button; this runs only
+   during the boot handoff wake class.
+   ============================================================ */
+body.tw-system-wake .topbar-left {
+  position: relative !important;
+  isolation: isolate !important;
+}
+
+body.tw-system-wake .topbar-left::before {
+  content: '' !important;
+  position: absolute !important;
+  inset: -9px -12px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  border-radius: 8px !important;
+  opacity: 0 !important;
+  background: radial-gradient(ellipse at 50% 50%, rgba(93,208,104,0.30), rgba(93,208,104,0.11) 46%, rgba(0,0,0,0) 76%) !important;
+  filter: blur(12px) !important;
+  animation: tw-brandmark-wake-halo 4.75s cubic-bezier(0.16,0.76,0.18,1) 0.18s both !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark {
+  color: var(--accent) !important;
+  border-color: rgba(93,208,104,0.86) !important;
+  background: rgba(0,0,0,0.08) !important;
+  box-shadow:
+    0 0 20px rgba(93,208,104,0.22),
+    inset 0 0 14px rgba(93,208,104,0.06) !important;
+  filter: brightness(1.08) !important;
+  animation: tw-brandmark-wake-button 4.75s cubic-bezier(0.16,0.76,0.18,1) 0.20s both !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  color: currentColor !important;
+  background: currentColor !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+@keyframes tw-brandmark-wake-halo {
+  0%   { opacity: 0; transform: translateY(-18px) scaleY(0.55); }
+  9%   { opacity: 0.88; }
+  38%  { opacity: 0.62; transform: translateY(3px) scaleY(0.95); }
+  72%  { opacity: 0.28; transform: translateY(18px) scaleY(1.08); }
+  100% { opacity: 0; transform: translateY(34px) scaleY(1.12); }
+}
+
+@keyframes tw-brandmark-wake-button {
+  0%   { color: var(--muted); border-color: var(--rule); box-shadow: none; filter: brightness(0.94); }
+  14%  { color: var(--accent); border-color: rgba(93,208,104,0.90); box-shadow: 0 0 22px rgba(93,208,104,0.25), inset 0 0 14px rgba(93,208,104,0.06); filter: brightness(1.12); }
+  52%  { color: var(--accent); border-color: rgba(93,208,104,0.48); box-shadow: 0 0 18px rgba(93,208,104,0.14), inset 0 0 10px rgba(93,208,104,0.04); filter: brightness(1.05); }
+  100% { color: var(--muted); border-color: var(--rule); box-shadow: none; filter: brightness(1); }
+}
