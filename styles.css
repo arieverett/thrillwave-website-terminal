@@ -5097,3 +5097,62 @@ body:not(.booting) #terminal-body .page-content.terminal-copy .line {
     max-width: 210px;
   }
 }
+
+
+/* Button-based internal navigation repair.
+   These replace broken internal anchors while keeping the exact terminal look. */
+button.tw-page-link {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none !important;
+}
+
+section.page button.tw-page-link:not(.menu-item),
+.next-link button.tw-page-link,
+button.cta-link.tw-page-link {
+  display: inline;
+  padding: 0;
+  margin: 0;
+  color: var(--accent) !important;
+  text-decoration: none !important;
+}
+
+section.page button.tw-page-link:not(.menu-item):hover,
+section.page button.tw-page-link:not(.menu-item):focus-visible,
+.next-link button.tw-page-link:hover,
+.next-link button.tw-page-link:focus-visible,
+button.cta-link.tw-page-link:hover,
+button.cta-link.tw-page-link:focus-visible {
+  color: var(--fg) !important;
+  outline: none;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35));
+}
+
+#side-menu button.menu-item.tw-page-link {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  width: calc(100% + 12px);
+  padding: 5px 10px;
+  margin: 0 -6px;
+  color: inherit;
+}
+
+#side-menu button.menu-item.tw-page-link:hover,
+#side-menu button.menu-item.tw-page-link:focus-visible {
+  background: transparent;
+  outline: none;
+}
+
+#side-menu button.menu-item.tw-page-link .num,
+#side-menu button.menu-item.tw-page-link .name {
+  pointer-events: none;
+}
