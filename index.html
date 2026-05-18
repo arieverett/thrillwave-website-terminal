@@ -307,7 +307,7 @@
 <div class="boot-log" id="boot-log"></div>
 <!-- Desktop -->
 <div class="desktop" id="desktop">
-<div class="desktop-brand">⏻ thrill_wave</div>
+<div class="desktop-brand">⏻ on / off</div>
 <div class="desktop-icon" id="desktop-icon">
 <div class="icon-glyph icon-glyph--logo"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--elf"></span></div>
 <div class="icon-label">thrill_wave.elf</div>
@@ -335,7 +335,7 @@
 <span aria-hidden="true" class="boot-term-scan"></span>
 <div class="boot-term-inner">
 <div class="boot-term-title">
-<span class="boot-term-title-text">thrill_wave — home</span>
+<span class="boot-term-title-text">home</span>
 <span aria-hidden="true" class="boot-term-dots">
 <span class="boot-dot"></span><span class="boot-dot"></span><span class="boot-dot live"></span>
 </span>
@@ -365,7 +365,7 @@
 </div>
 </div>
 <div class="frame">
-<a class="frame-label frame-label--tl" data-power-control="" href="index.html?power=1" onclick="return window.twPowerConfirm ? window.twPowerConfirm(event) : false;">⏻ thrill_wave</a>
+<a class="frame-label frame-label--tl" data-power-control="" href="index.html?power=1" onclick="return window.twPowerConfirm ? window.twPowerConfirm(event) : false;">⏻ on / off</a>
 <div class="frame-label frame-label--bl"><span id="clock">--:--:--</span></div>
 <div class="frame-label frame-label--br" id="page-indicator">home  ·  01 / 06</div>
 </div>
@@ -485,7 +485,7 @@
 <div class="stage">
 <div class="terminal main">
 <div class="terminal-bar">
-<span class="title"><a class="title-brand" href="index.html" id="title-brand">thrill_wave</a><span class="title-sep"> — </span><a class="title-page" href="#" id="title-page">home</a></span>
+<span class="title"><a class="title-page" href="#" id="title-page">home</a></span>
 <div class="terminal-dots">
 <span class="dot"></span><span class="dot"></span><span class="dot live"></span>
 </div>
@@ -1690,8 +1690,19 @@ async function runWelcomeTyping() {
   // Move the cursor down to line 2 (single DOM node — moves on append)
   l2.appendChild(cursor);
   await new Promise(r => setTimeout(r, 160));
-  await typeOut(l2text, '> welcome to thrill wave.', 42);
+  await typeOut(l2text, '> welcome to thrill wave', 42);
   if (welcomeTypingAborted) return;
+
+  // Opening gate only: add the white wave glyph inline after the typed text.
+  // The later terminal-window animation stays text-only.
+  if (!l2text.querySelector('.tw-logo-glyph--welcome')) {
+    l2text.appendChild(document.createTextNode(' '));
+    const welcomeGlyph = document.createElement('span');
+    welcomeGlyph.className = 'tw-logo-glyph tw-logo-glyph--welcome';
+    welcomeGlyph.setAttribute('aria-hidden', 'true');
+    l2text.appendChild(welcomeGlyph);
+    l2text.appendChild(document.createTextNode('.'));
+  }
 
   // Hold the finished typing moment a touch longer before revealing the start button.
   await new Promise(r => setTimeout(r, 1000));

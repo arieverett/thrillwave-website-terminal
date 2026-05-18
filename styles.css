@@ -6858,3 +6858,50 @@ body.tw-terminal-minimized .below-bar {
     height: 14px !important;
   }
 }
+
+/* ============================================================
+   Refinement pass — welcome glyph + clean brandmark HUD
+   ============================================================ */
+
+/* Opening welcome gate only: white wave glyph inline with the typed line. */
+.welcome-line .tw-logo-glyph--welcome {
+  color: var(--fg) !important;
+  width: 1.34em !important;
+  height: 0.96em !important;
+  margin-left: 0.08em !important;
+  vertical-align: -0.095em !important;
+  filter:
+    drop-shadow(0 0 3px rgba(255,255,255,0.58))
+    drop-shadow(0 0 9px rgba(255,255,255,0.20)) !important;
+  animation: none !important;
+}
+
+/* Remove the scanline/banding overlay from the logo + wordmark HUD control. */
+.tw-logo-orb.tw-brandmark::after,
+button.tw-logo-orb.tw-brandmark::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+}
+
+/* Keep the subtle hologram sweep/glow, but do not stripe the marks themselves. */
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  mix-blend-mode: normal !important;
+}
+
+/* Desktop only: make the wordmark just slightly smaller next to the wave mark. */
+@media (min-width: 721px) {
+  .tw-logo-orb.tw-brandmark,
+  button.tw-logo-orb.tw-brandmark {
+    min-width: 181px !important;
+  }
+
+  .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+  button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+    width: 144px !important;
+    height: 17px !important;
+  }
+}
