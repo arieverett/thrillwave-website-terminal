@@ -4706,3 +4706,176 @@ section.page a:focus-visible,
 ul.tile-list,
 ul.tile-list li { list-style: none !important; margin-left: 0 !important; padding-left: 0 !important; }
 .cta-link { color: var(--fg) !important; }
+
+/* ============================================================
+   TW INDEX PAGE REFINEMENT PASS — prompt rail, green links, team order
+   ============================================================ */
+
+/* A visual terminal prompt column. This makes every visual line — including
+   wrapped lines and empty lines — read with a white > without double-typing
+   prompt characters into the copy itself. */
+.page-content.terminal-copy {
+  position: relative;
+  display: block;
+  color: var(--fg) !important;
+  line-height: 1.58;
+  white-space: normal;
+  word-break: normal;
+  overflow: hidden;
+  padding-left: 2.05ch;
+  text-align: left !important;
+}
+
+.page-content.terminal-copy::before {
+  content: ">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>";
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: pre;
+  line-height: inherit;
+  color: var(--tw-prompt) !important;
+  pointer-events: none;
+}
+
+.page-content.terminal-copy .line {
+  display: block;
+  min-height: 1.58em;
+  white-space: pre-wrap;
+  color: var(--fg) !important;
+}
+
+/* Links should read as live commands: green, no underline. */
+section.page a,
+section.page a:visited,
+section.page a:hover,
+section.page a:focus-visible,
+.terminal a,
+.terminal a:visited,
+.below-bar a,
+.below-bar a:visited {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+
+section.page a:hover,
+section.page a:focus-visible,
+.terminal a:hover,
+.terminal a:focus-visible,
+.below-bar a:hover,
+.below-bar a:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35));
+}
+
+/* Keep accents green but all body copy white. */
+.page-content.terminal-copy .accent {
+  color: var(--accent) !important;
+}
+
+.page-content.terminal-copy .dim,
+.page-content.terminal-copy .muted,
+#talk_to_us .muted {
+  color: var(--fg) !important;
+}
+
+/* Work page toggles should sit at the same rhythm as text lines. */
+#our_work .page-content.terminal-copy {
+  margin-bottom: 0;
+}
+
+#our_work .work-cascade {
+  margin: 0 !important;
+  line-height: 1.58 !important;
+}
+
+#our_work .work-cascade .cascade-toggle {
+  line-height: 1.58 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+#our_work .work-cascade + .work-cascade {
+  margin-top: 0 !important;
+}
+
+/* Who-we-work-with and talk-to-us: remove divider-bar language and keep text left aligned. */
+#who_we_work_with .dim,
+#talk_to_us .section-rule {
+  display: none !important;
+}
+
+#who_we_work_with,
+#who_we_work_with *,
+#talk_to_us,
+#talk_to_us * {
+  text-align: left !important;
+}
+
+/* Team captions: one terminal-style line, same size as normal copy. */
+.team-card {
+  text-align: left !important;
+}
+
+.team-caption {
+  margin-top: 10px;
+  font: inherit;
+  font-size: inherit !important;
+  line-height: 1.58;
+  letter-spacing: 0;
+  color: var(--fg) !important;
+  text-align: left !important;
+}
+
+.team-caption::before {
+  content: "> ";
+  color: var(--tw-prompt) !important;
+}
+
+.team-name,
+.team-role,
+.team-name::before,
+.team-role::before {
+  display: none !important;
+  content: none !important;
+}
+
+/* Final page CTA: green command, no underline. */
+.section-end {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  opacity: 0;
+  text-transform: none !important;
+}
+
+.section-end::before {
+  color: var(--tw-prompt) !important;
+}
+
+.section-end:hover,
+.section-end:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 6px rgba(93,208,104,0.4));
+}
+
+@media (max-width: 720px) {
+  .page-content.terminal-copy {
+    line-height: 1.52;
+  }
+
+  .page-content.terminal-copy .line {
+    min-height: 1.52em;
+  }
+
+  .team-caption {
+    line-height: 1.52;
+  }
+
+  #our_work .work-cascade,
+  #our_work .work-cascade .cascade-toggle {
+    line-height: 1.52 !important;
+  }
+}
