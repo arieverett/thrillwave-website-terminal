@@ -427,7 +427,8 @@
     if (document.body.classList.contains('tw-powering-down')) return false;
     var modal = getModal();
     document.body.classList.add('tw-powering-down');
-    sndShutdown();
+    // Use the existing sweep synth — proven to work, reads as a power-off whoosh
+    try { sndSweep(); } catch(e) {}
     if (modal) modal.classList.add('is-shutting-down');
     try {
       sessionStorage.removeItem('tw_intro_played');
@@ -437,11 +438,11 @@
       sessionStorage.removeItem('tw_home_complete');
     } catch (_) {}
     window.setTimeout(function(){
-      // Pause music before unload to prevent audio pop
       try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e){}
-      // Navigate to index.html — with tw_intro_played cleared above,
-      // the full boot sequence (hi · welcome · click to start) plays fresh.
-      window.location.replace('index.html');
+      // Flag tells the PJAX popstate handler to stand down so the real
+      // full-page navigation fires instead of a soft PJAX load.
+      window.__twResetting = true;
+      window.location.href = 'index.html?' + Date.now();
     }, 760);
     return false;
   }
@@ -2881,6 +2882,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }, true);
 
   window.addEventListener('popstate', () => {
+    if (window.__twResetting) return; // power-off: let the real navigation through
     loadPage(location.href, { replace: true }).catch(() => {});
   });
 
