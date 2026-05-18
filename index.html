@@ -3354,36 +3354,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       sessionStorage.removeItem('tw_typing_done');
       sessionStorage.removeItem('tw_home_complete');
     } catch (e) {}
-
-    closeMenu();
-    document.body.classList.remove('tw-terminal-minimized');
-
-    // Already on home — replay directly, no PJAX needed (avoids DOM flash)
-    var onHome = !!document.querySelector('#terminal-body #hero');
-    if (onHome && typeof window.twResetAndReplayHome === 'function') {
-      window.twResetAndReplayHome();
-      return;
-    }
-
-    // On another page — load home via PJAX with skipPrefill so the static
-    // text isn't flash-rendered before the animation clears and replays it.
-    var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
-                : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
-                : null;
-
-    if (loader) {
-      loader('index.html', { skipPrefill: true }).then(function(){
-        window.setTimeout(function(){
-          if (typeof window.twResetAndReplayHome === 'function') {
-            window.twResetAndReplayHome();
-          }
-        }, 80);
-      }).catch(function(){
-        window.location.assign('index.html?homeIntro=' + Date.now());
-      });
-    } else {
-      window.location.assign('index.html?homeIntro=' + Date.now());
-    }
+    // Full-page reload: works from any page, no flash, no PJAX branching.
+    // tw_intro_played skips the boot so only the home typing animation replays.
+    window.location.assign('index.html?homeIntro=' + Date.now());
   }
 
   function toggleTerminalMinimize(){

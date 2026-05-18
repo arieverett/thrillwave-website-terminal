@@ -7483,3 +7483,16 @@ button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb {
   filter: drop-shadow(0 0 2px rgba(130,130,130,0.28)) !important;
   color: #7a7a7a !important;
 }
+
+/* ── Thrillwave hover sync: explicit green so border + glyphs fire together ──
+   Original hover uses border-color:currentColor where currentColor is animated
+   by twLogoOrbColorDrift (constantly shifting) — glyph filter snaps to fixed
+   green while border chases the animation, causing visual desync.
+   Fix: lock both to explicit var(--accent) on hover so they're always in step. */
+.tw-logo-orb.tw-brandmark:hover,
+button.tw-logo-orb.tw-brandmark:hover,
+.tw-logo-orb.tw-brandmark:focus-visible,
+button.tw-logo-orb.tw-brandmark:focus-visible {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
