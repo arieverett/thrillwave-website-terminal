@@ -78,6 +78,123 @@
   </script>
 
   <script>
+  // THRILL_WAVE NAV LOCK
+  // First capture listener on the page. It owns internal page links before
+  // any older terminal/menu handlers can redirect them back to home.
+  (function twNavLock(){
+    if (window.__twNavLock) return;
+    window.__twNavLock = true;
+
+    var PAGES = {
+      'index.html': true,
+      'about.html': true,
+      'sitrep.html': true,
+      'work.html': true,
+      'intel.html': true,
+      'contact.html': true
+    };
+
+    var lastKey = '';
+    var lastAt = 0;
+
+    function pageFromAnchor(a){
+      if (!a) return null;
+      if (a.closest && a.closest('#title-brand, #title-page, .frame-label--tl, [data-power-control]')) return null;
+      if (a.target && a.target !== '_self') return null;
+      var href = a.getAttribute('href') || a.getAttribute('data-page') || '';
+      if (!href || href.charAt(0) === '#' || /^mailto:|^tel:/i.test(href)) return null;
+
+      try {
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return null;
+        var page = u.pathname.split('/').pop() || 'index.html';
+        if (page === 'home.html') page = 'index.html';
+        if (!PAGES[page]) return null;
+        return { page: page, hash: u.hash || '', href: page + (u.hash || '') };
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function currentPageName(){
+      var page = (window.location.pathname.split('/').pop() || 'index.html');
+      if (page === 'home.html') page = 'index.html';
+      return PAGES[page] ? page : 'index.html';
+    }
+
+    function closeMenu(){
+      if (!document.body) return;
+      document.body.classList.remove('menu-open');
+      var menuBtn = document.getElementById('menu-btn');
+      var sideMenu = document.getElementById('side-menu');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.textContent = 'menu';
+        menuBtn.classList.remove('active');
+      }
+      if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    function absorb(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    function route(target){
+      closeMenu();
+
+      if (target.page === currentPageName() && target.hash) {
+        var shell = document.getElementById('terminal-body') || document.scrollingElement || document.documentElement;
+        var el = document.querySelector(target.hash);
+        if (el && shell && shell !== document.documentElement && shell !== document.body) {
+          shell.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
+          history.pushState({ page: target.page }, '', target.href);
+          return;
+        }
+      }
+
+      var loader = null;
+      if (typeof window.twLoadPage === 'function') loader = window.twLoadPage;
+      else if (typeof window.twSoftLoadPage === 'function') loader = window.twSoftLoadPage;
+
+      if (loader) {
+        Promise.resolve(loader(target.href)).catch(function(err){
+          console.warn('twNavLock fallback:', err);
+          window.location.assign(target.href);
+        });
+      } else {
+        window.location.assign(target.href);
+      }
+    }
+
+    function handle(e){
+      if (e.defaultPrevented && e.type !== 'pointerdown' && e.type !== 'touchstart') return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (typeof e.button === 'number' && e.button !== 0) return;
+
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      var target = pageFromAnchor(a);
+      if (!target) return;
+
+      var key = e.type + ':' + target.href;
+      var now = Date.now();
+      absorb(e);
+      if (target.href === lastKey && now - lastAt < 650) return;
+      lastKey = target.href;
+      lastAt = now;
+      route(target);
+    }
+
+    // pointer/touch capture matters because older mobile handlers also listen
+    // before the click. This listener is inserted before them and stops the rest.
+    window.addEventListener('pointerdown', handle, true);
+    window.addEventListener('touchstart', handle, { capture: true, passive: false });
+    window.addEventListener('click', handle, true);
+  })();
+  </script>
+
+  <script>
   // EARLY INTERNAL NAV PATCH
   // Keeps internal page links/menu clicks inside the persistent terminal shell
   // so audio stays seamless and links do not snap back to the top of home.
