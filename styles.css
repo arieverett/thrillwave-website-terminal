@@ -4406,6 +4406,32 @@ body.tw-system-wake .below-bar {
   animation: tw-neon-footer-wake 4.5s ease 1.18s both !important;
 }
 
+/* Logo + wordmark brandmark button — hit by the green glow early since it sits at the top-left */
+body.tw-system-wake .tw-logo-orb.tw-brandmark {
+  animation: tw-neon-brandmark-wake 5.0s ease 0.08s both !important;
+}
+
+/* Enhance the inner glyph and wordmark images during the wake pulse */
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  animation: tw-neon-brandmark-glyph-wake 4.8s ease 0.12s both !important;
+}
+
+@keyframes tw-neon-brandmark-wake {
+  0%   { border-color: var(--rule); box-shadow: none; filter: brightness(0.92); }
+  10%  { border-color: rgba(93,208,104,0.88); box-shadow: 0 0 20px rgba(93,208,104,0.28), inset 0 0 12px rgba(93,208,104,0.09); filter: brightness(1.14); }
+  38%  { border-color: rgba(93,208,104,0.46); box-shadow: 0 0 26px rgba(93,208,104,0.16), inset 0 0 16px rgba(93,208,104,0.05); filter: brightness(1.06); }
+  72%  { border-color: rgba(93,208,104,0.20); box-shadow: 0 0 10px rgba(93,208,104,0.08); filter: brightness(1.01); }
+  100% { border-color: var(--rule); box-shadow: none; filter: brightness(1); }
+}
+
+@keyframes tw-neon-brandmark-glyph-wake {
+  0%   { filter: drop-shadow(0 0 4px rgba(93,208,104,0.52)) drop-shadow(0 0 10px rgba(93,208,104,0.20)); }
+  14%  { filter: drop-shadow(0 0 7px rgba(93,208,104,1.0)) drop-shadow(0 0 24px rgba(93,208,104,0.60)) drop-shadow(0 0 4px rgba(255,255,255,0.22)); }
+  46%  { filter: drop-shadow(0 0 5px rgba(93,208,104,0.76)) drop-shadow(0 0 16px rgba(93,208,104,0.36)); }
+  100% { filter: drop-shadow(0 0 5px rgba(93,208,104,0.72)) drop-shadow(0 0 15px rgba(93,208,104,0.32)); }
+}
+
 @keyframes tw-neon-border-wake {
   0%   { border-color: var(--rule); box-shadow: none; filter: brightness(0.94); }
   10%  { border-color: rgba(93,208,104,0.78); box-shadow: 0 0 20px rgba(93,208,104,0.18), inset 0 0 14px rgba(93,208,104,0.06); }
@@ -4567,7 +4593,8 @@ body.tw-system-wake .terminal.main,
 body.tw-system-wake .audio-btn,
 body.tw-system-wake #menu-btn,
 body.tw-system-wake .audio-viz,
-body.tw-system-wake .below-bar {
+body.tw-system-wake .below-bar,
+body.tw-system-wake .tw-logo-orb.tw-brandmark {
   animation-duration: 4.75s !important;
 }
 
@@ -7287,66 +7314,4 @@ body.tw-powering-down .power-down-collapse::after {
   0% { opacity: 0; background: transparent; }
   2%, 78% { opacity: 1; background: transparent; }
   100% { opacity: 1; background: #000; }
-}
-
-
-/* ============================================================
-   TW opening handoff update — include new brandmark HUD button
-   The .elf launch scan now catches the wave + wordmark control too.
-   Normal state stays plain gray like the menu button; this runs only
-   during the boot handoff wake class.
-   ============================================================ */
-body.tw-system-wake .topbar-left {
-  position: relative !important;
-  isolation: isolate !important;
-}
-
-body.tw-system-wake .topbar-left::before {
-  content: '' !important;
-  position: absolute !important;
-  inset: -9px -12px !important;
-  z-index: -1 !important;
-  pointer-events: none !important;
-  border-radius: 8px !important;
-  opacity: 0 !important;
-  background: radial-gradient(ellipse at 50% 50%, rgba(93,208,104,0.30), rgba(93,208,104,0.11) 46%, rgba(0,0,0,0) 76%) !important;
-  filter: blur(12px) !important;
-  animation: tw-brandmark-wake-halo 4.75s cubic-bezier(0.16,0.76,0.18,1) 0.18s both !important;
-}
-
-body.tw-system-wake .tw-logo-orb.tw-brandmark,
-body.tw-system-wake button.tw-logo-orb.tw-brandmark {
-  color: var(--accent) !important;
-  border-color: rgba(93,208,104,0.86) !important;
-  background: rgba(0,0,0,0.08) !important;
-  box-shadow:
-    0 0 20px rgba(93,208,104,0.22),
-    inset 0 0 14px rgba(93,208,104,0.06) !important;
-  filter: brightness(1.08) !important;
-  animation: tw-brandmark-wake-button 4.75s cubic-bezier(0.16,0.76,0.18,1) 0.20s both !important;
-}
-
-body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
-body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
-body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
-body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
-  color: currentColor !important;
-  background: currentColor !important;
-  filter: none !important;
-  animation: none !important;
-}
-
-@keyframes tw-brandmark-wake-halo {
-  0%   { opacity: 0; transform: translateY(-18px) scaleY(0.55); }
-  9%   { opacity: 0.88; }
-  38%  { opacity: 0.62; transform: translateY(3px) scaleY(0.95); }
-  72%  { opacity: 0.28; transform: translateY(18px) scaleY(1.08); }
-  100% { opacity: 0; transform: translateY(34px) scaleY(1.12); }
-}
-
-@keyframes tw-brandmark-wake-button {
-  0%   { color: var(--muted); border-color: var(--rule); box-shadow: none; filter: brightness(0.94); }
-  14%  { color: var(--accent); border-color: rgba(93,208,104,0.90); box-shadow: 0 0 22px rgba(93,208,104,0.25), inset 0 0 14px rgba(93,208,104,0.06); filter: brightness(1.12); }
-  52%  { color: var(--accent); border-color: rgba(93,208,104,0.48); box-shadow: 0 0 18px rgba(93,208,104,0.14), inset 0 0 10px rgba(93,208,104,0.04); filter: brightness(1.05); }
-  100% { color: var(--muted); border-color: var(--rule); box-shadow: none; filter: brightness(1); }
 }
