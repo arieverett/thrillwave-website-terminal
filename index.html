@@ -309,7 +309,7 @@
 <div class="desktop" id="desktop">
 <div class="desktop-brand">⏻ thrill_wave</div>
 <div class="desktop-icon" id="desktop-icon">
-<div class="icon-glyph">&gt;_</div>
+<div class="icon-glyph icon-glyph--logo"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--elf"></span></div>
 <div class="icon-label">thrill_wave.elf</div>
 <!-- ignition spark — bursts at the moment of impact -->
 <span aria-hidden="true" class="icon-spark"></span>
@@ -341,7 +341,7 @@
 </span>
 </div>
 <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>hi.</div>
-<div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>welcome to thrill wave.</div>
+<div class="boot-term-line"><span class="boot-term-prompt">&gt;</span>welcome to thrill wave <span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--bootline"></span></div>
 <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span> </div>
 <div class="boot-term-line"><span class="boot-term-prompt">&gt;</span><span class="boot-cursor-block"></span></div>
 </div>
@@ -459,7 +459,9 @@
 <div class="stage-wrap">
 <div class="topbar">
 <div class="topbar-left">
-<button aria-label="play/pause audio" class="audio-btn" id="audio-toggle-btn" type="button"><span class="audio-glyph">▶</span> audio</button>
+<div aria-label="thrill wave signal" class="tw-logo-orb" role="img"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--orb"></span></div>
+</div>
+<div class="topbar-right">
 <div class="audio-viz" id="audio-viz">
 <span class="viz-bar"></span>
 <span class="viz-bar"></span>
@@ -476,8 +478,7 @@
 <span class="viz-bar"></span>
 <span class="viz-bar"></span>
 </div>
-</div>
-<div class="topbar-right">
+<button aria-label="play/pause music" class="audio-btn" id="audio-toggle-btn" type="button"><span class="audio-glyph">▶</span> audio</button>
 <button aria-controls="side-menu" aria-expanded="false" class="btn" id="menu-btn">menu</button>
 </div>
 </div>
@@ -1690,7 +1691,13 @@ async function runWelcomeTyping() {
   l2.appendChild(cursor);
   await new Promise(r => setTimeout(r, 160));
 
-  await typeOut(l2text, '> welcome to thrill wave.', 42);
+  await typeOut(l2text, '> welcome to thrill wave ', 42);
+  if (!welcomeTypingAborted) {
+    const glyph = document.createElement('span');
+    glyph.className = 'tw-logo-glyph tw-logo-glyph--welcome';
+    glyph.setAttribute('aria-hidden', 'true');
+    l2text.appendChild(glyph);
+  }
   if (welcomeTypingAborted) return;
 
   // Hold the finished typing moment a touch longer before revealing the start button.
@@ -2075,7 +2082,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   // ---------- typing animation copy ----------
   const introPreLines = [
     { t: '> hi.', p: 950 },
-    { t: '> welcome to thrill wave.', p: 600 },
+    { t: '> welcome to thrill wave ', p: 600, glyph: true },
   ];
 
   const introPostLines = [
@@ -2123,6 +2130,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
           const d = c === ' ' ? 18 : 36 + Math.random() * 22;
           setTimeout(ch, d);
         } else {
+          if (line.glyph) html += '<span class="tw-logo-glyph tw-logo-glyph--inline" aria-hidden="true"></span>';
           if (!isLastLine) html += '\n';
           idx++;
           setTimeout(next, line.p);
