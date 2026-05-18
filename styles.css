@@ -7429,25 +7429,7 @@ body.tw-powering-down .frame::before {
   box-shadow: none !important;
 }
 
-/* ── Button hover: momentary only, no focus latch after mouse click ──
-   :focus-visible = keyboard nav (show highlight). :focus:not(:focus-visible) =
-   mouse click (should feel instant/momentary, reset immediately on mouseup).  */
-
-/* Thrillwave brandmark — reset border/transform on mouse-click focus */
-.tw-logo-orb.tw-brandmark:focus:not(:focus-visible),
-button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
-  border-color: var(--rule) !important;
-  transform: none !important;
-  outline: none;
-}
-.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
-.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb,
-button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
-button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb {
-  filter: none !important;
-}
-
-/* Audio button — reset on mouse-click focus */
+/* ── Audio button focus reset ── */
 .audio-btn:focus:not(:focus-visible) {
   color: var(--muted) !important;
   border-color: var(--rule) !important;
@@ -7470,9 +7452,60 @@ body.menu-open #menu-btn:focus-visible {
   outline: none;
 }
 
-/* ── Thrillwave button: green on hover, gray on :active (click), green on release ── */
+/* ── Thrillwave button: fully synchronised hover/active states ──────────────
+   Root cause of desync: the button runs twLogoOrbColorDrift (color cycles
+   green↔white continuously) and the glyphs run twBrandmarkColorShift (filter
+   cycles gray↔white). On hover, !important rules fight the running animations
+   at different cycle points → they switch at different instants.
+
+   Fix: on :hover and :active we override the ENTIRE animation list so the
+   colour-cycling animation is paused for the interaction. Only the ambient
+   box-shadow pulse (twNeonBehindSm) continues. Both border and glyphs then
+   respond to explicit colour values at exactly the same time with matching
+   CSS transitions — identical to how the audio/menu buttons behave.          */
+
+/* Add transitions to the button base so hover entry/exit is smooth */
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark {
+  transition: color 100ms ease, border-color 100ms ease !important;
+}
+
+/* Add matching transitions to glyphs */
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  transition: color 100ms ease, filter 100ms ease !important;
+}
+
+/* HOVER / FOCUS-VISIBLE: stop colour animation, apply explicit green */
+.tw-logo-orb.tw-brandmark:hover,
+button.tw-logo-orb.tw-brandmark:hover,
+.tw-logo-orb.tw-brandmark:focus-visible,
+button.tw-logo-orb.tw-brandmark:focus-visible {
+  animation: twNeonBehindSm 6.0s ease-in-out 0.8s infinite !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb {
+  animation: none !important;
+  color: var(--accent) !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.75))
+          drop-shadow(0 0 14px rgba(93,208,104,0.35)) !important;
+}
+
+/* ACTIVE (mousedown): stop colour animation, apply explicit gray */
 .tw-logo-orb.tw-brandmark:active,
 button.tw-logo-orb.tw-brandmark:active {
+  animation: twNeonBehindSm 6.0s ease-in-out 0.8s infinite !important;
+  color: var(--muted) !important;
   border-color: var(--rule) !important;
   transform: none !important;
 }
@@ -7480,19 +7513,15 @@ button.tw-logo-orb.tw-brandmark:active {
 .tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
 button.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
 button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb {
-  filter: drop-shadow(0 0 2px rgba(130,130,130,0.28)) !important;
+  animation: none !important;
   color: #7a7a7a !important;
+  filter: drop-shadow(0 0 2px rgba(130,130,130,0.28)) !important;
 }
 
-/* ── Thrillwave hover sync: explicit green so border + glyphs fire together ──
-   Original hover uses border-color:currentColor where currentColor is animated
-   by twLogoOrbColorDrift (constantly shifting) — glyph filter snaps to fixed
-   green while border chases the animation, causing visual desync.
-   Fix: lock both to explicit var(--accent) on hover so they're always in step. */
-.tw-logo-orb.tw-brandmark:hover,
-button.tw-logo-orb.tw-brandmark:hover,
-.tw-logo-orb.tw-brandmark:focus-visible,
-button.tw-logo-orb.tw-brandmark:focus-visible {
-  color: var(--accent) !important;
-  border-color: var(--accent) !important;
+/* Focus-not-focus-visible: mouse-click focus reset (safety net after blur) */
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible),
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
+  border-color: var(--rule) !important;
+  transform: none !important;
+  outline: none;
 }
