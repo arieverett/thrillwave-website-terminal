@@ -437,15 +437,11 @@
       sessionStorage.removeItem('tw_home_complete');
     } catch (_) {}
     window.setTimeout(function(){
-      // Hard-stop all audio before navigating so music doesn't bleed through reload
-      try {
-        var bg = document.getElementById('bg-audio');
-        if (bg) { bg.pause(); bg.currentTime = 0; bg.src = ''; }
-      } catch (_) {}
-      if (typeof Tone !== 'undefined') {
-        try { Tone.Transport.stop(); Tone.getDestination().volume.value = -Infinity; } catch (_) {}
-      }
-      window.location.href = 'index.html?power=' + Date.now();
+      // Pause music before unload to prevent audio pop
+      try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e){}
+      // Navigate to index.html — with tw_intro_played cleared above,
+      // the full boot sequence (hi · welcome · click to start) plays fresh.
+      window.location.replace('index.html');
     }, 760);
     return false;
   }
@@ -1036,21 +1032,6 @@ async function initAudio() {
       volume: -16
     }).toDestination();
 
-    // 11) Shutdown — descending membrane thump + short noise decay.
-    //     A quick power-off thud that feels mechanical, not musical.
-    SND.shutdownThump = new Tone.MembraneSynth({
-      pitchDecay: 0.14,
-      octaves: 5,
-      oscillator: { type: 'sine' },
-      envelope: { attack: 0.004, decay: 0.45, sustain: 0, release: 0.25 },
-      volume: -10
-    }).toDestination();
-    SND.shutdownHiss = new Tone.NoiseSynth({
-      noise: { type: 'brown' },
-      envelope: { attack: 0.002, decay: 0.38, sustain: 0, release: 0.20 },
-      volume: -20
-    }).toDestination();
-
     audioReady = true;
   } catch (e) {
     console.warn('audio init error:', e);
@@ -1221,8 +1202,14 @@ function sndShutdown() {
   if (!audioReady) return;
   safe(() => {
     const now = Tone.now();
-    SND.shutdownThump.triggerAttackRelease('A1', 0.4, now);
-    SND.shutdownHiss.triggerAttackRelease(0.35, now + 0.04);
+    // Descending power-off tone: low rumble sweeping down to near-silence.
+    // Reuses sweepTone (proven to work) with a slower, much lower frequency ramp.
+    SND.sweepTone.frequency.cancelScheduledValues(now);
+    SND.sweepTone.frequency.setValueAtTime(260, now);
+    SND.sweepTone.frequency.exponentialRampToValueAtTime(28, now + 0.65);
+    SND.sweepTone.triggerAttackRelease(260, 0.65, now);
+    // Subtle pink-noise burst to sell the "system shutting off" feel
+    SND.sweepPop.triggerAttackRelease(0.07, now + 0.02);
   });
 }
 
