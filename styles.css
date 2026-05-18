@@ -7290,7 +7290,7 @@ body.tw-powering-down .power-down-collapse::after {
 }
 
 /* ============================================================
-   TW AMBIENT v3
+   TW AMBIENT v5
    ============================================================ */
 
 /* ── Traffic light: single larger pulsing dot ── */
@@ -7323,42 +7323,30 @@ body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:focus-visible 
 }
 
 /* ── Brandmark glyphs: slow gray↔white color shift ── */
-/* specificity (0,3,1) beats existing (0,3,0) rule; both !important → ours wins */
 body .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
 body .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
   animation: twBrandmarkColorShift 8.5s ease-in-out infinite !important;
 }
 @keyframes twBrandmarkColorShift {
-  0%, 100% {
-    color: #7a7a7a; opacity: 0.80;
-    filter: drop-shadow(0 0 3px rgba(150,150,150,0.28)) drop-shadow(0 0 7px rgba(150,150,150,0.10));
-  }
-  46%, 54% {
-    color: #e4e4e4; opacity: 1.0;
-    filter: drop-shadow(0 0 6px rgba(215,215,215,0.55)) drop-shadow(0 0 14px rgba(215,215,215,0.22));
-  }
+  0%, 100% { color: #7a7a7a; opacity: 0.80;
+    filter: drop-shadow(0 0 3px rgba(150,150,150,0.28)) drop-shadow(0 0 7px rgba(150,150,150,0.10)); }
+  46%, 54% { color: #e4e4e4; opacity: 1.0;
+    filter: drop-shadow(0 0 6px rgba(215,215,215,0.55)) drop-shadow(0 0 14px rgba(215,215,215,0.22)); }
 }
 
-/* ── Neon glow from behind each element — off-center, feathered, varying ──
-   Uses spread=0 (wide blur only), offset values so it reads as light from
-   behind the edge, multiple layers per keyframe at different offsets so it
-   flares unevenly like real neon. Pulse speeds are staggered so nothing
-   breathes in unison. During tw-system-wake the wake animation wins
-   (higher specificity) and takes over cleanly.                           */
+/* ── Neon glow pulse — off-center, feathered, varying flare points ── */
 @keyframes twNeonBehindLg {
   0%   { box-shadow:  3px  5px 48px 0 rgba(93,208,104,0.04), -2px -3px 40px 0 rgba(93,208,104,0.03); }
-  28%  { box-shadow:  5px  8px 68px 0 rgba(93,208,104,0.11), -1px -5px 54px 0 rgba(93,208,104,0.07),  4px -1px 44px 0 rgba(93,208,104,0.05); }
-  62%  { box-shadow:  1px  3px 55px 0 rgba(93,208,104,0.06), -4px -2px 70px 0 rgba(93,208,104,0.09),  0px  3px 40px 0 rgba(93,208,104,0.04); }
+  28%  { box-shadow:  5px  8px 68px 0 rgba(93,208,104,0.11), -1px -5px 54px 0 rgba(93,208,104,0.07), 4px -1px 44px 0 rgba(93,208,104,0.05); }
+  62%  { box-shadow:  1px  3px 55px 0 rgba(93,208,104,0.06), -4px -2px 70px 0 rgba(93,208,104,0.09), 0px  3px 40px 0 rgba(93,208,104,0.04); }
   100% { box-shadow:  3px  5px 48px 0 rgba(93,208,104,0.04), -2px -3px 40px 0 rgba(93,208,104,0.03); }
 }
 @keyframes twNeonBehindSm {
   0%   { box-shadow:  2px  3px 28px 0 rgba(93,208,104,0.04), -1px -2px 24px 0 rgba(93,208,104,0.03); }
-  32%  { box-shadow:  3px  5px 40px 0 rgba(93,208,104,0.10), -1px -3px 32px 0 rgba(93,208,104,0.06),  2px -1px 26px 0 rgba(93,208,104,0.04); }
+  32%  { box-shadow:  3px  5px 40px 0 rgba(93,208,104,0.10), -1px -3px 32px 0 rgba(93,208,104,0.06), 2px -1px 26px 0 rgba(93,208,104,0.04); }
   68%  { box-shadow:  1px  2px 32px 0 rgba(93,208,104,0.05), -3px -1px 42px 0 rgba(93,208,104,0.08); }
   100% { box-shadow:  2px  3px 28px 0 rgba(93,208,104,0.04), -1px -2px 24px 0 rgba(93,208,104,0.03); }
 }
-
-/* Apply to each element with staggered delays */
 .frame            { animation: twNeonBehindLg 8.0s ease-in-out 0.0s infinite; }
 .terminal.main    { animation: twNeonBehindLg 8.0s ease-in-out 3.2s infinite; }
 .audio-btn        { animation: twNeonBehindSm 6.0s ease-in-out 1.4s infinite; }
@@ -7368,36 +7356,61 @@ body .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
              twLogoOrbColorDrift 8.5s ease-in-out infinite !important;
 }
 
-/* ── Wake glow: add brandmark to the same rule as audio/menu buttons ──
-   Specificity (0,3,1) beats existing button.tw-logo-orb (0,1,1) rule.
-   Uses the identical keyframe already proven to work on the other controls. */
+/* ── Brandmark wake glow — intense custom keyframe, unmistakably visible ──
+   Specificity (0,3,1) beats button.tw-logo-orb (0,1,1). Appended last.
+   Peak brightness 1.8× + full green border + large bloom.              */
+@keyframes tw-neon-brandmark-wake {
+  0%   { border-color: var(--rule); box-shadow: 0 0 0px rgba(93,208,104,0); filter: brightness(0.88); }
+  18%  { border-color: #5dd068;     box-shadow: 0 0 40px rgba(93,208,104,0.70), 0 0 80px rgba(93,208,104,0.38), inset 0 0 22px rgba(93,208,104,0.14); filter: brightness(1.80); }
+  52%  { border-color: rgba(93,208,104,0.55); box-shadow: 0 0 28px rgba(93,208,104,0.42), 0 0 56px rgba(93,208,104,0.20); filter: brightness(1.22); }
+  100% { border-color: var(--rule); box-shadow: 0 0 0px rgba(93,208,104,0); filter: brightness(1.00); }
+}
 body.tw-system-wake .tw-logo-orb.tw-brandmark {
-  animation: tw-neon-control-wake 4.8s ease 0.18s both !important;
+  animation: tw-neon-brandmark-wake 5.0s ease 0.18s both !important;
 }
 
-/* ── Diagonal glare sweep using body::after (no overflow tricks needed) ──
-   mix-blend-mode:screen makes it invisible against black; it only brightens
-   border lines, labels, and highlights. A narrow luminous band drifts
-   corner-to-corner over 18s on repeat.                                   */
-body::after {
+/* ── Diagonal glare sweep — border elements only, via overflow-clipped ::after ──
+   Applied to terminal + buttons only. .frame is intentionally excluded to
+   avoid conflict with the power-down kinetic close (clip-path: circle()).
+   overflow:hidden clips the oversized animated gradient to the element bounds.
+   mix-blend-mode:screen = invisible on black, glints on border lines only.    */
+
+.terminal.main { overflow: hidden; }
+.audio-btn, #menu-btn { position: relative; overflow: hidden; }
+
+@keyframes twGlareSweep {
+  0%   { transform: translate(-70%, -70%); }
+  100% { transform: translate( 70%,  70%); }
+}
+
+.terminal.main::after,
+.audio-btn::after,
+#menu-btn::after {
   content: '';
-  position: fixed;
-  inset: -60%;          /* oversized so band travels fully across viewport  */
-  pointer-events: none;
-  z-index: 9001;
-  mix-blend-mode: screen;
+  position: absolute;
+  inset: -250%;
   background: linear-gradient(
     108deg,
     transparent            44%,
-    rgba(255,255,255,0.00) 49.0%,
-    rgba(255,255,255,0.04) 50.2%,
-    rgba(255,255,255,0.06) 51.0%,
+    rgba(255,255,255,0.00) 49.2%,
+    rgba(255,255,255,0.05) 50.5%,
+    rgba(255,255,255,0.07) 51.4%,
     rgba(255,255,255,0.00) 53.0%,
     transparent            58%
   );
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 999;
   animation: twGlareSweep 18s linear 6s infinite;
 }
-@keyframes twGlareSweep {
-  0%   { transform: translate(-55%, -55%); }
-  100% { transform: translate( 55%,  55%); }
+
+/* Kill glare during boot intro and power-down shutdown */
+body.booting .terminal.main::after,
+body.booting .audio-btn::after,
+body.booting #menu-btn::after,
+body.tw-powering-down .terminal.main::after,
+body.tw-powering-down .audio-btn::after,
+body.tw-powering-down #menu-btn::after {
+  display: none !important;
+  animation: none !important;
 }
