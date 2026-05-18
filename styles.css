@@ -6892,16 +6892,17 @@ button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
   mix-blend-mode: normal !important;
 }
 
-/* Desktop only: make the wordmark just slightly smaller next to the wave mark. */
+/* Desktop only: make the wordmark smaller next to the wave mark. */
 @media (min-width: 721px) {
   .tw-logo-orb.tw-brandmark,
   button.tw-logo-orb.tw-brandmark {
-    min-width: 181px !important;
+    min-width: 168px !important;
+    gap: 7px !important;
   }
 
   .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
   button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
-    width: 144px !important;
-    height: 17px !important;
+    width: 130px !important;
+    height: 15.5px !important;
   }
 }
