@@ -354,7 +354,7 @@
 </div>
 </section>
 <section class="page reveal" data-nav-section="" id="next-step">
-<div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05B</span><span class="hdr-slash"> // </span><span class="hdr-name">next</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+<div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05C</span><span class="hdr-slash"> // </span><span class="hdr-name">next</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy">
 <span class="line">enough reading.</span>
 <span class="line">next stop is the contact terminal.</span>
@@ -1143,6 +1143,113 @@
     absorb(e);
     route(btn.getAttribute('data-page'));
   }, true);
+})();
+</script>
+
+<script>
+// ============================================================
+// MOBILE ONE-SWIPE SECTION SNAP
+// Mobile Safari sometimes lets nested scroll-snap containers drift before
+// snapping, which makes a visitor swipe twice. This detects a real vertical
+// swipe inside the terminal and advances exactly one section from where the
+// swipe started.
+// ============================================================
+(function mobileOneSwipeSectionSnap(){
+  if (window.twMobileOneSwipeSectionSnapInstalled) return;
+  window.twMobileOneSwipeSectionSnapInstalled = true;
+
+  var terminalBody = document.getElementById('terminal-body');
+  if (!terminalBody) return;
+
+  var startY = 0;
+  var startX = 0;
+  var startTop = 0;
+  var startAt = 0;
+  var tracking = false;
+  var lastSnapAt = 0;
+  var settleTimer = null;
+
+  function isMobile(){
+    return window.matchMedia && window.matchMedia('(max-width: 820px)').matches;
+  }
+
+  function sections(){
+    return Array.prototype.slice.call(terminalBody.querySelectorAll('section.page'));
+  }
+
+  function indexAt(scrollTop){
+    var list = sections();
+    var idx = 0;
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].offsetTop <= scrollTop + 24) idx = i;
+    }
+    return idx;
+  }
+
+  function pageName(){
+    var p = (window.location.pathname.split('/').pop() || 'index.html');
+    return p || 'index.html';
+  }
+
+  function snapTo(idx){
+    var list = sections();
+    if (!list.length || !list[idx]) return;
+    lastSnapAt = Date.now();
+    terminalBody.scrollTo({ top: list[idx].offsetTop, behavior: 'smooth' });
+    if (list[idx].id && window.history && window.history.replaceState) {
+      window.history.replaceState(window.history.state || {}, '', pageName() + '#' + list[idx].id);
+    }
+  }
+
+  function shouldIgnoreTarget(target){
+    if (!target || !target.closest) return false;
+    return !!target.closest('#side-menu, #menu-btn, .music-control, .cascade-toggle, .cascade-content, .embed-frame, iframe, input, textarea, select');
+  }
+
+  terminalBody.addEventListener('touchstart', function(e){
+    if (!isMobile() || !e.touches || e.touches.length !== 1) return;
+    if (document.body.classList.contains('menu-open')) return;
+    if (shouldIgnoreTarget(e.target)) return;
+
+    startY = e.touches[0].clientY;
+    startX = e.touches[0].clientX;
+    startTop = terminalBody.scrollTop;
+    startAt = Date.now();
+    tracking = true;
+
+    if (settleTimer) {
+      clearTimeout(settleTimer);
+      settleTimer = null;
+    }
+  }, { passive: true, capture: true });
+
+  terminalBody.addEventListener('touchend', function(e){
+    if (!tracking || !isMobile()) return;
+    tracking = false;
+    if (!e.changedTouches || !e.changedTouches.length) return;
+
+    var now = Date.now();
+    if (now - lastSnapAt < 520) return;
+
+    var dy = startY - e.changedTouches[0].clientY;
+    var dx = startX - e.changedTouches[0].clientX;
+    var dt = Math.max(1, now - startAt);
+    var velocity = Math.abs(dy) / dt;
+    var threshold = Math.min(86, Math.max(42, terminalBody.clientHeight * 0.075));
+
+    if (Math.abs(dx) > Math.abs(dy) * 0.8) return;
+    if (Math.abs(dy) < threshold && velocity < 0.18) return;
+
+    var list = sections();
+    if (list.length < 2) return;
+
+    var idx = indexAt(startTop);
+    var nextIdx = dy > 0 ? Math.min(list.length - 1, idx + 1) : Math.max(0, idx - 1);
+    if (nextIdx === idx) return;
+
+    window.requestAnimationFrame(function(){ snapTo(nextIdx); });
+    settleTimer = setTimeout(function(){ snapTo(nextIdx); }, 180);
+  }, { passive: true, capture: true });
 })();
 </script>
 

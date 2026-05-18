@@ -1646,6 +1646,9 @@ body.menu-open .terminal.side {
   scroll-behavior: smooth;
   scroll-snap-type: y mandatory;
   scroll-padding-top: 0;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
   scrollbar-width: thin;
   scrollbar-color: rgba(245, 245, 245, 0.22) transparent;
   scrollbar-gutter: stable;
@@ -1676,7 +1679,7 @@ body.menu-open .terminal.side {
 
 section.page {
   scroll-snap-align: start;
-  scroll-snap-stop: always;
+  scroll-snap-stop: normal;
   min-height: 100%;
   padding: 28px 26px 88px;
   display: block;
@@ -5390,6 +5393,60 @@ section#landing .work-intel-next button.tw-page-link:focus-visible {
     row-gap: 2px !important;
   }
   .below-bar .sep {
+    margin: 0 5px !important;
+  }
+}
+
+/* ============================================================
+   TW FOOTER ALIGNMENT PASS — centered muted contact/social row
+   ============================================================ */
+.below-bar,
+.boot-clone-below {
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0 !important;
+  padding-inline: 8px !important;
+  text-align: center !important;
+  color: var(--muted) !important;
+  overflow: visible !important;
+}
+
+.below-bar a,
+.below-bar a:visited,
+.boot-clone-below a,
+.boot-clone-below a:visited,
+.below-bar .sep,
+.boot-clone-below .sep {
+  color: var(--muted) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+
+.below-bar a:hover,
+.below-bar a:focus-visible,
+.boot-clone-below a:hover,
+.boot-clone-below a:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+.below-bar .sep,
+.boot-clone-below .sep {
+  margin: 0 7px !important;
+}
+
+@media (max-width: 720px) {
+  .below-bar,
+  .boot-clone-below {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    row-gap: 2px !important;
+  }
+
+  .below-bar .sep,
+  .boot-clone-below .sep {
     margin: 0 5px !important;
   }
 }
