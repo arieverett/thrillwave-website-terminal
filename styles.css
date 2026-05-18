@@ -7428,3 +7428,44 @@ body.tw-powering-down .frame::before {
   animation: none !important;
   box-shadow: none !important;
 }
+
+/* ── Button hover: momentary only, no focus latch after mouse click ──
+   :focus-visible = keyboard nav (show highlight). :focus:not(:focus-visible) =
+   mouse click (should feel instant/momentary, reset immediately on mouseup).  */
+
+/* Thrillwave brandmark — reset border/transform on mouse-click focus */
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible),
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
+  border-color: var(--rule) !important;
+  transform: none !important;
+  outline: none;
+}
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb {
+  filter: none !important;
+}
+
+/* Audio button — reset on mouse-click focus */
+.audio-btn:focus:not(:focus-visible) {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  outline: none;
+}
+
+/* ── Menu button: latch green when open, momentary on hover ── */
+body.menu-open #menu-btn {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+body.menu-open #menu-btn:hover,
+body.menu-open #menu-btn:focus-visible {
+  color: var(--fg) !important;
+  border-color: var(--fg) !important;
+}
+#menu-btn:focus:not(:focus-visible) {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  outline: none;
+}

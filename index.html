@@ -1905,6 +1905,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   audioToggleBtn.addEventListener('click', () => {
+    audioToggleBtn.blur(); // release focus immediately so it doesn't latch green
     if (bgAudio.paused || bgAudio.muted) {
       // UNMUTE: music + tone fx both come back on.
       bgAudio.muted = false;
@@ -2732,6 +2733,10 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   }
 
   async function loadPage(url, opts = {}) {
+    // Kill any running home intro animation the moment navigation starts
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
+    window.twIntroRunning = false;
+
     const u = new URL(url, location.href);
     let page = normalizePage(u.pathname || url);
     const hash = u.hash;
@@ -3388,6 +3393,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       e.preventDefault();
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      logo.blur();
       restartHomeTyping();
       return;
     }
