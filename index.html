@@ -1040,7 +1040,21 @@ async function initAudio() {
 }
 
 // --- play helpers — every one is wrapped so a bad call doesn't break the boot ---
-function safe(fn) { try { fn(); } catch (e) { console.warn('audio play error:', e); } }
+function safe(fn) {
+  try {
+    // The browser suspends the Tone.js AudioContext after inactivity.
+    // Music keeps playing (HTML audio, separate path) but Web Audio synths
+    // go silent. Resume the context first, then play — fn() runs after
+    // resume so Tone.now() gives the correct post-resume timestamp.
+    if (typeof Tone !== 'undefined' && Tone.context && Tone.context.state !== 'running') {
+      Tone.context.resume().then(function() {
+        try { fn(); } catch (e) { console.warn('audio play error:', e); }
+      }).catch(function() {});
+    } else {
+      fn();
+    }
+  } catch (e) { console.warn('audio play error:', e); }
+}
 
 function sndBeep() {
   if (!audioReady) return;
