@@ -271,7 +271,7 @@
 
     <div class="topbar">
       <div class="topbar-left">
-        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause music"><span class="audio-glyph">▶</span> music</button>
+        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause audio"><span class="audio-glyph">▶</span> audio</button>
         <div class="audio-viz" id="audio-viz">
           <span class="viz-bar"></span>
           <span class="viz-bar"></span>
@@ -1604,25 +1604,48 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   const bgAudio = document.getElementById('bg-audio');
   const audioToggleBtn = document.getElementById('audio-toggle-btn');
   const MUSIC_KEY = 'tw_music_on';
+  const MUTE_KEY  = 'tw_audio_muted';   // unified mute for music + tone fx
+
+  // Apply the persisted mute state to Tone.Destination. Called whenever
+  // the toggle flips and on each page load so the mute state survives
+  // page-to-page navigation. Wrapped in try/catch because Tone may not
+  // have initialised yet on the very first call.
+  function applyToneMute(muted) {
+    try {
+      if (typeof Tone !== 'undefined' && Tone.Destination) {
+        Tone.Destination.mute = muted;
+      }
+    } catch (e) { /* tone not ready yet */ }
+  }
+  // Initial sync from sessionStorage. The Tone.Destination may not exist
+  // yet, so call applyToneMute again from initAudio() once tone synths
+  // are created. (Search for "applyToneMute" in initAudio.)
+  applyToneMute(sessionStorage.getItem(MUTE_KEY) === '1');
 
   function updateAudioState() {
     if (bgAudio.paused || bgAudio.muted || bgAudio.volume === 0 || bgAudio.dataset.priming === '1') {
-      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> music';
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> audio';
     } else {
-      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> pause';
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> mute';
     }
   }
 
   audioToggleBtn.addEventListener('click', () => {
     if (bgAudio.paused || bgAudio.muted) {
+      // UNMUTE: music + tone fx both come back on.
       bgAudio.muted = false;
       bgAudio.volume = 0.4;
+      sessionStorage.setItem(MUTE_KEY, '0');
+      applyToneMute(false);
       bgAudio.play().then(() => {
         sessionStorage.setItem(MUSIC_KEY, '1');
       }).catch(() => {});
     } else {
+      // MUTE: music pauses AND tone-generated sounds go silent.
       bgAudio.pause();
       sessionStorage.removeItem(MUSIC_KEY);
+      sessionStorage.setItem(MUTE_KEY, '1');
+      applyToneMute(true);
     }
     audioToggleBtn.blur();
   });
@@ -1672,11 +1695,16 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     // If we create a MediaElementSource during the timed .elf launch,
     // the audio can route into a suspended AudioContext: the button says
     // pause, the timeline moves, but no sound comes out.
-    // On mobile, skip the analyser entirely and let the <audio> element
-    // play directly. The visualizer is cosmetic; reliable music matters more.
+    // On mobile, skip the real analyser and drive the bars with a CSS
+    // pulse fallback. Tag .audio-viz with .active so the CSS pulse
+    // animation runs and the bars visibly move while music plays.
     const mobileAudio = window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches;
     if (mobileAudio) {
-      if (audioViz) audioViz.classList.toggle('active', !bgAudio.paused && !bgAudio.muted && bgAudio.volume > 0);
+      const playing = !bgAudio.paused && !bgAudio.muted && bgAudio.volume > 0;
+      if (audioViz) {
+        audioViz.classList.toggle('active', playing);
+        audioViz.classList.toggle('mobile-pulse', playing);
+      }
       return;
     }
 
@@ -1696,7 +1724,10 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function stopViz() {
     if (_vizRAF) { cancelAnimationFrame(_vizRAF); _vizRAF = null; }
-    if (audioViz) audioViz.classList.remove('active');
+    if (audioViz) {
+      audioViz.classList.remove('active');
+      audioViz.classList.remove('mobile-pulse');
+    }
     vizBars.forEach(b => b.style.height = '2px');
   }
 
@@ -1774,8 +1805,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       applyTimeAndMaybePlay();
     } else {
       bgAudio.addEventListener('loadedmetadata', applyTimeAndMaybePlay, { once: true });
-      // Fallback in case metadata never fires
-      setTimeout(applyTimeAndMaybePlay, 600);
+      bgAudio.addEventListener('canplay', applyTimeAndMaybePlay, { once: true });
+      // Aggressive fallback to keep cross-page handoff feeling seamless.
+      setTimeout(applyTimeAndMaybePlay, 80);
     }
   }
   restoreMusic();
@@ -2243,8 +2275,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (!bgAudio || !audioToggleBtn) return;
     const effectivelyPlaying = !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0);
     audioToggleBtn.innerHTML = effectivelyPlaying
-      ? '<span class="audio-glyph">⏸</span> pause'
-      : '<span class="audio-glyph">▶</span> music';
+      ? '<span class="audio-glyph">⏸</span> mute'
+      : '<span class="audio-glyph">▶</span> audio';
     if (audioViz) audioViz.classList.toggle('active', effectivelyPlaying);
     if (!effectivelyPlaying && vizBars.length) vizBars.forEach(b => b.style.height = '2px');
   }

@@ -94,7 +94,7 @@
 
     <div class="topbar">
       <div class="topbar-left">
-        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause music"><span class="audio-glyph">▶</span> music</button>
+        <button class="audio-btn" id="audio-toggle-btn" type="button" aria-label="play/pause music"><span class="audio-glyph">▶</span> audio</button>
         <div class="audio-viz" id="audio-viz">
           <span class="viz-bar"></span>
           <span class="viz-bar"></span>
@@ -269,21 +269,39 @@
   const bgAudio = document.getElementById('bg-audio');
   const audioToggleBtn = document.getElementById('audio-toggle-btn');
   const MUSIC_KEY = 'tw_music_on';
+  const MUTE_KEY  = 'tw_audio_muted';
+
+  // Apply persisted mute state to Tone.Destination on every page load.
+  // The music button mutes both the <audio> element AND all Tone.js synths
+  // (typing clicks, etc.) via a single flag.
+  function applyToneMute(muted) {
+    try {
+      if (typeof Tone !== 'undefined' && Tone.Destination) {
+        Tone.Destination.mute = muted;
+      }
+    } catch (e) { /* tone not ready */ }
+  }
+  applyToneMute(sessionStorage.getItem(MUTE_KEY) === '1');
 
   function updateAudioState() {
-    if (bgAudio.paused) {
-      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> music';
+    if (bgAudio.paused || bgAudio.muted) {
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> audio';
     } else {
-      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> pause';
+      audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> mute';
     }
   }
 
   audioToggleBtn.addEventListener('click', () => {
-    if (bgAudio.paused) {
+    if (bgAudio.paused || bgAudio.muted) {
+      bgAudio.muted = false;
+      sessionStorage.setItem(MUTE_KEY, '0');
+      applyToneMute(false);
       bgAudio.play().then(() => sessionStorage.setItem(MUSIC_KEY, '1')).catch(() => {});
     } else {
       bgAudio.pause();
       sessionStorage.removeItem(MUSIC_KEY);
+      sessionStorage.setItem(MUTE_KEY, '1');
+      applyToneMute(true);
     }
     audioToggleBtn.blur();
   });
@@ -417,8 +435,9 @@
       applyTimeAndMaybePlay();
     } else {
       bgAudio.addEventListener('loadedmetadata', applyTimeAndMaybePlay, { once: true });
-      // Fallback in case metadata never fires
-      setTimeout(applyTimeAndMaybePlay, 600);
+      bgAudio.addEventListener('canplay', applyTimeAndMaybePlay, { once: true });
+      // Aggressive fallback to keep cross-page handoff feeling seamless.
+      setTimeout(applyTimeAndMaybePlay, 80);
     }
   }
   restoreMusic();

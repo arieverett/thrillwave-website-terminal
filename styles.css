@@ -1374,6 +1374,38 @@ a.frame-label:hover, a.frame-label:focus-visible { color: var(--accent); outline
   filter: brightness(1.05) saturate(1) drop-shadow(0 0 1px rgba(93, 208, 104, 0.6));
 }
 
+/* Mobile fallback animation. Web Audio analyser is disabled on mobile
+   for reliability (mobile Safari can route the song into a suspended
+   AudioContext and silence it). When music is playing on mobile, each
+   bar runs a staggered height pulse so the EQ visibly moves. The
+   heights cap at 18px so the meter still reads as a "halfway lit" VU
+   rather than slamming red. */
+.audio-viz.mobile-pulse .viz-bar {
+  animation: viz-mobile-pulse 0.9s ease-in-out infinite;
+}
+.audio-viz.mobile-pulse .viz-bar:nth-child(1)  { animation-delay: -0.05s; animation-duration: 0.78s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(2)  { animation-delay: -0.45s; animation-duration: 0.94s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(3)  { animation-delay: -0.12s; animation-duration: 0.66s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(4)  { animation-delay: -0.80s; animation-duration: 1.04s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(5)  { animation-delay: -0.28s; animation-duration: 0.72s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(6)  { animation-delay: -0.60s; animation-duration: 0.86s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(7)  { animation-delay: -0.18s; animation-duration: 0.98s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(8)  { animation-delay: -0.42s; animation-duration: 0.74s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(9)  { animation-delay: -0.04s; animation-duration: 0.84s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(10) { animation-delay: -0.66s; animation-duration: 0.92s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(11) { animation-delay: -0.22s; animation-duration: 0.70s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(12) { animation-delay: -0.48s; animation-duration: 0.88s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(13) { animation-delay: -0.10s; animation-duration: 0.80s; }
+.audio-viz.mobile-pulse .viz-bar:nth-child(14) { animation-delay: -0.36s; animation-duration: 0.96s; }
+
+@keyframes viz-mobile-pulse {
+  0%, 100% { height: 3px; }
+  20%      { height: 11px; }
+  45%      { height: 6px; }
+  70%      { height: 16px; }
+  90%      { height: 5px; }
+}
+
 /* subtle phosphor glow when playing */
 .audio-viz.active {
   animation: viz-bloom 2.8s ease-in-out infinite;
@@ -4072,31 +4104,16 @@ body.booting.handoff-show-live > main.content {
   display: none !important;
 }
 
-/* ---- KINETIC TERMINAL REVEAL (handoff) ----
-   Same grammar as the menu and power-modal openings: clip-path inset
-   top-to-bottom. Title bar appears first as the clip recedes from the
-   top, body unfolds downward beneath it. Combined with the brightness
-   sheen for a "powering up" feel. */
-body.booting.handoff-show-live .terminal.main {
-  clip-path: inset(0 0 100% 0);
-  animation:
-    tw-terminal-clip-reveal 0.52s cubic-bezier(0.16, 0.86, 0.24, 1) 0.04s both,
-    tw-interface-scan-sheen 1.12s cubic-bezier(0.16, 0.78, 0.2, 1) both;
-  transform-origin: top center;
-}
-
+/* ---- ELF→TERMINAL HANDOFF ----
+   After the user couldn't get the clip-path reveal perfectly in sync
+   with the scan bar, we switched to the simpler approach: the live
+   terminal/topbar/footer appear instantly when handoff fires, and the
+   scan bar passes over the top to sell the reveal. Just the brightness
+   sheen runs alongside for a "powering up" feel. */
+body.booting.handoff-show-live .terminal.main,
 body.booting.handoff-show-live .topbar,
 body.booting.handoff-show-live .below-bar {
-  clip-path: inset(0 0 100% 0);
-  animation:
-    tw-terminal-clip-reveal 0.34s cubic-bezier(0.16, 0.86, 0.24, 1) 0.18s both,
-    tw-interface-scan-sheen 1.12s cubic-bezier(0.16, 0.78, 0.2, 1) both;
-  transform-origin: top center;
-}
-
-@keyframes tw-terminal-clip-reveal {
-  0%   { clip-path: inset(0 0 100% 0); }
-  100% { clip-path: inset(0 0 0 0); }
+  animation: tw-interface-scan-sheen 0.52s cubic-bezier(0.16, 0.78, 0.2, 1) both;
 }
 
 @keyframes tw-interface-scan-sheen {
@@ -4274,36 +4291,18 @@ body.tw-frame-scan::after {
 
 /* Slow green system-wake reflection. It drifts down the actual interface for
    about five seconds, continuing underneath the music and homepage typing. */
+/* The slow 5-second second scan (tw-system-wake) has been retired. It
+   was reading as a duplicate, washed-out scan line and conflicting with
+   the kinetic terminal clip-reveal. The single sharp scan from
+   body.tw-frame-scan::after is now the only handoff effect. */
 body.tw-system-wake .content::after {
-  content: '';
-  position: fixed;
-  left: 24px;
-  right: 24px;
-  top: 24px;
-  bottom: 24px;
-  z-index: 35;
-  pointer-events: none;
-  opacity: 0;
-  border-radius: 4px;
-  background:
-    linear-gradient(
-      to bottom,
-      rgba(93,208,104,0) 0%,
-      rgba(93,208,104,0.04) 34%,
-      rgba(93,208,104,0.22) 48%,
-      rgba(255,255,255,0.10) 50%,
-      rgba(93,208,104,0.10) 56%,
-      rgba(93,208,104,0) 100%
-    );
-  filter: blur(0.2px);
-  mix-blend-mode: screen;
-  animation: tw-system-wake-glow 5.15s cubic-bezier(0.18,0.68,0.16,1) both;
+  display: none !important;
+  animation: none !important;
 }
-
 body.tw-system-wake .terminal.main,
 body.tw-system-wake .topbar,
 body.tw-system-wake .below-bar {
-  animation: tw-interface-wake-brightness 5.15s ease both;
+  animation: none !important;
 }
 
 @keyframes tw-system-wake-glow {
