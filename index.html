@@ -1036,17 +1036,18 @@ async function initAudio() {
     }).toDestination();
 
     // 12) Scroll whoosh — brown noise through a sweeping bandpass filter.
-    //     The filter cutoff animates low→high→low to create the "air movement"
-    //     quality of a genuine whoosh. Much lower and more physical than the
-    //     boot sweep tone.
     scrollFilter = new Tone.Filter({
       type: 'bandpass', frequency: 300, Q: 1.2, rolloff: -24
     }).toDestination();
-    SND.scrollWoosh = new Tone.NoiseSynth({
+    // NOTE: .connect() returns the destination, not the source.
+    // Store the NoiseSynth reference explicitly so triggerAttackRelease works.
+    var _scrollNoise = new Tone.NoiseSynth({
       noise: { type: 'brown' },
       envelope: { attack: 0.006, decay: 0.20, sustain: 0, release: 0.09 },
       volume: -1
-    }).connect(scrollFilter);
+    });
+    _scrollNoise.connect(scrollFilter);
+    SND.scrollWoosh = _scrollNoise;
 
     audioReady = true;
   } catch (e) {
@@ -3283,131 +3284,107 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
 <script>
 // ============================================================
-// TW SECTION SNAP CONTROLLER
-// Desktop: gesture-aware — snaps only on the FIRST event of each new
-// deliberate gesture. Trackpad momentum (continuous event stream) can
-// never trigger a second snap; the user must pause 200ms and re-swipe.
-// Mouse: each wheel notch is a separate gesture → one snap per notch.
+// TW SECTION SNAP CONTROLLER — minimal & reliable
+// One action = one snap. A single "locked" flag gates everything.
+// No gesture detection, no accumulated delta, no complexity.
 // ============================================================
-(function twSectionSnapControllerV5(){
-  var terminalBody = document.getElementById('terminal-body');
-  if (!terminalBody || window.__twSectionSnapControllerV5) return;
-  window.__twSectionSnapControllerV5 = true;
+(function twSectionSnap() {
+  var el = document.getElementById('terminal-body');
+  if (!el || window.__twSectionSnap) return;
+  window.__twSectionSnap = true;
 
-  var cooldownUntil = 0;  // no snap during cooldown
-  var inGesture = false;  // true while wheel events are continuous
-  var gestureTimer = null;// resets inGesture after 200ms quiet period
-  var touch = { active: false, x: 0, y: 0, at: 0 };
+  var locked = false;       // true during snap animation
+  var COOLDOWN = 950;       // ms before another snap is allowed
 
-  function sections() {
-    return Array.prototype.slice.call(terminalBody.querySelectorAll('section.page'));
+  function getSections() {
+    return Array.prototype.slice.call(el.querySelectorAll('section.page'));
   }
 
-  function nearestIndex(list) {
-    var y = terminalBody.scrollTop, best = 0, bestDist = Infinity;
+  function currentIndex(list) {
+    var y = el.scrollTop, best = 0, bestD = Infinity;
     for (var i = 0; i < list.length; i++) {
       var d = Math.abs(list[i].offsetTop - y);
-      if (d < bestDist) { best = i; bestDist = d; }
+      if (d < bestD) { best = i; bestD = d; }
     }
     return best;
   }
 
-  function blocked(target) {
-    if (!target || !target.closest) return false;
-    return !!target.closest('#side-menu, #menu-btn, .music-control, .audio-btn, .tw-logo-orb, .cascade-toggle, iframe, input, textarea, select');
+  function snap(dir, snd) {
+    if (locked) return;
+    var list = getSections();
+    if (!list.length) return;
+    var cur = currentIndex(list);
+    var nxt = Math.min(Math.max(0, cur + dir), list.length - 1);
+    if (nxt === cur) return;
+
+    locked = true;
+    // Sound: use optional override (e.g. click for Enter key) or scroll whoosh
+    var play = (typeof snd === 'function') ? snd
+             : (window.twUI && typeof window.twUI.sndScroll === 'function') ? window.twUI.sndScroll
+             : null;
+    if (play) try { play(); } catch (_) {}
+
+    el.scrollTo({ top: list[nxt].offsetTop, behavior: 'smooth' });
+
+    // Update URL hash
+    var page = window.location.pathname.split('/').pop() || 'index.html';
+    if (list[nxt].id && window.history && window.history.replaceState) {
+      try { window.history.replaceState(null, '', page + '#' + list[nxt].id); } catch (_) {}
+    }
+
+    setTimeout(function () { locked = false; }, COOLDOWN);
   }
 
-  function snap(direction, snd) {
-    if (Date.now() < cooldownUntil) return;
-    var list = sections();
-    if (list.length < 2) return;
-    var current = nearestIndex(list);
-    var next = Math.max(0, Math.min(list.length - 1, current + direction));
-    if (next === current) return;
-    cooldownUntil = Date.now() + 900;
-    // snd is an optional override; defaults to scroll whoosh
-    var play = snd || (window.twUI && window.twUI.sndScroll);
-    if (play) try { play(); } catch(e) {}
-    terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
-    var page = (window.location.pathname.split('/').pop() || 'index.html') || 'index.html';
-    if (list[next].id && window.history && window.history.replaceState) {
-      window.history.replaceState(null, '', page + '#' + list[next].id);
-    }
-  }
-
-  terminalBody.addEventListener('wheel', function(e) {
+  // ── Wheel ──────────────────────────────────────────────────────────
+  // Always preventDefault so CSS scroll-snap never interferes.
+  // During cooldown: prevent default, do nothing else.
+  // Not in cooldown: first event above threshold fires one snap.
+  el.addEventListener('wheel', function (e) {
+    // Ignore horizontal-dominant scrolls
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    // Ignore elements that need their own scroll (menus, iframes, inputs)
+    if (e.target && e.target.closest &&
+        e.target.closest('#side-menu,iframe,input,textarea,select')) return;
     if (document.body.classList.contains('menu-open')) return;
-    if (blocked(e.target)) return;
-    if (Math.abs(e.deltaY) < Math.abs(e.deltaX)) return;
 
-    // ALWAYS prevent native scroll first — if we let any event through,
-    // CSS scroll-snap-type takes over and fights our programmatic scrollTo,
-    // causing the "doesn't snap to anchors" bug. We own all scroll here.
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault(); // always — we own vertical scroll here
 
-    // Gesture boundary: events arriving within 150ms of each other are the
-    // same continuous gesture (trackpad momentum). When events stop for 150ms,
-    // gestureActive resets — the next event is a fresh deliberate gesture.
-    var wasActive = gestureActive;
-    gestureActive = true;
-    clearTimeout(gestureTimer);
-    gestureTimer = setTimeout(function() { gestureActive = false; }, 150);
+    if (locked) return;
 
-    if (Date.now() < cooldownUntil) return; // snap animation in progress
-    if (wasActive) return;                  // momentum — not a new gesture
+    var threshold = e.deltaMode === 1 ? 1 : 10; // 1 line or 10px
+    if (Math.abs(e.deltaY) < threshold) return;
 
-    // First event of a fresh gesture: fire one snap.
-    var threshold = e.deltaMode === 1 ? 1 : 15;
-    if (Math.abs(e.deltaY) >= threshold) {
-      snap(e.deltaY > 0 ? 1 : -1);
-    }
+    snap(e.deltaY > 0 ? 1 : -1);
   }, { passive: false, capture: true });
 
-  // Touch: swipe or flick, 50px minimum or 0.12 velocity.
-  terminalBody.addEventListener('touchstart', function(e) {
-    if (e.touches.length !== 1) return;
+  // ── Touch ──────────────────────────────────────────────────────────
+  var tY = 0, tT = 0;
+  el.addEventListener('touchstart', function (e) {
+    if (e.touches.length === 1) { tY = e.touches[0].clientY; tT = Date.now(); }
+  }, { passive: true });
+  el.addEventListener('touchmove', function (e) {
+    if (Math.abs(e.touches[0].clientY - tY) > 8) e.preventDefault();
+  }, { passive: false });
+  el.addEventListener('touchend', function (e) {
+    var dy = tY - e.changedTouches[0].clientY;
+    var dt = Math.max(1, Date.now() - tT);
+    if (Math.abs(dy) > 45 || Math.abs(dy) / dt > 0.1) snap(dy > 0 ? 1 : -1);
+  }, { passive: true });
+
+  // ── Keyboard ───────────────────────────────────────────────────────
+  document.addEventListener('keydown', function (e) {
     if (document.body.classList.contains('menu-open')) return;
-    if (blocked(e.target)) return;
-    touch.active = true;
-    touch.x = e.touches[0].clientX;
-    touch.y = e.touches[0].clientY;
-    touch.at = Date.now();
-  }, { passive: true, capture: true });
+    var tag = document.activeElement && document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
-  terminalBody.addEventListener('touchmove', function(e) {
-    if (!touch.active) return;
-    var dy = e.touches[0].clientY - touch.y;
-    var dx = e.touches[0].clientX - touch.x;
-    if (Math.abs(dy) > Math.abs(dx) * 1.2) e.preventDefault();
-  }, { passive: false, capture: true });
-
-  terminalBody.addEventListener('touchend', function(e) {
-    if (!touch.active) return;
-    touch.active = false;
-    if (!e.changedTouches || !e.changedTouches.length) return;
-    var dy = touch.y - e.changedTouches[0].clientY;
-    var dx = touch.x - e.changedTouches[0].clientX;
-    var dt = Math.max(1, Date.now() - touch.at);
-    var velocity = Math.abs(dy) / dt;
-    if (Math.abs(dx) > Math.abs(dy) * 0.85) return;
-    var minSwipe = Math.min(55, terminalBody.clientHeight * 0.055);
-    if (Math.abs(dy) < minSwipe && velocity < 0.12) return;
-    snap(dy > 0 ? 1 : -1);
-  }, { passive: false, capture: true });
-
-  // Keyboard: arrows, page keys, Enter
-  document.addEventListener('keydown', function(e) {
-    if (document.body.classList.contains('menu-open')) return;
-    if (document.activeElement && document.activeElement.tagName === 'INPUT') return;
     if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); snap(1); }
-    else if (e.key === 'ArrowUp' || e.key === 'PageUp') { e.preventDefault(); snap(-1); }
+    else if (e.key === 'ArrowUp'   || e.key === 'PageUp')   { e.preventDefault(); snap(-1); }
     else if (e.key === 'Enter') {
       e.preventDefault();
-      // Button-press sound for Enter — distinct from the scroll whoosh
+      // Button-press sound for Enter, distinct from scroll whoosh
       snap(1, window.twUI && window.twUI.sndClick);
     }
-  }, false);
+  });
 })();
 </script>
 
