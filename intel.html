@@ -343,14 +343,44 @@
 <div class="page-content terminal-copy feed-copy">
 <span class="line">recent transmissions from the notebook.</span>
 <span class="line">expand a file, steal the useful part, then keep moving.</span>
-<span class="line"> </span>
+<span class="line"></span>
 </div>
-<div class="cascade intel-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_01 // the brief is the product</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="page-content terminal-copy rss-copy"><span class="line">before the camera, before the deck, before the clever line:</span><span class="line">the brief decides whether the work has a spine.</span></div></div></div>
-<div class="cascade intel-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_02 // attention is a trust problem</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="page-content terminal-copy rss-copy"><span class="line">people do not owe brands attention.</span><span class="line">you earn it by proving you understand the room.</span></div></div></div>
-<div class="cascade intel-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_03 // make fewer things matter more</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="page-content terminal-copy rss-copy"><span class="line">content systems get stronger when every asset has a job.</span><span class="line">less noise. more signal. better work.</span></div></div></div>
+<div class="cascade intel-cascade" data-expanded="false">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_01 // the brief is the product</span><span class="toggle-mark"></span></span>
+<div class="cascade-content">
+<div class="page-content terminal-copy rss-copy">
+<span class="line">before the camera, before the deck, before the clever line:</span>
+<span class="line">the brief decides whether the work has a spine.</span>
+<span class="line"></span>
+<span class="line"><a href="https://chriskuzman.substack.com/p/the-brief-is-the-product" rel="noopener" target="_blank">read more...</a></span>
+</div>
+</div>
+</div>
+<div class="cascade intel-cascade" data-expanded="false">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_02 // attention is a trust problem</span><span class="toggle-mark"></span></span>
+<div class="cascade-content">
+<div class="page-content terminal-copy rss-copy">
+<span class="line">people do not owe brands attention.</span>
+<span class="line">you earn it by proving you understand the room.</span>
+<span class="line"></span>
+<span class="line"><a href="https://chriskuzman.substack.com/p/attention-is-a-trust-problem" rel="noopener" target="_blank">read more...</a></span>
+</div>
+</div>
+</div>
+<div class="cascade intel-cascade" data-expanded="false">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">article_03 // make fewer things matter more</span><span class="toggle-mark"></span></span>
+<div class="cascade-content">
+<div class="page-content terminal-copy rss-copy">
+<span class="line">content systems get stronger when every asset has a job.</span>
+<span class="line">less noise. more signal. better work.</span>
+<span class="line"></span>
+<span class="line"><a href="https://chriskuzman.substack.com/p/make-fewer-things-matter-more" rel="noopener" target="_blank">read more...</a></span>
+</div>
+</div>
+</div>
 <div class="page-content terminal-copy read-more-copy">
-<span class="line"> </span>
-<span class="line"><a class="cta-link" href="https://chriskuzman.substack.com/" rel="noopener" target="_blank">read more...</a></span>
+<span class="line"></span>
+<span class="line"><a class="cta-link" href="https://chriskuzman.substack.com/" rel="noopener" target="_blank">read more on substack...</a></span>
 </div>
 </section>
 <section class="page reveal" data-nav-section="" id="next-step">
@@ -1250,6 +1280,53 @@
     window.requestAnimationFrame(function(){ snapTo(nextIdx); });
     settleTimer = setTimeout(function(){ snapTo(nextIdx); }, 180);
   }, { passive: true, capture: true });
+})();
+</script>
+
+<script>
+// TW desktop wheel snap: one mouse/trackpad gesture advances one terminal section.
+(function(){
+  if (window.__twDesktopWheelSnap) return;
+  window.__twDesktopWheelSnap = true;
+  var terminalBody = document.getElementById('terminal-body');
+  if (!terminalBody) return;
+  var lastSnap = 0;
+  var accum = 0;
+  var timer = null;
+  function isDesktop(){ return !(window.matchMedia && window.matchMedia('(max-width: 720px), (hover: none) and (pointer: coarse)').matches); }
+  function sections(){ return Array.prototype.slice.call(document.querySelectorAll('#terminal-body section.page')); }
+  function currentIndex(list){
+    var y = terminalBody.scrollTop;
+    var idx = 0;
+    for (var i=0;i<list.length;i++) if (list[i].offsetTop <= y + 32) idx = i;
+    return idx;
+  }
+  function blocked(target){
+    return target && target.closest && target.closest('#side-menu, #menu-btn, .cascade-content, .embed-frame, iframe, input, textarea, select');
+  }
+  terminalBody.addEventListener('wheel', function(e){
+    if (!isDesktop() || document.body.classList.contains('menu-open')) return;
+    if (blocked(e.target)) return;
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    var list = sections();
+    if (list.length < 2) return;
+    accum += e.deltaY;
+    clearTimeout(timer);
+    timer = setTimeout(function(){ accum = 0; }, 180);
+    if (Math.abs(accum) < 48) return;
+    e.preventDefault();
+    var now = Date.now();
+    if (now - lastSnap < 560) return;
+    lastSnap = now;
+    var idx = currentIndex(list);
+    var next = accum > 0 ? Math.min(list.length - 1, idx + 1) : Math.max(0, idx - 1);
+    accum = 0;
+    if (next === idx) return;
+    terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
+    if (list[next].id && history && history.replaceState) {
+      history.replaceState(history.state || {}, '', (location.pathname.split('/').pop() || 'index.html') + '#' + list[next].id);
+    }
+  }, { passive: false });
 })();
 </script>
 
