@@ -429,11 +429,19 @@
     document.body.classList.add('tw-powering-down');
     if (modal) modal.classList.add('is-shutting-down');
 
-    // Kill music immediately so the shutdown thud is heard clearly
+    // 1. Kill the typing animation immediately — stops twTypeClick() from firing
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
+    window.twIntroRunning = false;
+
+    // 2. Mute ALL Tone.js sounds (catches any in-flight typing clicks)
+    try { if (typeof Tone !== 'undefined' && Tone.Destination) Tone.Destination.mute = true; } catch(e) {}
+
+    // 3. Kill music
     try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e) {}
 
-    // Play thud after 50ms — brief silence makes the hit land harder
+    // 4. Brief silence (50ms), then unmute and play thud — heard cleanly
     window.setTimeout(function() {
+      try { if (typeof Tone !== 'undefined' && Tone.Destination) Tone.Destination.mute = false; } catch(e) {}
       try { if (window.twUI) window.twUI.sndShutdown(); } catch(e) {}
     }, 50);
 
@@ -485,6 +493,20 @@
     var interactive = t.closest('button,a,[role="button"],.cascade-toggle,.section-jump,.section-end,.dot.live');
     if (!interactive) return;
     // Only skip things with a different explicit sound or no desired sound
+    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
+    if (window.twUI) window.twUI.sndClick();
+  }, true);
+
+  // Keyboard Enter/Space on a focused button plays the click sound.
+  // Registered here (early, capture phase) so it fires BEFORE any navigation
+  // handler that calls stopImmediatePropagation — keyboard never triggers pointerdown.
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (!e.isTrusted) return;
+    var t = e.target;
+    if (!t || !t.closest) return;
+    var interactive = t.closest('button,a,[role="button"],.dot.live');
+    if (!interactive) return;
     if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
     if (window.twUI) window.twUI.sndClick();
   }, true);
