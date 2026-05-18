@@ -49,7 +49,7 @@
     "foundingDate": "2018",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Scottsdale",
+      "addressLocality": "Phoenix",
       "addressRegion": "AZ",
       "addressCountry": "US"
     }
@@ -75,6 +75,97 @@
     }
   }
 ]
+  </script>
+
+  <script>
+  // EARLY INTERNAL NAV PATCH
+  // Keeps internal page links/menu clicks inside the persistent terminal shell
+  // so audio stays seamless and links do not snap back to the top of home.
+  (function earlyInternalNavPatch(){
+    if (window.__twEarlyInternalNavPatch) return;
+    window.__twEarlyInternalNavPatch = true;
+
+    var PAGES = {
+      'index.html': true,
+      'about.html': true,
+      'sitrep.html': true,
+      'work.html': true,
+      'intel.html': true,
+      'contact.html': true
+    };
+
+    function pageFromHref(href){
+      if (!href || href.charAt(0) === '#' || /^mailto:|^tel:/i.test(href)) return null;
+      try {
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return null;
+        var page = u.pathname.split('/').pop() || 'index.html';
+        if (page === 'home.html') page = 'index.html';
+        if (!PAGES[page]) return null;
+        return page + (u.hash || '');
+      } catch(e) { return null; }
+    }
+
+    function closeMenu(){
+      document.body.classList.remove('menu-open');
+      var menuBtn = document.getElementById('menu-btn');
+      var sideMenu = document.getElementById('side-menu');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.textContent = 'menu';
+        menuBtn.classList.remove('active');
+      }
+      if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    var lastTarget = '';
+    var lastAt = 0;
+    function route(target){
+      var now = Date.now();
+      if (target === lastTarget && now - lastAt < 650) return;
+      lastTarget = target;
+      lastAt = now;
+      closeMenu();
+
+      if (typeof window.twLoadPage === 'function') {
+        window.twLoadPage(target).catch(function(){ window.location.href = target; });
+      } else if (typeof window.twSoftLoadPage === 'function') {
+        window.twSoftLoadPage(target).catch(function(){ window.location.href = target; });
+      } else {
+        window.location.href = target;
+      }
+    }
+
+    function absorb(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    function handlePageClick(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.closest('#title-brand, #title-page, .frame-label--tl')) return;
+      if (a.target && a.target !== '_self') return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    function handleMenuPress(e){
+      var a = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+      if (!a) return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    window.addEventListener('click', handlePageClick, true);
+    window.addEventListener('pointerdown', handleMenuPress, true);
+    window.addEventListener('touchstart', handleMenuPress, { capture: true, passive: false });
+  })();
   </script>
 </head>
 <body>
@@ -127,77 +218,117 @@
         </div>
         <div class="terminal-body" id="terminal-body">
 
-          <section id="hero" class="page reveal " data-nav-section>
+          <section id="hero" class="page reveal" data-nav-section>
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03</span><span class="hdr-slash"> // </span><span class="hdr-name">sitrep</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="page-content">&gt; 
-&gt; <span class="accent">the brief before the big idea.</span>
-&gt; 
-&gt; sitrep is our intelligence protocol.
-&gt; it studies your audience, competitors, category,
-&gt; and cultural signals before we recommend a story.
-&gt; 
-&gt; the point is simple: make the right thing,
-&gt; not just a beautiful thing.</div>
-          </section>
-
-          <section id="ingest" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03A</span><span class="hdr-slash"> // </span><span class="hdr-name">ingest map</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="data-grid four-up">
-              <div class="data-cell"><span>audience</span><p>what they want, fear, trust, ignore, repeat, and quietly Google at 11:47pm.</p></div>
-              <div class="data-cell"><span>competitors</span><p>what everyone is saying, what nobody owns, and where the category got lazy.</p></div>
-              <div class="data-cell"><span>category</span><p>the rules, expectations, patterns, taboos, language, and proof points.</p></div>
-              <div class="data-cell"><span>culture</span><p>the signals around the market that affect timing, tone, and attention.</p></div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line"><span class="accent">the brief before the big idea.</span></span>
+              <span class="line"></span>
+              <span class="line">sitrep is our intelligence protocol. it turns research into a guiding line before anything gets filmed, edited, or launched.</span>
+              <span class="line"></span>
+              <span class="line">we ingest the room, synthesize the signal, then execute against the clearest story. that way the work has a reason to exist before it starts looking good.</span>
             </div>
-          </section>
-
-          <section id="process" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03B</span><span class="hdr-slash"> // </span><span class="hdr-name">process</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="flowline">
-              <div><b>01</b><span>scan</span><p>collect signals from the market.</p></div>
-              <div><b>02</b><span>sift</span><p>remove noise, guesses, and pretty distractions.</p></div>
-              <div><b>03</b><span>score</span><p>rank what matters by trust, relevance, and opportunity.</p></div>
-              <div><b>04</b><span>story</span><p>turn the findings into a creative direction.</p></div>
-            </div>
-            <div class="page-content small-after">&gt; no magic. better inputs and a calmer robot.</div>
-          </section>
-
-          <section id="output" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03C</span><span class="hdr-slash"> // </span><span class="hdr-name">output table</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <table class="terminal-table">
-              <tr><th>deliverable</th><th>what it answers</th></tr>
-              <tr><td>audience read</td><td>who are we really trying to move?</td></tr>
-              <tr><td>competitor map</td><td>where is the white space?</td></tr>
-              <tr><td>message angles</td><td>what should we say, and why now?</td></tr>
-              <tr><td>creative direction</td><td>what story should production serve?</td></tr>
-              <tr><td>asset plan</td><td>what should be filmed, cut, launched, and reused?</td></tr>
-            </table>
-          </section>
-
-          <section id="best-for" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">best for</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="check-columns">
-              <div>
-                &gt;     launching a campaign<br>
-                &gt;     entering a new market<br>
-                &gt;     repositioning a brand<br>
-                &gt;     explaining complex work
+            <div class="triptych sitrep-triptych">
+              <div class="tile">
+                <div class="tile-corner-num">01</div>
+                <div class="tile-graphic ingest-graphic"><span class="glyph">▼</span><span class="glyph">▼</span><span class="glyph">▼</span></div>
+                <div class="tile-title">INGEST</div>
+                <ul class="tile-list"><li>audience</li><li>competitor</li><li>category</li></ul>
               </div>
-              <div>
-                &gt;     sales enablement<br>
-                &gt;     recruitment stories<br>
-                &gt;     founder narratives<br>
-                &gt;     content that needs to matter
+              <div class="tile">
+                <div class="tile-corner-num">02</div>
+                <div class="tile-graphic synth-graphic"><span class="glyph">◇</span><span class="glyph">◆</span><span class="glyph">◇</span></div>
+                <div class="tile-title">SYNTHESIZE</div>
+                <ul class="tile-list"><li>patterns</li><li>trust gaps</li><li>blind spots</li></ul>
+              </div>
+              <div class="tile">
+                <div class="tile-corner-num">03</div>
+                <div class="tile-graphic exec-graphic"><span class="glyph">⚡</span><span class="glyph">⚡</span><span class="glyph">⚡</span></div>
+                <div class="tile-title">EXECUTE</div>
+                <ul class="tile-list"><li>best story</li><li>production plan</li><li>ground truth</li></ul>
               </div>
             </div>
           </section>
 
-          <section id="request" class="page reveal " data-nav-section>
-            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03E</span><span class="hdr-slash"> // </span><span class="hdr-name">request protocol</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
-            <div class="page-content">&gt; send us the mission.
-&gt; we will come back with a read on the room.
-&gt; 
-&gt; <a href="contact.html" class="cta-link">request a sitrep</a></div>
-            <div class="next-link reveal">&gt; <a href="work.html">next: work</a></div>
+          <section id="ingest" class="page reveal" data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03A</span><span class="hdr-slash"> // </span><span class="hdr-name">ingest</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="triptych single-tile">
+              <div class="tile">
+                <div class="tile-corner-num">01</div>
+                <div class="tile-graphic ingest-graphic"><span class="glyph">▼</span><span class="glyph">▼</span><span class="glyph">▼</span></div>
+                <div class="tile-title">INGEST</div>
+                <ul class="tile-list"><li>audience</li><li>competitor</li><li>category</li></ul>
+              </div>
+            </div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line">ingest is the listening phase.</span>
+              <span class="line"></span>
+              <span class="line">we collect audience behavior, competitor patterns, category language, and cultural timing before we touch a concept.</span>
+              <span class="line"></span>
+              <span class="line">the goal is to get out of our own heads. we want the room as it actually is, not the room a brand wishes it had.</span>
+            </div>
+          </section>
+
+          <section id="process" class="page reveal" data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03B</span><span class="hdr-slash"> // </span><span class="hdr-name">synthesize</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="triptych single-tile">
+              <div class="tile">
+                <div class="tile-corner-num">02</div>
+                <div class="tile-graphic synth-graphic"><span class="glyph">◇</span><span class="glyph">◆</span><span class="glyph">◇</span></div>
+                <div class="tile-title">SYNTHESIZE</div>
+                <ul class="tile-list"><li>patterns</li><li>trust gaps</li><li>blind spots</li></ul>
+              </div>
+            </div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line">synthesize is where the pile becomes a point of view.</span>
+              <span class="line"></span>
+              <span class="line">we look for repetition, tension, trust gaps, emotional openings, and the ideas competitors are all circling but not owning.</span>
+              <span class="line"></span>
+              <span class="line">this is where a guiding line appears: the clearest story the brand can tell, to the right people, at the right moment.</span>
+            </div>
+          </section>
+
+          <section id="output" class="page reveal" data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03C</span><span class="hdr-slash"> // </span><span class="hdr-name">execute</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="triptych single-tile">
+              <div class="tile">
+                <div class="tile-corner-num">03</div>
+                <div class="tile-graphic exec-graphic"><span class="glyph">⚡</span><span class="glyph">⚡</span><span class="glyph">⚡</span></div>
+                <div class="tile-title">EXECUTE</div>
+                <ul class="tile-list"><li>best story</li><li>production plan</li><li>ground truth</li></ul>
+              </div>
+            </div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line">execute is where intelligence becomes content.</span>
+              <span class="line"></span>
+              <span class="line">we use the signal from millions of facts, not committee opinions, to decide what to make, what to cut, what to say, and where the story should live.</span>
+              <span class="line"></span>
+              <span class="line">the final work should feel human, but it should not feel random. it should carry the weight of the room behind it.</span>
+            </div>
+          </section>
+
+          <section id="best-for" class="page reveal" data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03D</span><span class="hdr-slash"> // </span><span class="hdr-name">where it works</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line"><span class="accent">companies we've used it for</span></span>
+              <span class="line"><a href="https://www.golfdigest.com/" target="_blank" rel="noopener">golf digest</a>, <a href="https://www.discovery.com/" target="_blank" rel="noopener">discovery</a>, <a href="https://www.musiccelebrations.com/" target="_blank" rel="noopener">music celebrations international</a>, <a href="https://www.andresplasticsurgery.com/" target="_blank" rel="noopener">andres plastic surgery</a>, <a href="https://www.aurelioperformance.com/" target="_blank" rel="noopener">aurelio performance physical therapy</a></span>
+              <span class="line"></span>
+              <span class="line"><span class="accent">industries we've used it for</span></span>
+              <span class="line">media, sports, entertainment, healthcare, performance, travel, education, music, live events, founder-led brands</span>
+              <span class="line"></span>
+              <span class="line"><span class="accent">types of marketing</span></span>
+              <span class="line">launching a campaign, entering a new market, repositioning a brand, explaining complex work, sales enablement, recruitment stories, founder narratives, content that needs to matter</span>
+            </div>
+          </section>
+
+          <section id="request" class="page reveal" data-nav-section>
+            <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">03E</span><span class="hdr-slash"> // </span><span class="hdr-name">start a sitrep</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+            <div class="page-content terminal-copy sitrep-copy">
+              <span class="line">send us the mission.</span>
+              <span class="line">we will come back with a read on the room.</span>
+              <span class="line"></span>
+              <span class="line"><a href="contact.html" class="cta-link">request a sitrep</a></span>
+            </div>
+            <div class="next-link reveal">&gt; <a href="work.html">click for next page: work</a></div>
           </section>
 </div>
       </div>
@@ -525,7 +656,7 @@
         const end = document.createElement('a');
         end.href = 'work.html';
         end.className = 'section-end';
-        end.textContent = 'end - next page';
+        end.textContent = 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || 'next');
         sec.appendChild(end);
       }
     });
@@ -710,7 +841,7 @@
         end.type = 'button';
         end.className = 'section-end';
         end.setAttribute('aria-label', 'end, next page');
-        end.textContent = 'end - next page';
+        end.textContent = 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || 'next');
         end.addEventListener('click', function(e){
           e.preventDefault();
           e.stopPropagation();

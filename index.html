@@ -50,7 +50,7 @@
     "foundingDate": "2018",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Scottsdale",
+      "addressLocality": "Phoenix",
       "addressRegion": "AZ",
       "addressCountry": "US"
     }
@@ -76,6 +76,97 @@
     }
   }
 ]
+  </script>
+
+  <script>
+  // EARLY INTERNAL NAV PATCH
+  // Keeps internal page links/menu clicks inside the persistent terminal shell
+  // so audio stays seamless and links do not snap back to the top of home.
+  (function earlyInternalNavPatch(){
+    if (window.__twEarlyInternalNavPatch) return;
+    window.__twEarlyInternalNavPatch = true;
+
+    var PAGES = {
+      'index.html': true,
+      'about.html': true,
+      'sitrep.html': true,
+      'work.html': true,
+      'intel.html': true,
+      'contact.html': true
+    };
+
+    function pageFromHref(href){
+      if (!href || href.charAt(0) === '#' || /^mailto:|^tel:/i.test(href)) return null;
+      try {
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return null;
+        var page = u.pathname.split('/').pop() || 'index.html';
+        if (page === 'home.html') page = 'index.html';
+        if (!PAGES[page]) return null;
+        return page + (u.hash || '');
+      } catch(e) { return null; }
+    }
+
+    function closeMenu(){
+      document.body.classList.remove('menu-open');
+      var menuBtn = document.getElementById('menu-btn');
+      var sideMenu = document.getElementById('side-menu');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.textContent = 'menu';
+        menuBtn.classList.remove('active');
+      }
+      if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    var lastTarget = '';
+    var lastAt = 0;
+    function route(target){
+      var now = Date.now();
+      if (target === lastTarget && now - lastAt < 650) return;
+      lastTarget = target;
+      lastAt = now;
+      closeMenu();
+
+      if (typeof window.twLoadPage === 'function') {
+        window.twLoadPage(target).catch(function(){ window.location.href = target; });
+      } else if (typeof window.twSoftLoadPage === 'function') {
+        window.twSoftLoadPage(target).catch(function(){ window.location.href = target; });
+      } else {
+        window.location.href = target;
+      }
+    }
+
+    function absorb(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    function handlePageClick(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.closest('#title-brand, #title-page, .frame-label--tl')) return;
+      if (a.target && a.target !== '_self') return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    function handleMenuPress(e){
+      var a = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+      if (!a) return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    window.addEventListener('click', handlePageClick, true);
+    window.addEventListener('pointerdown', handleMenuPress, true);
+    window.addEventListener('touchstart', handleMenuPress, { capture: true, passive: false });
+  })();
   </script>
 </head>
 <body class="booting">
@@ -327,17 +418,17 @@
               <span class="line">we make content end to end. every project begins</span>
               <span class="line">with a <a href="sitrep.html" class="cta-link">sitrep</a>, so we know the story before a camera turns on.</span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">strategy &amp; intelligence</span></span>
-              <span class="line">        sitrep · audience research · messaging · positioning</span>
+              <span class="line"><span class="accent">strategy &amp; intelligence</span></span>
+              <span class="line">sitrep · audience research · messaging · positioning</span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">pre-production</span></span>
-              <span class="line">        scripts · casting · locations · scheduling</span>
+              <span class="line"><span class="accent">pre-production</span></span>
+              <span class="line">scripts · casting · locations · scheduling</span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">production</span></span>
-              <span class="line">        multi-cam shoots · directing · live capture</span>
+              <span class="line"><span class="accent">production</span></span>
+              <span class="line">multi-cam shoots · directing · live capture</span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">post-production</span></span>
-              <span class="line">        edit · motion · sound · color · finish</span>
+              <span class="line"><span class="accent">post-production</span></span>
+              <span class="line">edit · motion · sound · color · finish</span>
             </div>
           </section>
 
@@ -392,12 +483,12 @@
             </div>
 
                         <div class="page-content terminal-copy">
-              <span class="line">    <span class="accent">what you get</span></span>
-              <span class="line">        a clear read on your audience and the gaps</span>
-              <span class="line">        standing between you and them.</span>
-              <span class="line">        the one story most worth telling right now.</span>
+              <span class="line"><span class="accent">what you get</span></span>
+              <span class="line">a clear read on your audience and the gaps</span>
+              <span class="line">standing between you and them.</span>
+              <span class="line">the one story most worth telling right now.</span>
               <span class="line"></span>
-              <span class="line">    <a href="sitrep.html" class="cta-link">request a sitrep</a></span>
+              <span class="line"><a href="sitrep.html" class="cta-link">request a sitrep</a></span>
             </div>
           </section>
 
@@ -466,40 +557,40 @@
               <span class="line">we work with the people building what comes next.</span>
               <span class="line">80+ organizations across 6 industries and 41 verticals.</span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">defense</span></span>
-              <span class="line">        <a href="https://anduril.com" target="_blank" rel="noopener">anduril</a> · <a href="https://lockheedmartin.com" target="_blank" rel="noopener">lockheed</a> · <a href="https://rtx.com" target="_blank" rel="noopener">raytheon</a></span>
-              <span class="line">        <a href="https://northropgrumman.com" target="_blank" rel="noopener">northrop_grumman</a> · <a href="https://boeing.com" target="_blank" rel="noopener">boeing</a> · <a href="https://defense.gov" target="_blank" rel="noopener">DoD</a></span>
+              <span class="line"><span class="accent">defense</span></span>
+              <span class="line"><a href="https://anduril.com" target="_blank" rel="noopener">anduril</a> · <a href="https://lockheedmartin.com" target="_blank" rel="noopener">lockheed</a> · <a href="https://rtx.com" target="_blank" rel="noopener">raytheon</a></span>
+              <span class="line"><a href="https://northropgrumman.com" target="_blank" rel="noopener">northrop_grumman</a> · <a href="https://boeing.com" target="_blank" rel="noopener">boeing</a> · <a href="https://defense.gov" target="_blank" rel="noopener">DoD</a></span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">healthcare</span></span>
-              <span class="line">        <a href="https://mayoclinic.org" target="_blank" rel="noopener">mayo_clinic</a> · <a href="https://kaiserpermanente.org" target="_blank" rel="noopener">kaiser</a></span>
-              <span class="line">        <a href="https://clevelandclinic.org" target="_blank" rel="noopener">cleveland_clinic</a> · <a href="https://stanfordhealthcare.org" target="_blank" rel="noopener">stanford_health</a></span>
+              <span class="line"><span class="accent">healthcare</span></span>
+              <span class="line"><a href="https://mayoclinic.org" target="_blank" rel="noopener">mayo_clinic</a> · <a href="https://kaiserpermanente.org" target="_blank" rel="noopener">kaiser</a></span>
+              <span class="line"><a href="https://clevelandclinic.org" target="_blank" rel="noopener">cleveland_clinic</a> · <a href="https://stanfordhealthcare.org" target="_blank" rel="noopener">stanford_health</a></span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">gov + research</span></span>
-              <span class="line">        <a href="https://darpa.mil" target="_blank" rel="noopener">DARPA</a> · <a href="https://nasa.gov" target="_blank" rel="noopener">NASA</a> · <a href="https://nih.gov" target="_blank" rel="noopener">NIH</a> · <a href="https://stanford.edu" target="_blank" rel="noopener">stanford</a></span>
+              <span class="line"><span class="accent">gov + research</span></span>
+              <span class="line"><a href="https://darpa.mil" target="_blank" rel="noopener">DARPA</a> · <a href="https://nasa.gov" target="_blank" rel="noopener">NASA</a> · <a href="https://nih.gov" target="_blank" rel="noopener">NIH</a> · <a href="https://stanford.edu" target="_blank" rel="noopener">stanford</a></span>
               <span class="line"></span>
-              <span class="line">    <span class="accent">tech + corporate</span></span>
-              <span class="line">        <a href="https://cisco.com" target="_blank" rel="noopener">cisco</a> · <a href="https://honeywell.com" target="_blank" rel="noopener">honeywell</a> · <a href="https://sequoiacap.com" target="_blank" rel="noopener">sequoia</a></span>
+              <span class="line"><span class="accent">tech + corporate</span></span>
+              <span class="line"><a href="https://cisco.com" target="_blank" rel="noopener">cisco</a> · <a href="https://honeywell.com" target="_blank" rel="noopener">honeywell</a> · <a href="https://sequoiacap.com" target="_blank" rel="noopener">sequoia</a></span>
             </div>
           </section>
 
           <section id="the_team" class="page reveal">
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">05</span><span class="hdr-slash"> // </span><span class="hdr-name">the team</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
                         <div class="page-content terminal-copy">
-              <span class="line">three co-founders. one studio.</span>
+              <span class="line">three founders. one studio.</span>
             </div>
 
             <div class="team-grid">
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/chris.avif" alt="chris"></div>
-                <figcaption class="team-caption">chris // co-founder + director</figcaption>
+                <figcaption class="team-caption">chris // founder + strategy</figcaption>
               </figure>
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/tony.avif" alt="tony"></div>
-                <figcaption class="team-caption">tony // co-founder + production</figcaption>
+                <figcaption class="team-caption">tony // founder + director</figcaption>
               </figure>
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/ari.avif" alt="ari"></div>
-                <figcaption class="team-caption">ari // co-founder + strategy</figcaption>
+                <figcaption class="team-caption">ari // founder + producer</figcaption>
               </figure>
             </div>
 
@@ -510,7 +601,7 @@
               <span class="line">help the audience on the other end live a</span>
               <span class="line">little better for having watched.</span>
               <span class="line"></span>
-              <span class="line">    <a href="about.html" class="cta-link">about us</a></span>
+              <span class="line"><a href="about.html" class="cta-link">about us</a></span>
             </div>
           </section>
 
@@ -523,8 +614,8 @@
               <span class="line">we'll tell you what we're seeing, then decide</span>
               <span class="line">together if there's a story worth making.</span>
               <span class="line"></span>
-              <span class="line">    <a href="contact.html" class="cta-link">start a project</a></span>
-              <span class="line">    <a href="https://calendly.com/christhrillwave/30-minute-meeting-clone" target="_blank" rel="noopener" class="cta-link">book a call</a></span>
+              <span class="line"><a href="contact.html" class="cta-link">start a project</a></span>
+              <span class="line"><a href="https://calendly.com/christhrillwave/30-minute-meeting-clone" target="_blank" rel="noopener" class="cta-link">book a call</a></span>
               <span class="line"></span>
               <span class="line">hi@thrillwave.com  ·  480.766.9585</span>
             </div>
@@ -2436,7 +2527,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
         end.type = 'button';
         end.className = 'section-end';
         end.setAttribute('aria-label', 'end, next page');
-        end.textContent = 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || nextPageName(currentPage).replace('.html',''));
+        end.textContent = currentPage === 'index.html' ? 'end - next page: about' : 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || nextPageName(currentPage).replace('.html',''));
         end.addEventListener('click', e => {
           e.preventDefault();
           e.stopPropagation();

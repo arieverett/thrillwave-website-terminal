@@ -76,6 +76,97 @@
   }
 ]
   </script>
+
+  <script>
+  // EARLY INTERNAL NAV PATCH
+  // Keeps internal page links/menu clicks inside the persistent terminal shell
+  // so audio stays seamless and links do not snap back to the top of home.
+  (function earlyInternalNavPatch(){
+    if (window.__twEarlyInternalNavPatch) return;
+    window.__twEarlyInternalNavPatch = true;
+
+    var PAGES = {
+      'index.html': true,
+      'about.html': true,
+      'sitrep.html': true,
+      'work.html': true,
+      'intel.html': true,
+      'contact.html': true
+    };
+
+    function pageFromHref(href){
+      if (!href || href.charAt(0) === '#' || /^mailto:|^tel:/i.test(href)) return null;
+      try {
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return null;
+        var page = u.pathname.split('/').pop() || 'index.html';
+        if (page === 'home.html') page = 'index.html';
+        if (!PAGES[page]) return null;
+        return page + (u.hash || '');
+      } catch(e) { return null; }
+    }
+
+    function closeMenu(){
+      document.body.classList.remove('menu-open');
+      var menuBtn = document.getElementById('menu-btn');
+      var sideMenu = document.getElementById('side-menu');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.textContent = 'menu';
+        menuBtn.classList.remove('active');
+      }
+      if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    var lastTarget = '';
+    var lastAt = 0;
+    function route(target){
+      var now = Date.now();
+      if (target === lastTarget && now - lastAt < 650) return;
+      lastTarget = target;
+      lastAt = now;
+      closeMenu();
+
+      if (typeof window.twLoadPage === 'function') {
+        window.twLoadPage(target).catch(function(){ window.location.href = target; });
+      } else if (typeof window.twSoftLoadPage === 'function') {
+        window.twSoftLoadPage(target).catch(function(){ window.location.href = target; });
+      } else {
+        window.location.href = target;
+      }
+    }
+
+    function absorb(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    function handlePageClick(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.closest('#title-brand, #title-page, .frame-label--tl')) return;
+      if (a.target && a.target !== '_self') return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    function handleMenuPress(e){
+      var a = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+      if (!a) return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    window.addEventListener('click', handlePageClick, true);
+    window.addEventListener('pointerdown', handleMenuPress, true);
+    window.addEventListener('touchstart', handleMenuPress, { capture: true, passive: false });
+  })();
+  </script>
 </head>
 <body>
 
@@ -192,35 +283,35 @@
           <section id="team" class="page reveal " data-nav-section>
             <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">02B</span><span class="hdr-slash"> // </span><span class="hdr-name">operator roster</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
             <div class="page-content terminal-copy">
-              <span class="line">three co-founders. one signal tower.</span>
+              <span class="line">three founders. one signal tower.</span>
               <span class="line">&nbsp;</span>
             </div>
 
             <div class="team-grid profile-grid about-team-grid">
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/chris.avif" alt="Chris Kuzman"></div>
-                <figcaption class="team-caption">chris // co-founder + director</figcaption>
+                <figcaption class="team-caption">chris // founder + strategy</figcaption>
               </figure>
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/tony.avif" alt="Tony Swann"></div>
-                <figcaption class="team-caption">tony // co-founder + production</figcaption>
+                <figcaption class="team-caption">tony // founder + director</figcaption>
               </figure>
               <figure class="team-card">
                 <div class="photo"><img src="assets/team/ari.avif" alt="Ari Everett"></div>
-                <figcaption class="team-caption">ari // co-founder + strategy</figcaption>
+                <figcaption class="team-caption">ari // founder + producer</figcaption>
               </figure>
             </div>
 
             <div class="page-content terminal-copy team-bio-copy">
-              <span class="line">chris brings a director's eye to the work. he is</span>
+              <span class="line">chris brings a strategist's eye to the work. he is</span>
               <span class="line">drawn to honest moments, clean frames, and the</span>
               <span class="line">kind of story structure that makes people stay.</span>
               <span class="line">&nbsp;</span>
-              <span class="line">tony is the calm center of production. he keeps</span>
+              <span class="line">tony is the calm center of direction. he keeps</span>
               <span class="line">the moving pieces human, organized, and ready,</span>
               <span class="line">so the work can feel polished without feeling stiff.</span>
               <span class="line">&nbsp;</span>
-              <span class="line">ari lives where strategy meets feeling. he looks</span>
+              <span class="line">ari lives where production meets feeling. he looks</span>
               <span class="line">for the audience truth, the market signal, and the</span>
               <span class="line">one sentence that makes the whole thing matter.</span>
             </div>

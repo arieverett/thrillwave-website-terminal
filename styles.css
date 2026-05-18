@@ -4963,3 +4963,137 @@ section.page a:focus-visible,
     margin-bottom: 14px;
   }
 }
+
+
+/* ============================================================
+   SITREP + HOMEPAGE REFINEMENT PASS
+   ============================================================ */
+
+/* Header/title links return to gray, with green hover only. */
+.terminal-bar .title a.title-brand,
+.terminal-bar .title a.title-page,
+.terminal-bar .title a.title-brand:visited,
+.terminal-bar .title a.title-page:visited {
+  color: var(--muted) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+.terminal-bar .title a.title-brand:hover,
+.terminal-bar .title a.title-page:hover,
+.terminal-bar .title a.title-brand:focus-visible,
+.terminal-bar .title a.title-page:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* Footer contact/social links: white at rest, green on hover. */
+.below-bar a,
+.below-bar a:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+.below-bar a:hover,
+.below-bar a:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 5px rgba(93,208,104,0.35)) !important;
+}
+
+/* Homepage should not use tabbed copy indentation for now. */
+body:not(.booting) #terminal-body .page-content.terminal-copy .line {
+  padding-left: 0 !important;
+  text-indent: 0 !important;
+}
+
+/* Team captions: smaller, cleaner, max two-line feel. */
+#the_team .team-caption,
+#team .team-caption {
+  font-size: 11.5px !important;
+  line-height: 1.34 !important;
+  letter-spacing: 0.1px !important;
+  max-width: 100% !important;
+}
+@media (max-width: 720px) {
+  #the_team .team-caption,
+  #team .team-caption {
+    font-size: 10.25px !important;
+    line-height: 1.3 !important;
+  }
+}
+
+/* Dynamic end-of-page prompt: white at rest, green on hover. */
+.section-end,
+.section-end:visited {
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  filter: none !important;
+}
+.section-end::before {
+  color: var(--tw-prompt) !important;
+}
+.section-end:hover,
+.section-end:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  filter: drop-shadow(0 0 6px rgba(93,208,104,0.4)) !important;
+}
+
+/* Sitrep triptych stays compact enough to share the hero page with copy. */
+.sitrep-triptych {
+  margin: 14px 0 6px !important;
+  gap: 8px !important;
+}
+.sitrep-triptych .tile,
+.single-tile .tile {
+  padding: 11px 9px 10px !important;
+}
+.sitrep-triptych .tile-graphic,
+.single-tile .tile-graphic {
+  height: 26px !important;
+  margin: 4px 0 8px !important;
+}
+.sitrep-triptych .tile-title,
+.single-tile .tile-title {
+  margin-bottom: 6px !important;
+}
+.sitrep-triptych .tile-list,
+.single-tile .tile-list {
+  line-height: 1.38 !important;
+}
+.single-tile {
+  max-width: 230px;
+  margin: 0 0 14px !important;
+}
+.single-tile .tile {
+  flex: 0 0 100%;
+}
+.sitrep-copy {
+  margin-top: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .sitrep-triptych {
+    gap: 5px !important;
+    margin: 10px 0 4px !important;
+  }
+  .sitrep-triptych .tile {
+    padding: 9px 5px 8px !important;
+  }
+  .sitrep-triptych .tile-graphic {
+    height: 22px !important;
+    font-size: 13px !important;
+  }
+  .sitrep-triptych .tile-title {
+    font-size: 8px !important;
+    letter-spacing: 1px !important;
+  }
+  .sitrep-triptych .tile-list {
+    font-size: 8px !important;
+    line-height: 1.3 !important;
+  }
+  .single-tile {
+    max-width: 210px;
+  }
+}

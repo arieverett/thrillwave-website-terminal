@@ -49,7 +49,7 @@
     "foundingDate": "2018",
     "address": {
       "@type": "PostalAddress",
-      "addressLocality": "Scottsdale",
+      "addressLocality": "Phoenix",
       "addressRegion": "AZ",
       "addressCountry": "US"
     }
@@ -75,6 +75,97 @@
     }
   }
 ]
+  </script>
+
+  <script>
+  // EARLY INTERNAL NAV PATCH
+  // Keeps internal page links/menu clicks inside the persistent terminal shell
+  // so audio stays seamless and links do not snap back to the top of home.
+  (function earlyInternalNavPatch(){
+    if (window.__twEarlyInternalNavPatch) return;
+    window.__twEarlyInternalNavPatch = true;
+
+    var PAGES = {
+      'index.html': true,
+      'about.html': true,
+      'sitrep.html': true,
+      'work.html': true,
+      'intel.html': true,
+      'contact.html': true
+    };
+
+    function pageFromHref(href){
+      if (!href || href.charAt(0) === '#' || /^mailto:|^tel:/i.test(href)) return null;
+      try {
+        var u = new URL(href, window.location.href);
+        if (u.origin !== window.location.origin) return null;
+        var page = u.pathname.split('/').pop() || 'index.html';
+        if (page === 'home.html') page = 'index.html';
+        if (!PAGES[page]) return null;
+        return page + (u.hash || '');
+      } catch(e) { return null; }
+    }
+
+    function closeMenu(){
+      document.body.classList.remove('menu-open');
+      var menuBtn = document.getElementById('menu-btn');
+      var sideMenu = document.getElementById('side-menu');
+      if (menuBtn) {
+        menuBtn.setAttribute('aria-expanded', 'false');
+        menuBtn.textContent = 'menu';
+        menuBtn.classList.remove('active');
+      }
+      if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+    }
+
+    var lastTarget = '';
+    var lastAt = 0;
+    function route(target){
+      var now = Date.now();
+      if (target === lastTarget && now - lastAt < 650) return;
+      lastTarget = target;
+      lastAt = now;
+      closeMenu();
+
+      if (typeof window.twLoadPage === 'function') {
+        window.twLoadPage(target).catch(function(){ window.location.href = target; });
+      } else if (typeof window.twSoftLoadPage === 'function') {
+        window.twSoftLoadPage(target).catch(function(){ window.location.href = target; });
+      } else {
+        window.location.href = target;
+      }
+    }
+
+    function absorb(e){
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    }
+
+    function handlePageClick(e){
+      var a = e.target && e.target.closest ? e.target.closest('a') : null;
+      if (!a) return;
+      if (a.closest('#title-brand, #title-page, .frame-label--tl')) return;
+      if (a.target && a.target !== '_self') return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    function handleMenuPress(e){
+      var a = e.target && e.target.closest ? e.target.closest('#side-menu a.menu-item') : null;
+      if (!a) return;
+      var target = pageFromHref(a.getAttribute('href') || a.dataset.page || '');
+      if (!target) return;
+      absorb(e);
+      route(target);
+    }
+
+    window.addEventListener('click', handlePageClick, true);
+    window.addEventListener('pointerdown', handleMenuPress, true);
+    window.addEventListener('touchstart', handleMenuPress, { capture: true, passive: false });
+  })();
   </script>
 </head>
 <body>
@@ -508,7 +599,7 @@
         const end = document.createElement('a');
         end.href = 'index.html';
         end.className = 'section-end';
-        end.textContent = 'end - next page';
+        end.textContent = 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || 'next');
         sec.appendChild(end);
       }
     });
@@ -693,7 +784,7 @@
         end.type = 'button';
         end.className = 'section-end';
         end.setAttribute('aria-label', 'end, next page');
-        end.textContent = 'end - next page';
+        end.textContent = 'click for next page: ' + (PAGE_LABELS[nextPageName(currentPage)] || 'next');
         end.addEventListener('click', function(e){
           e.preventDefault();
           e.stopPropagation();
