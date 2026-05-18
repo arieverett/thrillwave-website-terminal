@@ -398,6 +398,7 @@
     }
     var modal = getModal();
     if (!modal) return false;
+    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('power-modal-open');
@@ -427,8 +428,7 @@
     if (document.body.classList.contains('tw-powering-down')) return false;
     var modal = getModal();
     document.body.classList.add('tw-powering-down');
-    // Use the existing sweep synth — proven to work, reads as a power-off whoosh
-    try { if (window.twUI) window.twUI.sndSweep(); } catch(e) {}
+    try { if (window.twUI) window.twUI.sndShutdown(); } catch(e) {}
     if (modal) modal.classList.add('is-shutting-down');
     try {
       sessionStorage.removeItem('tw_intro_played');
@@ -438,9 +438,9 @@
       sessionStorage.removeItem('tw_home_complete');
     } catch (_) {}
     window.setTimeout(function(){
+      // Kill audio system so the new boot starts clean
       try { var bg = document.getElementById('bg-audio'); if (bg) bg.pause(); } catch(e){}
-      // Flag tells the PJAX popstate handler to stand down so the real
-      // full-page navigation fires instead of a soft PJAX load.
+      try { if (window.twUI) window.twUI.killAudio(); } catch(e) {}
       window.__twResetting = true;
       window.location.href = 'index.html?' + Date.now();
     }, 760);
@@ -1852,9 +1852,41 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   // power modal) can't reach them directly. window.twUI is the bridge.
   // Tone.Destination.mute (set by the audio button) silences all of these
   // automatically, so mute/unmute works without any extra wiring.
+
+  // Low-pitch scroll swoosh: sawtooth descending 220→48 Hz in 250ms.
+  // Distinct from the boot sweep (which goes 1100→160 Hz at high pitch).
+  function sndScroll() {
+    if (!audioReady) return;
+    safe(() => {
+      const now = Tone.now();
+      SND.sweepTone.frequency.cancelScheduledValues(now);
+      SND.sweepTone.frequency.setValueAtTime(220, now);
+      SND.sweepTone.frequency.exponentialRampToValueAtTime(48, now + 0.24);
+      SND.sweepTone.triggerAttackRelease(220, 0.24, now);
+    });
+  }
+
+  // Shutdown thud: deep sub-bass hit using the ELF impact synth at C1.
+  // Much lower than C2 (used for the ELF click) — reads as a power-off thump.
+  function sndThud() {
+    if (!audioReady) return;
+    safe(() => {
+      const now = Tone.now();
+      SND.elfImpact.triggerAttackRelease('C1', 0.22, now);
+    });
+  }
+
   window.twUI = window.twUI || {};
-  window.twUI.sndSweep = sndSweep;
-  window.twUI.sndClick = sndMouseClick;
+  window.twUI.sndScroll    = sndScroll;
+  window.twUI.sndClick     = sndMouseClick;
+  window.twUI.sndShutdown  = sndThud;
+  // Kill audio cleanly on power-off so the new boot starts fresh.
+  // Does NOT close the AudioContext (page unload handles that); just
+  // stops scheduled transport events and frees the synth queues.
+  window.twUI.killAudio = function() {
+    try { if (typeof Tone !== 'undefined') Tone.Transport.stop(); } catch(e) {}
+    audioReady = false; // force full reinit on next boot
+  };
 
   // kick off welcome typing once DOM is ready
   if (document.readyState === 'loading') {
@@ -3271,7 +3303,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     var next = Math.max(0, Math.min(list.length - 1, current + direction));
     if (next === current) return;
     cooldownUntil = Date.now() + 850;
-    if (window.twUI) window.twUI.sndSweep();
+    if (window.twUI) window.twUI.sndScroll();
     terminalBody.scrollTo({ top: list[next].offsetTop, behavior: 'smooth' });
     var page = (window.location.pathname.split('/').pop() || 'index.html') || 'index.html';
     if (list[next].id && window.history && window.history.replaceState) {
@@ -3405,6 +3437,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
       logo.blur();
+      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
       restartHomeTyping();
       return;
     }
