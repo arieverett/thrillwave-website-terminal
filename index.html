@@ -1537,6 +1537,45 @@ async function runSequence() {
     window.twSystemWakeTimer = window.setTimeout(() => {
       document.body.classList.remove('tw-frame-scan', 'tw-system-wake');
     }, 5200);
+
+    // Wake the logo + wordmark brandmark — inline setProperty('important') beats
+    // any stylesheet !important so this reliably overrides twLogoOrbColorDrift.
+    (function wakeBrandmark() {
+      const bm = document.querySelector('.tw-logo-orb.tw-brandmark');
+      if (!bm) return;
+      const logoGlyph     = bm.querySelector('.tw-logo-glyph--orb');
+      const wordmarkGlyph = bm.querySelector('.tw-wordmark-glyph--orb');
+
+      // Button border + box-shadow glow
+      bm.style.setProperty('animation', 'none', 'important');
+      void bm.offsetWidth;
+      bm.style.setProperty('animation', 'tw-neon-brandmark-wake 5.0s ease both', 'important');
+
+      // Logo glyph — preserve its slow rotation alongside the wake flare
+      if (logoGlyph) {
+        logoGlyph.style.setProperty('animation', 'none', 'important');
+        void logoGlyph.offsetWidth;
+        logoGlyph.style.setProperty('animation',
+          'twGlyphHoloRotateSlow 24s linear infinite, tw-neon-brandmark-glyph-wake 4.8s ease 0.06s both',
+          'important');
+      }
+      // Wordmark glyph — filter flare only
+      if (wordmarkGlyph) {
+        wordmarkGlyph.style.setProperty('animation', 'none', 'important');
+        void wordmarkGlyph.offsetWidth;
+        wordmarkGlyph.style.setProperty('animation',
+          'tw-neon-brandmark-glyph-wake 4.8s ease 0.12s both',
+          'important');
+      }
+
+      // Restore stylesheet animations after wake is done
+      window.clearTimeout(window.twBrandmarkWakeTimer);
+      window.twBrandmarkWakeTimer = window.setTimeout(() => {
+        bm.style.removeProperty('animation');
+        if (logoGlyph)     logoGlyph.style.removeProperty('animation');
+        if (wordmarkGlyph) wordmarkGlyph.style.removeProperty('animation');
+      }, 5200);
+    })();
     if (greenFlash) {
       greenFlash.classList.remove('fire', 'frame-scan');
       void greenFlash.offsetWidth;
