@@ -3103,6 +3103,16 @@ body.home-intro-complete #hero > .section-jump:focus-visible {
   opacity: 1 !important;
 }
 
+/* The intro-cascade ("show intro_video") sits right under the
+   "welcome to thrill wave." line. The default .cascade margin (8px top
+   and bottom) made the gap between those two lines bigger than the
+   line-height gap between "hi." and "welcome to thrill wave.". Zero
+   out the top margin so the cascade toggle reads as just another
+   prose line in the prompt sequence. */
+.intro-cascade {
+  margin-top: 0 !important;
+}
+
 /* Mobile intro cascade spacing: keep terminal wording readable on small screens. */
 @media (max-width: 720px) {
   .intro-cascade .cascade-toggle {
@@ -4050,8 +4060,6 @@ body.booting.handoff-show-live > main.content {
   pointer-events: none !important;
 }
 
-/* Clipped frame-wide top-to-bottom green scan. It uses the real outer frame
-   dimensions instead of viewport dimensions. */
 /* The duplicate green-flash.frame-scan reveal has been retired. The
    handoff scan is now provided by body.tw-frame-scan::after (see below)
    which is the cool gritty version. Keep .green-flash itself for the
@@ -4064,10 +4072,31 @@ body.booting.handoff-show-live > main.content {
   display: none !important;
 }
 
-body.booting.handoff-show-live .terminal.main,
+/* ---- KINETIC TERMINAL REVEAL (handoff) ----
+   Same grammar as the menu and power-modal openings: clip-path inset
+   top-to-bottom. Title bar appears first as the clip recedes from the
+   top, body unfolds downward beneath it. Combined with the brightness
+   sheen for a "powering up" feel. */
+body.booting.handoff-show-live .terminal.main {
+  clip-path: inset(0 0 100% 0);
+  animation:
+    tw-terminal-clip-reveal 0.52s cubic-bezier(0.16, 0.86, 0.24, 1) 0.04s both,
+    tw-interface-scan-sheen 1.12s cubic-bezier(0.16, 0.78, 0.2, 1) both;
+  transform-origin: top center;
+}
+
 body.booting.handoff-show-live .topbar,
 body.booting.handoff-show-live .below-bar {
-  animation: tw-interface-scan-sheen 1.12s cubic-bezier(0.16,0.78,0.2,1) both;
+  clip-path: inset(0 0 100% 0);
+  animation:
+    tw-terminal-clip-reveal 0.34s cubic-bezier(0.16, 0.86, 0.24, 1) 0.18s both,
+    tw-interface-scan-sheen 1.12s cubic-bezier(0.16, 0.78, 0.2, 1) both;
+  transform-origin: top center;
+}
+
+@keyframes tw-terminal-clip-reveal {
+  0%   { clip-path: inset(0 0 100% 0); }
+  100% { clip-path: inset(0 0 0 0); }
 }
 
 @keyframes tw-interface-scan-sheen {
@@ -4226,22 +4255,20 @@ body.tw-frame-scan::after {
     0 0 80px rgba(93, 208, 104, 0.55),
     0 0 160px rgba(93, 208, 104, 0.22);
   mix-blend-mode: screen;
-  animation: tw-reliable-frame-scan 1.34s cubic-bezier(0.12,0.82,0.18,1) both;
+  animation: tw-reliable-frame-scan 0.52s cubic-bezier(0.32, 0.0, 0.4, 1) both;
 }
 
 @keyframes tw-reliable-frame-scan {
-  /* Sweep with brightness flickers (CRT stutter) along the travel.
-     Range: -42px → (100vh - 48px) so the bar starts just above the
-     top frame edge and exits just past the bottom frame edge. */
+  /* Single smooth sweep from above the top frame edge to past the bottom.
+     The position interpolation runs from 0% → 100% with NO intermediate
+     transform stops — the cubic-bezier handles the easing so the bar
+     glides instead of jerking through flicker stops. Opacity has just
+     two soft stops (fade in at the start, fade out at the end) to read
+     as a clean flash rather than a stuttering CRT signal. Half-second
+     duration matches the snappy feel of the white/green blink flashes. */
   0%   { opacity: 0;    transform: translateY(-42px) scaleY(0.75); }
-  6%   { opacity: 1;    transform: translateY(0) scaleY(1); }
-  18%  { opacity: 0.42; transform: translateY(calc((100vh - 48px) * 0.15)) scaleY(1); }
-  26%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.24)) scaleY(1); }
-  42%  { opacity: 0.5;  transform: translateY(calc((100vh - 48px) * 0.42)) scaleY(1); }
-  54%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.56)) scaleY(1); }
-  68%  { opacity: 0.35; transform: translateY(calc((100vh - 48px) * 0.72)) scaleY(1); }
-  82%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.88)) scaleY(1); }
-  92%  { opacity: 0.7;  transform: translateY(calc((100vh - 48px) * 0.97)) scaleY(0.95); }
+  10%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.06)) scaleY(1); }
+  88%  { opacity: 1;    transform: translateY(calc((100vh - 48px) * 0.94)) scaleY(1); }
   100% { opacity: 0;    transform: translateY(calc(100vh - 48px)) scaleY(0.9); }
 }
 
