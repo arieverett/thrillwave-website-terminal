@@ -1758,12 +1758,17 @@ function skipSequence() {
   sndPadOff();
   sndHumOff();
   bootEnded = true;
-  // hand straight off to the live site — no partial boot state
   sessionStorage.setItem('tw_intro_played', '1');
+  sessionStorage.setItem('tw_typing_done',  '1'); // go straight to static content
   document.body.classList.remove('booting');
   const root = document.getElementById('boot-root');
   if (root) root.remove();
-  if (typeof window.runHomeIntro === 'function') window.runHomeIntro();
+  // initAudio() was never called (welcome click skipped).
+  // Call it now — synths created synchronously, audioReady = true set before
+  // any sound plays, safe() handles AudioContext resumption on first gesture.
+  initAudio();
+  // Show full static home content immediately — no typing animation.
+  preFillHome();
 }
 
 // ----------------------------------------------------------
@@ -3461,34 +3466,36 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   function restartHomeTyping(){
     try {
       sessionStorage.setItem('tw_intro_played', '1');
-      sessionStorage.removeItem('tw_typing_done');
+      sessionStorage.setItem('tw_typing_done',  '1'); // skip animation on next load too
       sessionStorage.removeItem('tw_home_complete');
     } catch (e) {}
 
     closeMenu();
     document.body.classList.remove('tw-terminal-minimized');
 
-    // PJAX keeps the <audio> element alive — no music skip.
-    // Full-page reload (location.assign) is only used as a last-resort fallback.
-    var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
-                : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
-                : null;
+    // Kill any running typing animation immediately
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
+    window.twIntroRunning = false;
 
-    if (!loader) {
-      window.location.assign('index.html?homeIntro=' + Date.now());
+    // If already on home: prefill static content directly — no PJAX, no flash
+    var onHome = !!document.querySelector('#terminal-body #hero');
+    if (onHome && typeof window.twPrefillHome === 'function') {
+      window.twPrefillHome();
       return;
     }
 
-    // skipPrefill: don't flash static text before animation clears + replays.
-    loader('index.html', { skipPrefill: true })
-      .then(function(){
-        if (typeof window.twResetAndReplayHome === 'function') {
-          window.twResetAndReplayHome();
-        }
-      })
-      .catch(function(){
-        window.location.assign('index.html?homeIntro=' + Date.now());
+    // On another page: PJAX to home. loadPage() calls twPrefillHome()
+    // automatically, showing static content immediately.
+    var loader = typeof window.twLoadPage === 'function' ? window.twLoadPage
+                : typeof window.twSoftLoadPage === 'function' ? window.twSoftLoadPage
+                : null;
+    if (loader) {
+      loader('index.html').catch(function() {
+        window.location.assign('index.html');
       });
+    } else {
+      window.location.assign('index.html');
+    }
   }
 
   function toggleTerminalMinimize(){
