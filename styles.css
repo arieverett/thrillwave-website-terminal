@@ -7387,7 +7387,7 @@ body.tw-system-wake .tw-logo-orb.tw-brandmark {
 .terminal.main::before {
   content: '';
   position: absolute;
-  inset: -1px;
+  inset: 0;
   padding: 1px;
   border-radius: inherit;
   pointer-events: none;
@@ -7416,12 +7416,12 @@ body.tw-system-wake .tw-logo-orb.tw-brandmark {
 
 .frame::before {
   z-index: 0;
-  animation: twBorderBeamFrame 22s linear infinite;
+  animation: twBorderBeamFrame 28s linear infinite;
 }
 
 .terminal.main::before {
   z-index: 7;
-  animation: twBorderBeamTerminal 22s linear infinite;
+  animation: twBorderBeamTerminal 28s linear infinite;
 }
 
 @keyframes twBorderBeamFrame {
@@ -7456,8 +7456,7 @@ body.tw-frame-scan .terminal.main::before,
 body.tw-frame-scan .frame::before,
 body.menu-open .terminal.main::before,
 body.tw-powering-down .terminal.main::before,
-body.tw-powering-down .frame::before,
-body.tw-terminal-minimized .terminal.main::before {
+body.tw-powering-down .frame::before {
   animation: none !important;
   opacity: 0 !important;
   filter: none !important;
