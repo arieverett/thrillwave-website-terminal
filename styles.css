@@ -7334,21 +7334,21 @@ body .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
     filter: drop-shadow(0 0 6px rgba(215,215,215,0.55)) drop-shadow(0 0 14px rgba(215,215,215,0.22)); }
 }
 
-/* ── Neon glow pulse — off-center, feathered, varying flare points ── */
-@keyframes twNeonBehindLg {
-  0%   { box-shadow:  3px  5px 48px 0 rgba(93,208,104,0.04), -2px -3px 40px 0 rgba(93,208,104,0.03); }
-  28%  { box-shadow:  5px  8px 68px 0 rgba(93,208,104,0.11), -1px -5px 54px 0 rgba(93,208,104,0.07), 4px -1px 44px 0 rgba(93,208,104,0.05); }
-  62%  { box-shadow:  1px  3px 55px 0 rgba(93,208,104,0.06), -4px -2px 70px 0 rgba(93,208,104,0.09), 0px  3px 40px 0 rgba(93,208,104,0.04); }
-  100% { box-shadow:  3px  5px 48px 0 rgba(93,208,104,0.04), -2px -3px 40px 0 rgba(93,208,104,0.03); }
-}
+/* ── Ambient controls glow — keep the small HUD controls alive, but remove
+   the old whole-frame / whole-terminal halo. The new border life below is a
+   border-native neon beam, not a shadow floating outside the UI. ─────────── */
 @keyframes twNeonBehindSm {
   0%   { box-shadow:  2px  3px 28px 0 rgba(93,208,104,0.04), -1px -2px 24px 0 rgba(93,208,104,0.03); }
   32%  { box-shadow:  3px  5px 40px 0 rgba(93,208,104,0.10), -1px -3px 32px 0 rgba(93,208,104,0.06), 2px -1px 26px 0 rgba(93,208,104,0.04); }
   68%  { box-shadow:  1px  2px 32px 0 rgba(93,208,104,0.05), -3px -1px 42px 0 rgba(93,208,104,0.08); }
   100% { box-shadow:  2px  3px 28px 0 rgba(93,208,104,0.04), -1px -2px 24px 0 rgba(93,208,104,0.03); }
 }
-.frame            { animation: twNeonBehindLg 8.0s ease-in-out 0.0s infinite; }
-.terminal.main    { animation: twNeonBehindLg 8.0s ease-in-out 3.2s infinite; }
+
+.frame,
+.terminal.main {
+  animation: none !important;
+  box-shadow: none;
+}
 .audio-btn        { animation: twNeonBehindSm 6.0s ease-in-out 1.4s infinite; }
 #menu-btn         { animation: twNeonBehindSm 6.0s ease-in-out 3.8s infinite; }
 .tw-logo-orb.tw-brandmark {
@@ -7369,64 +7369,106 @@ body.tw-system-wake .tw-logo-orb.tw-brandmark {
   animation: tw-neon-brandmark-wake 5.0s ease 0.18s both !important;
 }
 
+/* ── Border-native traveling neon beam ─────────────────────────────────────
+   Replaces the old rotating outside/inside glow. A short green beam lives on
+   the actual 1px border using a masked conic gradient. It runs clockwise on
+   the background frame first, then the terminal window, then repeats.         */
+@property --tw-border-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
 
-/* ── Clockwise traveling neon glow on terminal + frame borders ──
-   terminal.main::before does a full CW loop in the first 8s of a 16s cycle,
-   then rests for 8s. frame::before starts 8s later (animation-delay: 8s)
-   so it runs exactly when the terminal rests — seamless alternation.
-   Each loop: top → right → bottom → left → top.                        */
+.terminal.main {
+  position: relative;
+}
 
-.terminal.main { position: relative; }
-
+.frame::before,
 .terminal.main::before {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -1px;
+  padding: 1px;
   border-radius: inherit;
   pointer-events: none;
-  z-index: -1;
-  animation: twTerminalBorderTravel 16s linear 0s infinite;
+  background:
+    conic-gradient(from var(--tw-border-angle),
+      rgba(93,208,104,0.00) 0deg,
+      rgba(93,208,104,0.00) 306deg,
+      rgba(93,208,104,0.10) 318deg,
+      rgba(93,208,104,0.42) 331deg,
+      rgba(202,255,206,0.94) 345deg,
+      rgba(93,208,104,0.58) 356deg,
+      rgba(93,208,104,0.00) 360deg);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  filter:
+    drop-shadow(0 0 2px rgba(93,208,104,0.62))
+    drop-shadow(0 0 5px rgba(93,208,104,0.22));
+  opacity: 0;
 }
 
 .frame::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 4px;
-  pointer-events: none;
-  z-index: -1;
-  animation: twFrameBorderTravel 16s linear 8s infinite;
+  z-index: 0;
+  animation: twBorderBeamFrame 22s linear infinite;
 }
 
-@keyframes twTerminalBorderTravel {
-  0%    { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.00); }
-  3%    { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.50); }
-  12.5% { box-shadow: 14px  0  30px 0 rgba(93,208,104,0.50); }
-  25%   { box-shadow: 0  14px 30px 0 rgba(93,208,104,0.50); }
-  37.5% { box-shadow: -14px 0  30px 0 rgba(93,208,104,0.50); }
-  47%   { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.50); }
-  50%   { box-shadow: 0 -14px 30px 0 rgba(93,208,104,0.00); }
-  50.1%, 100% { box-shadow: none; }
+.terminal.main::before {
+  z-index: 7;
+  animation: twBorderBeamTerminal 22s linear infinite;
 }
 
-@keyframes twFrameBorderTravel {
-  0%    { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.00); }
-  3%    { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.38); }
-  12.5% { box-shadow: 16px  0  34px 0 rgba(93,208,104,0.38); }
-  25%   { box-shadow: 0  16px 34px 0 rgba(93,208,104,0.38); }
-  37.5% { box-shadow: -16px 0  34px 0 rgba(93,208,104,0.38); }
-  47%   { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.38); }
-  50%   { box-shadow: 0 -16px 34px 0 rgba(93,208,104,0.00); }
-  50.1%, 100% { box-shadow: none; }
+@keyframes twBorderBeamFrame {
+  0%      { --tw-border-angle: 0deg;   opacity: 0; }
+  3%      { --tw-border-angle: 22deg;  opacity: 0.28; filter: drop-shadow(0 0 2px rgba(93,208,104,0.48)) drop-shadow(0 0 4px rgba(93,208,104,0.16)); }
+  12%     { opacity: 0.46; filter: drop-shadow(0 0 3px rgba(93,208,104,0.72)) drop-shadow(0 0 7px rgba(93,208,104,0.26)); }
+  24%     { opacity: 0.34; filter: drop-shadow(0 0 2px rgba(93,208,104,0.54)) drop-shadow(0 0 5px rgba(93,208,104,0.18)); }
+  36%     { opacity: 0.50; filter: drop-shadow(0 0 3px rgba(93,208,104,0.76)) drop-shadow(0 0 8px rgba(93,208,104,0.28)); }
+  47%     { --tw-border-angle: 360deg; opacity: 0.30; }
+  50%     { --tw-border-angle: 382deg; opacity: 0; }
+  50.001%,
+  100%    { --tw-border-angle: 382deg; opacity: 0; }
 }
 
-/* Hide during boot and power-down */
+@keyframes twBorderBeamTerminal {
+  0%,
+  49.999%  { --tw-border-angle: 0deg;   opacity: 0; }
+  50%      { --tw-border-angle: 0deg;   opacity: 0; }
+  53%      { --tw-border-angle: 22deg;  opacity: 0.34; filter: drop-shadow(0 0 2px rgba(93,208,104,0.52)) drop-shadow(0 0 4px rgba(93,208,104,0.16)); }
+  62%      { opacity: 0.56; filter: drop-shadow(0 0 3px rgba(93,208,104,0.80)) drop-shadow(0 0 7px rgba(93,208,104,0.28)); }
+  74%      { opacity: 0.40; filter: drop-shadow(0 0 2px rgba(93,208,104,0.58)) drop-shadow(0 0 5px rgba(93,208,104,0.18)); }
+  86%      { opacity: 0.58; filter: drop-shadow(0 0 3px rgba(93,208,104,0.84)) drop-shadow(0 0 8px rgba(93,208,104,0.30)); }
+  97%      { --tw-border-angle: 360deg; opacity: 0.32; }
+  100%     { --tw-border-angle: 382deg; opacity: 0; }
+}
+
+/* Hide the ambient border beam during boot, scan handoff, menu, and power-down
+   so it never fights the intro reveal or reset animation. */
 body.booting .terminal.main::before,
 body.booting .frame::before,
+body.tw-frame-scan .terminal.main::before,
+body.tw-frame-scan .frame::before,
+body.menu-open .terminal.main::before,
 body.tw-powering-down .terminal.main::before,
-body.tw-powering-down .frame::before {
+body.tw-powering-down .frame::before,
+body.tw-terminal-minimized .terminal.main::before {
   animation: none !important;
-  box-shadow: none !important;
+  opacity: 0 !important;
+  filter: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .frame::before,
+  .terminal.main::before {
+    animation: none !important;
+    opacity: 0 !important;
+  }
 }
 
 /* ── Audio button focus reset ── */
