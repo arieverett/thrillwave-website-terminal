@@ -77,6 +77,154 @@
 ]
   </script>
 <script>
+// THRILL_WAVE HOME BUTTON HARD ROUTE
+// One authoritative path for the Thrill Wave logo/wordmark: always go home,
+// show the #index/home content immediately, and land at the top.
+(function twHomeButtonHardRoute(){
+  if (window.__twHomeButtonHardRoute) return;
+  window.__twHomeButtonHardRoute = true;
+
+  var routingHome = false;
+
+  function homeTrigger(target){
+    return !!(target && target.closest && target.closest('.tw-home-restart, #title-brand, .frame-label--tl'));
+  }
+
+  function closeMenu(){
+    if (!document.body) return;
+    document.body.classList.remove('menu-open');
+    var menuBtn = document.getElementById('menu-btn');
+    var sideMenu = document.getElementById('side-menu');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.textContent = 'menu';
+      menuBtn.classList.remove('active');
+    }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+  }
+
+  function cancelMovingParts(){
+    try {
+      sessionStorage.setItem('tw_intro_played', '1');
+      sessionStorage.setItem('tw_typing_done', '1');
+      sessionStorage.removeItem('tw_home_complete');
+    } catch (e) {}
+
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
+    window.twIntroRunning = false;
+
+    if (document.body) {
+      document.body.classList.remove('booting', 'menu-open', 'tw-terminal-minimized', 'home-intro-running');
+      document.body.classList.add('home-intro-complete');
+    }
+
+    var bootRoot = document.getElementById('boot-root');
+    if (bootRoot) bootRoot.remove();
+    closeMenu();
+  }
+
+  function hasHomeShell(){
+    return !!document.querySelector('#terminal-body #intro-pre, #terminal-body #intro-post, #terminal-body #intro-cascade');
+  }
+
+  function fallbackPrefillHome(){
+    var terminalBody = document.getElementById('terminal-body');
+    if (!terminalBody) return;
+
+    var pre = terminalBody.querySelector('#intro-pre');
+    var post = terminalBody.querySelector('#intro-post');
+    var toggle = terminalBody.querySelector('#intro-cascade-toggle');
+    var cascade = terminalBody.querySelector('#intro-cascade');
+    var iframe = terminalBody.querySelector('#intro-video-iframe');
+
+    if (pre && !pre.innerHTML.trim()) {
+      pre.innerHTML = '&gt; hi.<br>&gt; welcome to thrill wave.<br>';
+    }
+    if (toggle && !toggle.innerHTML.trim()) {
+      toggle.innerHTML = '<span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">intro_video</span><span class="toggle-mark"></span>';
+    }
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+    if (cascade) {
+      cascade.dataset.expanded = 'true';
+      cascade.style.opacity = '1';
+    }
+    if (iframe && iframe.dataset && iframe.dataset.src) iframe.setAttribute('src', iframe.dataset.src);
+    if (post && !post.innerHTML.trim()) {
+      post.innerHTML = '&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.<br>&gt;<br>&gt; press enter or scroll down to go to the next section, or click menu to jump to a page.<br>';
+    }
+  }
+
+  function finishAtHomeTop(){
+    cancelMovingParts();
+
+    try {
+      if (typeof window.twPrefillHome === 'function') window.twPrefillHome();
+      else fallbackPrefillHome();
+    } catch (e) {
+      fallbackPrefillHome();
+    }
+
+    var terminalBody = document.getElementById('terminal-body');
+    if (terminalBody) {
+      terminalBody.scrollTo({ top: 0, behavior: 'auto' });
+      requestAnimationFrame(function(){ terminalBody.scrollTo({ top: 0, behavior: 'auto' }); });
+    }
+
+    try { history.replaceState({ page: 'index.html' }, '', 'index.html'); } catch (e) {}
+  }
+
+  function goHome(){
+    if (routingHome) return;
+    routingHome = true;
+    cancelMovingParts();
+
+    var loader = null;
+    if (typeof window.twLoadPage === 'function') loader = window.twLoadPage;
+    else if (typeof window.twSoftLoadPage === 'function') loader = window.twSoftLoadPage;
+
+    function done(){
+      finishAtHomeTop();
+      routingHome = false;
+    }
+
+    if (hasHomeShell()) {
+      done();
+      return;
+    }
+
+    if (loader) {
+      Promise.resolve(loader('index.html')).then(done).catch(function(){
+        routingHome = false;
+        window.location.assign('index.html');
+      });
+    } else {
+      window.location.assign('index.html');
+    }
+  }
+
+  function absorb(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
+  window.addEventListener('click', function(e){
+    if (!homeTrigger(e.target)) return;
+    absorb(e);
+    try { if (window.twUI) window.twUI.sndClick(); } catch (_) {}
+    goHome();
+  }, true);
+
+  window.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    if (!homeTrigger(e.target)) return;
+    absorb(e);
+    try { if (window.twUI) window.twUI.sndClick(); } catch (_) {}
+    goHome();
+  }, true);
+})();
+</script>
+<script>
   // THRILL_WAVE NAV LOCK
   // First capture listener on the page. It owns internal page links before
   // any older terminal/menu handlers can redirect them back to home.
@@ -296,7 +444,7 @@
 <div class="stage-wrap">
 <div class="topbar">
 <div class="topbar-left">
-<button aria-label="restart home animation" class="tw-logo-orb tw-home-restart tw-brandmark" type="button"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--orb"></span><span aria-hidden="true" class="tw-wordmark-glyph tw-wordmark-glyph--orb"></span></button>
+<button aria-label="go to homepage" class="tw-logo-orb tw-home-restart tw-brandmark" type="button"><span aria-hidden="true" class="tw-logo-glyph tw-logo-glyph--orb"></span><span aria-hidden="true" class="tw-wordmark-glyph tw-wordmark-glyph--orb"></span></button>
 </div>
 <div class="topbar-right">
 <div class="audio-viz" id="audio-viz">
