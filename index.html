@@ -1074,6 +1074,12 @@ async function initAudio() {
 
     audioReady = true;
 
+    // Re-apply mute state from sessionStorage after synths exist.
+    // The audio IIFE may have set applyToneMute before synths were created.
+    if (typeof window.twApplyMute === 'function') {
+      window.twApplyMute(sessionStorage.getItem('tw_audio_muted') === '1');
+    }
+
     // Best-effort context start — succeeds from a user gesture, no-ops
     // otherwise. safe() handles resumption on first sound play.
     Tone.start().catch(function() {});
@@ -1767,6 +1773,10 @@ function skipSequence() {
   // Call it now — synths created synchronously, audioReady = true set before
   // any sound plays, safe() handles AudioContext resumption on first gesture.
   initAudio();
+  // Mute SFX immediately — stays off until user explicitly clicks audio button.
+  // applyToneMute is in a different IIFE so write directly via window.twApplyMute.
+  if (typeof window.twApplyMute === 'function') window.twApplyMute(true);
+  else try { if (typeof Tone !== 'undefined' && Tone.Destination) Tone.Destination.volume.value = -Infinity; } catch(e) {}
   // Show full static home content immediately — no typing animation.
   preFillHome();
 }
@@ -1994,11 +2004,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   // have initialised yet on the very first call.
   function applyToneMute(muted) {
     try {
-      if (typeof Tone !== 'undefined' && Tone.Destination) {
-        Tone.Destination.mute = muted;
+      if (typeof Tone !== 'undefined') {
+        // Use volume.value (-Infinity / 0) — more reliable than .mute property
+        // across Tone.js versions; works regardless of AudioContext state.
+        const dest = typeof Tone.getDestination === 'function'
+                   ? Tone.getDestination()
+                   : Tone.Destination;
+        if (dest && dest.volume) dest.volume.value = muted ? -Infinity : 0;
+        else if (dest) dest.mute = muted; // fallback
       }
     } catch (e) { /* tone not ready yet */ }
   }
+  // Expose so bootIntro IIFE (skipSequence, initAudio) can call it
+  window.twApplyMute = applyToneMute;
   // Initial sync from sessionStorage. The Tone.Destination may not exist
   // yet, so call applyToneMute again from initAudio() once tone synths
   // are created. (Search for "applyToneMute" in initAudio.)
@@ -2882,9 +2900,9 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     updateMusicButton();
 
     if (page === 'index.html' && typeof window.twPrefillHome === 'function' && !opts.skipPrefill) {
-      requestAnimationFrame(() => {
-        try { window.twPrefillHome(); } catch (e) { console.warn('home prefill failed:', e); }
-      });
+      // Synchronous call: content fills before the browser paints, so user
+      // never sees the blank skeleton that homeHTML starts with.
+      try { window.twPrefillHome(); } catch (e) { console.warn('home prefill failed:', e); }
     }
 
     requestAnimationFrame(() => scrollToHash(hash, false));
