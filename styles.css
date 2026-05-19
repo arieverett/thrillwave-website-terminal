@@ -7416,12 +7416,12 @@ body.tw-system-wake .tw-logo-orb.tw-brandmark {
 
 .frame::before {
   z-index: 0;
-  animation: twBorderBeamFrame 24s linear infinite;
+  animation: twBorderBeamFrame 18s linear infinite;
 }
 
 .terminal.main::before {
   z-index: 7;
-  animation: twBorderBeamTerminal 24s linear infinite;
+  animation: twBorderBeamTerminal 18s linear infinite;
 }
 
 @keyframes twBorderBeamFrame {
@@ -7594,4 +7594,1529 @@ button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
   background: #ff5f56 !important;
   box-shadow: 0 0 3px rgba(255,95,86,0.6) !important;
   transform: scale(0.94);
+}
+
+/* ============================================================
+   TW brandmark design update — true-white <-> neon-green drift
+   Keeps hover/click behavior authoritative after the home click.
+   ============================================================ */
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark {
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.92) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  animation: twBrandmarkWhiteGreenDrift 9.6s ease-in-out infinite !important;
+  transition:
+    color 140ms ease,
+    border-color 140ms ease,
+    transform 140ms ease,
+    box-shadow 140ms ease !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  color: currentColor !important;
+  background: currentColor !important;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+  mix-blend-mode: normal !important;
+}
+
+.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible),
+button.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible) {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: transparent !important;
+  box-shadow:
+    0 0 7px rgba(93,208,104,0.20),
+    0 0 16px rgba(93,208,104,0.10) !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible) .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:is(:hover, :focus, :focus-visible) .tw-wordmark-glyph--orb {
+  color: var(--accent) !important;
+  background: var(--accent) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-brandmark:active {
+  color: #ffffff !important;
+  border-color: var(--accent) !important;
+  transform: scale(0.985) !important;
+  box-shadow:
+    0 0 8px rgba(93,208,104,0.26),
+    inset 0 0 8px rgba(93,208,104,0.10) !important;
+  animation: none !important;
+}
+
+@keyframes twBrandmarkWhiteGreenDrift {
+  0%, 100% {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.94);
+    box-shadow: none;
+  }
+  48%, 58% {
+    color: var(--accent);
+    border-color: rgba(93, 208, 104, 0.96);
+    box-shadow:
+      0 0 6px rgba(93,208,104,0.16),
+      0 0 14px rgba(93,208,104,0.08);
+  }
+}
+
+/* ============================================================
+   TW design fix — brand button gray reset, fixed control widths,
+   and longer/brighter border beam
+   ============================================================ */
+
+/* Brandmark returns to the same gray HUD language as audio/menu. */
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+  transition:
+    color 120ms ease,
+    border-color 120ms ease,
+    box-shadow 120ms ease,
+    transform 120ms ease !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+  mix-blend-mode: normal !important;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    filter 120ms ease !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover,
+button.tw-logo-orb.tw-brandmark:hover,
+.tw-logo-orb.tw-brandmark:focus-visible,
+button.tw-logo-orb.tw-brandmark:focus-visible {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: transparent !important;
+  box-shadow:
+    0 0 7px rgba(93,208,104,0.20),
+    0 0 16px rgba(93,208,104,0.10) !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb {
+  color: var(--accent) !important;
+  background: var(--accent) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* After a mouse click, keep the button reset to gray so the next hover lights green again. */
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible),
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible) .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-brandmark:active {
+  color: var(--muted) !important;
+  border-color: var(--accent) !important;
+  transform: scale(0.985) !important;
+  box-shadow:
+    0 0 7px rgba(93,208,104,0.22),
+    inset 0 0 7px rgba(93,208,104,0.08) !important;
+  animation: none !important;
+}
+
+/* Fixed-width top controls so audio/mute and menu/close never resize the topbar. */
+.topbar-right .audio-btn,
+.topbar-right #menu-btn {
+  width: 72px !important;
+  min-width: 72px !important;
+  max-width: 72px !important;
+  justify-content: center !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  text-align: center !important;
+}
+
+@media (max-width: 720px) {
+  .topbar-right .audio-btn,
+  .topbar-right #menu-btn {
+    width: 62px !important;
+    min-width: 62px !important;
+    max-width: 62px !important;
+  }
+}
+
+/* Longer, brighter border-native beam on both the outer frame and terminal border. */
+.frame::before,
+.terminal.main::before {
+  background:
+    conic-gradient(from var(--tw-border-angle),
+      rgba(93,208,104,0.00) 0deg,
+      rgba(93,208,104,0.00) 246deg,
+      rgba(93,208,104,0.10) 262deg,
+      rgba(93,208,104,0.36) 282deg,
+      rgba(93,208,104,0.76) 306deg,
+      rgba(204,255,208,1.00) 330deg,
+      rgba(93,208,104,0.88) 348deg,
+      rgba(93,208,104,0.18) 358deg,
+      rgba(93,208,104,0.00) 360deg) !important;
+  filter:
+    drop-shadow(0 0 3px rgba(93,208,104,0.90))
+    drop-shadow(0 0 8px rgba(93,208,104,0.46))
+    drop-shadow(0 0 14px rgba(93,208,104,0.18)) !important;
+}
+
+@keyframes twBorderBeamFrame {
+  0%      { --tw-border-angle: 0deg;   opacity: 0; }
+  3%      { --tw-border-angle: 22deg;  opacity: 0.48; filter: drop-shadow(0 0 3px rgba(93,208,104,0.72)) drop-shadow(0 0 8px rgba(93,208,104,0.32)) drop-shadow(0 0 14px rgba(93,208,104,0.12)); }
+  12%     { opacity: 0.78; filter: drop-shadow(0 0 4px rgba(93,208,104,0.98)) drop-shadow(0 0 10px rgba(93,208,104,0.48)) drop-shadow(0 0 18px rgba(93,208,104,0.18)); }
+  24%     { opacity: 0.58; filter: drop-shadow(0 0 3px rgba(93,208,104,0.78)) drop-shadow(0 0 8px rgba(93,208,104,0.34)) drop-shadow(0 0 14px rgba(93,208,104,0.12)); }
+  36%     { opacity: 0.82; filter: drop-shadow(0 0 4px rgba(93,208,104,1.00)) drop-shadow(0 0 11px rgba(93,208,104,0.52)) drop-shadow(0 0 20px rgba(93,208,104,0.20)); }
+  47%     { --tw-border-angle: 360deg; opacity: 0.48; }
+  50%     { --tw-border-angle: 382deg; opacity: 0; }
+  50.001%,
+  100%    { --tw-border-angle: 382deg; opacity: 0; }
+}
+
+@keyframes twBorderBeamTerminal {
+  0%,
+  49.999%  { --tw-border-angle: 0deg;   opacity: 0; }
+  50%      { --tw-border-angle: 0deg;   opacity: 0; }
+  53%      { --tw-border-angle: 22deg;  opacity: 0.52; filter: drop-shadow(0 0 3px rgba(93,208,104,0.76)) drop-shadow(0 0 8px rgba(93,208,104,0.34)) drop-shadow(0 0 14px rgba(93,208,104,0.12)); }
+  62%      { opacity: 0.86; filter: drop-shadow(0 0 4px rgba(93,208,104,1.00)) drop-shadow(0 0 10px rgba(93,208,104,0.50)) drop-shadow(0 0 18px rgba(93,208,104,0.18)); }
+  74%      { opacity: 0.64; filter: drop-shadow(0 0 3px rgba(93,208,104,0.82)) drop-shadow(0 0 8px rgba(93,208,104,0.36)) drop-shadow(0 0 14px rgba(93,208,104,0.12)); }
+  86%      { opacity: 0.88; filter: drop-shadow(0 0 4px rgba(93,208,104,1.00)) drop-shadow(0 0 11px rgba(93,208,104,0.54)) drop-shadow(0 0 20px rgba(93,208,104,0.20)); }
+  97%      { --tw-border-angle: 360deg; opacity: 0.52; }
+  100%     { --tw-border-angle: 382deg; opacity: 0; }
+}
+
+/* ============================================================
+   TW patch — brandmark matches audio button interaction exactly
+   ============================================================ */
+.tw-logo-orb.tw-brandmark,
+button.tw-logo-orb.tw-brandmark,
+.tw-logo-orb.tw-home-restart,
+button.tw-logo-orb.tw-home-restart {
+  color: var(--muted) !important;
+  border: 1px solid var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  animation: none !important;
+  transform: none !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  transition: color 120ms ease, border-color 120ms ease !important;
+}
+
+.tw-logo-orb.tw-brandmark::before,
+.tw-logo-orb.tw-brandmark::after,
+button.tw-logo-orb.tw-brandmark::before,
+button.tw-logo-orb.tw-brandmark::after,
+.tw-logo-orb.tw-home-restart::before,
+.tw-logo-orb.tw-home-restart::after,
+button.tw-logo-orb.tw-home-restart::before,
+button.tw-logo-orb.tw-home-restart::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+  box-shadow: none !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+  transform: none !important;
+  mix-blend-mode: normal !important;
+  transition: color 120ms ease, background-color 120ms ease !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover,
+.tw-logo-orb.tw-brandmark:focus-visible,
+.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-brandmark:hover,
+button.tw-logo-orb.tw-brandmark:focus-visible,
+button.tw-logo-orb.tw-brandmark:active,
+.tw-logo-orb.tw-home-restart:hover,
+.tw-logo-orb.tw-home-restart:focus-visible,
+.tw-logo-orb.tw-home-restart:active,
+button.tw-logo-orb.tw-home-restart:hover,
+button.tw-logo-orb.tw-home-restart:focus-visible,
+button.tw-logo-orb.tw-home-restart:active {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus-visible .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart:hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart:hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart:focus-visible .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart:focus-visible .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart:hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart:hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart:focus-visible .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart:focus-visible .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart:active .tw-wordmark-glyph--orb {
+  color: var(--accent) !important;
+  background: var(--accent) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active),
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active),
+.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active),
+button.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* ============================================================
+   TW patch — brand hover-after-click focus fix + beam tuning
+   ============================================================ */
+
+/* The browser keeps the logo button focused after mouse click. These higher-
+   specificity rules make focused+hovered behave exactly like the audio button:
+   green while hovered/pressed, muted gray the moment it is not hovered. */
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):hover .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):active .tw-wordmark-glyph--orb {
+  color: var(--accent) !important;
+  background: var(--accent) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active),
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:focus:not(:focus-visible):not(:hover):not(:active) .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* Beam: slow back down slightly and make the hot core neon green instead of white. */
+.frame::before,
+.terminal.main::before {
+  background:
+    conic-gradient(from var(--tw-border-angle),
+      rgba(93,208,104,0.00) 0deg,
+      rgba(93,208,104,0.00) 246deg,
+      rgba(93,255,112,0.12) 262deg,
+      rgba(93,255,112,0.40) 282deg,
+      rgba(93,255,112,0.82) 306deg,
+      rgba(105,255,126,0.98) 330deg,
+      rgba(93,255,112,0.92) 348deg,
+      rgba(93,255,112,0.20) 358deg,
+      rgba(93,208,104,0.00) 360deg) !important;
+  filter:
+    drop-shadow(0 0 3px rgba(93,255,112,0.92))
+    drop-shadow(0 0 8px rgba(93,255,112,0.50))
+    drop-shadow(0 0 14px rgba(93,255,112,0.20)) !important;
+}
+
+.frame::before {
+  animation: twBorderBeamFrame 20s linear infinite !important;
+}
+
+.terminal.main::before {
+  animation: twBorderBeamTerminal 20s linear infinite !important;
+}
+
+/* ============================================================
+   TW patch — brand click feedback + beam timing v2
+   ============================================================ */
+
+/* Beam: slightly slower, with a longer quiet handoff between the outer
+   desktop frame pass and the terminal-window pass. */
+.frame::before {
+  animation: twBorderBeamFrame 22s linear infinite !important;
+}
+
+.terminal.main::before {
+  animation: twBorderBeamTerminal 22s linear infinite !important;
+}
+
+@keyframes twBorderBeamFrame {
+  0%      { --tw-border-angle: 0deg;   opacity: 0; }
+  4%      { --tw-border-angle: 24deg;  opacity: 0.46; filter: drop-shadow(0 0 3px rgba(93,255,112,0.74)) drop-shadow(0 0 8px rgba(93,255,112,0.34)) drop-shadow(0 0 14px rgba(93,255,112,0.13)); }
+  13%     { opacity: 0.76; filter: drop-shadow(0 0 4px rgba(93,255,112,0.98)) drop-shadow(0 0 10px rgba(93,255,112,0.48)) drop-shadow(0 0 18px rgba(93,255,112,0.18)); }
+  24%     { opacity: 0.56; filter: drop-shadow(0 0 3px rgba(93,255,112,0.78)) drop-shadow(0 0 8px rgba(93,255,112,0.34)) drop-shadow(0 0 14px rgba(93,255,112,0.12)); }
+  36%     { opacity: 0.80; filter: drop-shadow(0 0 4px rgba(93,255,112,1.00)) drop-shadow(0 0 11px rgba(93,255,112,0.52)) drop-shadow(0 0 20px rgba(93,255,112,0.20)); }
+  43%     { --tw-border-angle: 360deg; opacity: 0.44; }
+  47%     { --tw-border-angle: 382deg; opacity: 0; }
+  47.001%,
+  100%    { --tw-border-angle: 382deg; opacity: 0; }
+}
+
+@keyframes twBorderBeamTerminal {
+  0%,
+  57.999%  { --tw-border-angle: 0deg;   opacity: 0; }
+  58%      { --tw-border-angle: 0deg;   opacity: 0; }
+  62%      { --tw-border-angle: 24deg;  opacity: 0.50; filter: drop-shadow(0 0 3px rgba(93,255,112,0.76)) drop-shadow(0 0 8px rgba(93,255,112,0.34)) drop-shadow(0 0 14px rgba(93,255,112,0.12)); }
+  70%      { opacity: 0.84; filter: drop-shadow(0 0 4px rgba(93,255,112,1.00)) drop-shadow(0 0 10px rgba(93,255,112,0.50)) drop-shadow(0 0 18px rgba(93,255,112,0.18)); }
+  80%      { opacity: 0.62; filter: drop-shadow(0 0 3px rgba(93,255,112,0.82)) drop-shadow(0 0 8px rgba(93,255,112,0.36)) drop-shadow(0 0 14px rgba(93,255,112,0.12)); }
+  91%      { opacity: 0.86; filter: drop-shadow(0 0 4px rgba(93,255,112,1.00)) drop-shadow(0 0 11px rgba(93,255,112,0.54)) drop-shadow(0 0 20px rgba(93,255,112,0.20)); }
+  97%      { --tw-border-angle: 360deg; opacity: 0.48; }
+  100%     { --tw-border-angle: 382deg; opacity: 0; }
+}
+
+/* Brand button: after the hover/focus fixes, force the actual mousedown
+   moment to match the audio/menu button behavior: it flashes back to muted
+   gray while pressed, then returns to green if the cursor is still hovering. */
+button.tw-logo-orb.tw-brandmark.tw-home-restart:active,
+.tw-logo-orb.tw-brandmark.tw-home-restart:active,
+button.tw-logo-orb.tw-brandmark:active,
+.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-home-restart:active,
+.tw-logo-orb.tw-home-restart:active {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+}
+
+button.tw-logo-orb.tw-brandmark.tw-home-restart:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-home-restart:active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-home-restart:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-home-restart:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-home-restart:active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-home-restart:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-home-restart:active .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+
+/* ============================================================
+   TW patch — brandmark true pressed state
+   JS adds .tw-brandmark-pressing on pointerdown so the click flash
+   is visible even when the home-route handler blurs/reroutes instantly.
+   ============================================================ */
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing,
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:hover,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:hover,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:hover,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:hover,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:hover,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:hover,
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:focus,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:focus,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:focus,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:focus,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:focus,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:focus,
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:active,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:active,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:active,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:active,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:active,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:active {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+
+/* ============================================================
+   TW patch — brandmark active-click final override
+   The press state is now also painted by JS inline for one brief beat,
+   but these selectors keep the CSS side locked to the audio button feel.
+   ============================================================ */
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing,
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:hover,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:hover,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:hover,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:hover,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:hover,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:hover,
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:focus,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:focus,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:focus,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:focus,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:focus,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:focus,
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:active,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing:active,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing:active,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing:active,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing:active,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing:active {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  text-shadow: none !important;
+  transform: none !important;
+  outline: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body button.tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body .tw-logo-orb.tw-brandmark.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body .tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body button.tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-logo-glyph--orb,
+html body .tw-logo-orb.tw-home-restart.tw-brandmark-pressing .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  opacity: 1 !important;
+  filter: none !important;
+  transform: none !important;
+  animation: none !important;
+  transition: none !important;
+}
+
+
+/* ============================================================
+   TW brandmark instant release / audio-button click match
+   ============================================================ */
+.tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+.tw-logo-orb.tw-brandmark:active,
+.tw-logo-orb.tw-brandmark:hover:active,
+.tw-logo-orb.tw-brandmark:focus-visible:active,
+button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing,
+button.tw-logo-orb.tw-brandmark:active,
+button.tw-logo-orb.tw-brandmark:hover:active,
+button.tw-logo-orb.tw-brandmark:focus-visible:active {
+  color: var(--muted) !important;
+  border-color: var(--rule) !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover:active .tw-logo-glyph--orb,
+.tw-logo-orb.tw-brandmark:hover:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark.tw-brandmark-pressing .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:active .tw-wordmark-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover:active .tw-logo-glyph--orb,
+button.tw-logo-orb.tw-brandmark:hover:active .tw-wordmark-glyph--orb {
+  color: var(--muted) !important;
+  background: var(--muted) !important;
+  filter: none !important;
+  animation: none !important;
+}
+
+/* ============================================================
+   TW patch — restore original ELF handoff glow behavior
+   Reuses the existing wake keyframes already used by the terminal,
+   audio, and menu controls. No new glow-hit effect is introduced here.
+   ============================================================ */
+
+/* The rotating border beam patch set .frame animation to none !important.
+   This restores the original outer/background frame wake hit during the
+   post-.elf handoff using the existing tw-neon-border-wake keyframe. */
+html body.tw-system-wake > .frame {
+  animation: tw-neon-border-wake 5.1s ease both !important;
+}
+
+/* Give the Thrill Wave brandmark button the same border glow hit as the
+   audio/menu controls by reusing their existing tw-neon-control-wake keyframe. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart {
+  animation: tw-neon-control-wake 4.8s ease 0.22s both !important;
+}
+
+/* Keep the ambient rotating beam out of the way while the original glow hit
+   is firing, then let it return normally once tw-system-wake is removed. */
+html body.tw-system-wake > .frame::before,
+html body.tw-system-wake .terminal.main::before {
+  animation: none !important;
+  opacity: 0 !important;
+  filter: none !important;
+}
+
+/* ============================================================
+   TW patch — sync ELF handoff border wake + brandmark terminal glow
+   - Delays the outer frame wake so it lands with the terminal wake hit.
+   - Applies the same terminal-window wake keyframe to the Thrill Wave
+     brandmark border, then mirrors that timing on the logo/wordmark glyphs.
+   ============================================================ */
+
+/* The previous restore brought the outer frame glow back, but it started
+   early. Match the terminal window's wake timing so the background frame
+   hits with the rest of the interface during the post-.elf handoff. */
+html body.tw-system-wake > .frame {
+  animation: tw-neon-border-wake 5.1s ease 0.62s both !important;
+}
+
+/* Brandmark border: reuse the terminal window's original wake animation
+   directly, instead of a custom glow. This gives the Thrill Wave button the
+   same neon hit / slow fade behavior as the terminal frame. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart {
+  animation: tw-neon-terminal-wake 5.15s ease 0.62s both !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  transform: none !important;
+}
+
+/* Logo + wordmark: same timing curve as the terminal wake, translated to
+   glyph color/drop-shadow so the mark catches the same light as the border. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb {
+  animation: tw-brandmark-terminal-glyph-wake 5.15s ease 0.62s both !important;
+  background: currentColor !important;
+  opacity: 1 !important;
+}
+
+@keyframes tw-brandmark-terminal-glyph-wake {
+  0% {
+    color: var(--muted);
+    filter: none;
+  }
+  16% {
+    color: var(--accent);
+    filter:
+      drop-shadow(0 0 5px rgba(93,208,104,0.82))
+      drop-shadow(0 0 14px rgba(93,208,104,0.42))
+      drop-shadow(0 0 24px rgba(93,208,104,0.18));
+  }
+  54% {
+    color: rgba(93,208,104,0.86);
+    filter:
+      drop-shadow(0 0 4px rgba(93,208,104,0.58))
+      drop-shadow(0 0 12px rgba(93,208,104,0.26));
+  }
+  100% {
+    color: var(--muted);
+    filter: none;
+  }
+}
+
+/* ============================================================
+   TW intro wake repair — brandmark glow proxy
+   The brandmark's normal state intentionally locks box-shadow/filter to none
+   with !important so it behaves like the audio/menu buttons after click.
+   CSS keyframes cannot override those important base declarations, so the
+   intro glow is drawn on temporary overlay layers instead. The timing and
+   intensity mirror the terminal window wake hit.
+   ============================================================ */
+body.tw-system-wake .tw-logo-orb.tw-brandmark,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark {
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark::before,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -1px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border: 1px solid transparent !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  box-shadow: none;
+  filter: none;
+  opacity: 0;
+  animation: tw-brandmark-terminal-border-wake 5.15s ease 0.62s both !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark::after,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -7px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  border-radius: 8px !important;
+  background: radial-gradient(ellipse at 50% 50%, rgba(93,208,104,0.24), rgba(93,208,104,0.075) 52%, rgba(0,0,0,0) 76%) !important;
+  box-shadow: none !important;
+  filter: blur(10px) !important;
+  opacity: 0;
+  animation: tw-brandmark-terminal-aura-wake 5.15s ease 0.62s both !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb {
+  position: relative !important;
+  z-index: 2 !important;
+  overflow: visible !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb::after,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  -webkit-mask: var(--tw-glyph-url) center / contain no-repeat !important;
+          mask: var(--tw-glyph-url) center / contain no-repeat !important;
+  opacity: 0;
+  filter: none;
+  animation: tw-brandmark-terminal-glyph-wake 5.15s ease 0.62s both !important;
+}
+
+body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb::after,
+body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  -webkit-mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+          mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+  opacity: 0;
+  filter: none;
+  animation: tw-brandmark-terminal-glyph-wake 5.15s ease 0.62s both !important;
+}
+
+@keyframes tw-brandmark-terminal-border-wake {
+  0% {
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(0.95);
+  }
+  16% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.82);
+    box-shadow:
+      0 0 30px rgba(93,208,104,0.20),
+      inset 0 0 20px rgba(93,208,104,0.055);
+    filter: brightness(1.08);
+  }
+  54% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.40);
+    box-shadow:
+      0 0 24px rgba(93,208,104,0.12),
+      inset 0 0 16px rgba(93,208,104,0.035);
+  }
+  100% {
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(1);
+  }
+}
+
+@keyframes tw-brandmark-terminal-aura-wake {
+  0%   { opacity: 0; }
+  16%  { opacity: 0.54; }
+  54%  { opacity: 0.24; }
+  100% { opacity: 0; }
+}
+
+@keyframes tw-brandmark-terminal-glyph-wake {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+  16% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 5px rgba(93,208,104,0.82))
+      drop-shadow(0 0 14px rgba(93,208,104,0.38));
+  }
+  54% {
+    opacity: 0.58;
+    filter:
+      drop-shadow(0 0 4px rgba(93,208,104,0.46))
+      drop-shadow(0 0 10px rgba(93,208,104,0.20));
+  }
+  100% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+}
+
+/* ============================================================
+   TW intro wake timing refinement — earlier synced glow hit
+   Starts every post-ELF glow hit from the same earlier beat, while keeping
+   the ambient border beam disabled during the wake handoff.
+   ============================================================ */
+:root {
+  --tw-intro-glow-delay: 0.42s;
+}
+
+html body.tw-system-wake > .frame {
+  animation: tw-neon-border-wake 5.1s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .terminal.main {
+  animation: tw-neon-terminal-wake 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .terminal.main .terminal-bar {
+  animation: tw-neon-terminal-bar-wake 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .audio-btn,
+html body.tw-system-wake #menu-btn,
+html body.tw-system-wake .audio-viz {
+  animation: tw-neon-control-wake 4.8s ease var(--tw-intro-glow-delay) both !important;
+}
+
+/* Let the proxy layer do the brandmark glow so the normal hover/click rules
+   stay untouched after the opening sequence. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart {
+  animation: none !important;
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+}
+
+/* Brandmark border glow: same attack/sustain/release/decay contour as
+   tw-neon-terminal-wake, with only opacity added so the proxy disappears
+   cleanly when the wake pass ends. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark::before,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark::before,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart::before,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -1px !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+  border: 1px solid transparent !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  filter: none;
+  box-shadow: none;
+  animation: tw-brandmark-terminal-border-match 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+/* Soft spill around the button, timed to the same border envelope so it does
+   not blink out early compared with the terminal frame. */
+html body.tw-system-wake .tw-logo-orb.tw-brandmark::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark::after,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart::after,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -8px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  border-radius: 9px !important;
+  background: radial-gradient(ellipse at 50% 50%, rgba(93,208,104,0.26), rgba(93,208,104,0.08) 54%, rgba(0,0,0,0) 78%) !important;
+  box-shadow: none !important;
+  filter: blur(10px) !important;
+  opacity: 0 !important;
+  animation: tw-brandmark-terminal-aura-match 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb {
+  position: relative !important;
+  z-index: 2 !important;
+  overflow: visible !important;
+}
+
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb::after,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-logo-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  -webkit-mask: var(--tw-glyph-url) center / contain no-repeat !important;
+          mask: var(--tw-glyph-url) center / contain no-repeat !important;
+  opacity: 0 !important;
+  filter: none;
+  animation: tw-brandmark-terminal-glyph-match 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb::after {
+  content: '' !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  -webkit-mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+          mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+  opacity: 0 !important;
+  filter: none;
+  animation: tw-brandmark-terminal-glyph-match 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+@keyframes tw-brandmark-terminal-border-match {
+  0% {
+    opacity: 1;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(0.95);
+  }
+  16% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.82);
+    box-shadow:
+      0 0 30px rgba(93,208,104,0.20),
+      inset 0 0 20px rgba(93,208,104,0.055);
+    filter: brightness(1.08);
+  }
+  54% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.40);
+    box-shadow:
+      0 0 24px rgba(93,208,104,0.12),
+      inset 0 0 16px rgba(93,208,104,0.035);
+    filter: brightness(1);
+  }
+  99% {
+    opacity: 1;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(1);
+  }
+}
+
+@keyframes tw-brandmark-terminal-aura-match {
+  0%   { opacity: 0; }
+  16%  { opacity: 0.54; }
+  54%  { opacity: 0.24; }
+  99%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes tw-brandmark-terminal-glyph-match {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+  16% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 5px rgba(93,208,104,0.82))
+      drop-shadow(0 0 14px rgba(93,208,104,0.38));
+  }
+  54% {
+    opacity: 0.58;
+    filter:
+      drop-shadow(0 0 4px rgba(93,208,104,0.46))
+      drop-shadow(0 0 10px rgba(93,208,104,0.20));
+  }
+  99% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+  100% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+}
+
+
+/* ============================================================
+   TW intro wake final repair — earlier sync + visible brandmark glow
+   ------------------------------------------------------------
+   The earlier proxy tried to animate child glyph layers, but the brandmark
+   normal-state rules intentionally suppress those layers so the button stays
+   clean after clicks. This version draws the wake pass from the brandmark
+   button itself: one border/glow proxy and one masked logo+wordmark proxy.
+   It starts the entire interface wake sooner after the ELF click, while all
+   wake hits still begin together from the same timing variable.
+   ============================================================ */
+:root {
+  --tw-intro-glow-delay: 0.06s;
+  --tw-brand-glyph-mask: url('assets/img/tw-glyph-mask.png');
+  --tw-brand-wordmark-mask: url('assets/img/tw-wordmark-mask.png');
+}
+
+html body.tw-system-wake > .frame {
+  animation: tw-neon-border-wake 5.1s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .terminal.main {
+  animation: tw-neon-terminal-wake 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .terminal.main .terminal-bar {
+  animation: tw-neon-terminal-bar-wake 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+html body.tw-system-wake .audio-btn,
+html body.tw-system-wake #menu-btn,
+html body.tw-system-wake .audio-viz {
+  animation: tw-neon-control-wake 4.8s ease var(--tw-intro-glow-delay) both !important;
+}
+
+/* Hide the ambient travelling beams during the one-time wake hit so the
+   border flash reads cleanly, then the beams resume once tw-system-wake drops. */
+html body.tw-system-wake > .frame::before,
+html body.tw-system-wake .terminal.main::before {
+  animation: none !important;
+  opacity: 0 !important;
+  filter: none !important;
+}
+
+/* Brandmark parent: create a clean stacking context, but do not alter the
+   regular hover/click behavior after the wake class is gone. */
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart {
+  position: relative !important;
+  overflow: visible !important;
+  isolation: isolate !important;
+  animation: none !important;
+}
+
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart .tw-wordmark-glyph--orb {
+  position: relative !important;
+  z-index: 2 !important;
+}
+
+/* Border/glow proxy. This intentionally uses the same envelope as the live
+   terminal border wake: 0 → 16 attack, 16 → 54 sustain/release, 54 → 100 decay. */
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark::before,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark::before,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart::before,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -1px !important;
+  z-index: 4 !important;
+  pointer-events: none !important;
+  border: 1px solid transparent !important;
+  border-radius: inherit !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  filter: none !important;
+  box-shadow: none !important;
+  mix-blend-mode: screen !important;
+  animation: tw-brandmark-terminal-border-visible 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+/* Logo + wordmark proxy drawn from the button itself. This avoids child-level
+   pseudo-element suppression and keeps the glow perfectly aligned to the mark. */
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark::after,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark::after,
+html body.tw-system-wake button.tw-logo-orb.tw-home-restart::after,
+html body.tw-system-wake .tw-logo-orb.tw-home-restart::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 3 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  opacity: 0 !important;
+  filter: none !important;
+  box-shadow: none !important;
+  mix-blend-mode: screen !important;
+  -webkit-mask-image: var(--tw-brand-glyph-mask), var(--tw-brand-wordmark-mask) !important;
+          mask-image: var(--tw-brand-glyph-mask), var(--tw-brand-wordmark-mask) !important;
+  -webkit-mask-position: 10px center, 43px center !important;
+          mask-position: 10px center, 43px center !important;
+  -webkit-mask-size: 25px 18px, 152px 18px !important;
+          mask-size: 25px 18px, 152px 18px !important;
+  -webkit-mask-repeat: no-repeat, no-repeat !important;
+          mask-repeat: no-repeat, no-repeat !important;
+  animation: tw-brandmark-terminal-glyph-visible 5.15s ease var(--tw-intro-glow-delay) both !important;
+}
+
+@keyframes tw-brandmark-terminal-border-visible {
+  0% {
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(0.95);
+  }
+  16% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.82);
+    box-shadow:
+      0 0 30px rgba(93,208,104,0.20),
+      inset 0 0 20px rgba(93,208,104,0.055);
+    filter: brightness(1.08);
+  }
+  54% {
+    opacity: 1;
+    border-color: rgba(93,208,104,0.40);
+    box-shadow:
+      0 0 24px rgba(93,208,104,0.12),
+      inset 0 0 16px rgba(93,208,104,0.035);
+    filter: brightness(1);
+  }
+  100% {
+    opacity: 0;
+    border-color: transparent;
+    box-shadow: none;
+    filter: brightness(1);
+  }
+}
+
+@keyframes tw-brandmark-terminal-glyph-visible {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+  16% {
+    opacity: 1;
+    filter:
+      drop-shadow(0 0 5px rgba(93,208,104,0.82))
+      drop-shadow(0 0 14px rgba(93,208,104,0.38));
+  }
+  54% {
+    opacity: 0.58;
+    filter:
+      drop-shadow(0 0 4px rgba(93,208,104,0.46))
+      drop-shadow(0 0 10px rgba(93,208,104,0.20));
+  }
+  100% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 rgba(93,208,104,0));
+  }
+}
+
+/* ============================================================
+   TW surgical fix — brandmark wake glow cannot be suppressed
+   ------------------------------------------------------------
+   The brandmark button has several important cleanup rules that correctly keep
+   the normal hover/click state clean. Those same rules can also suppress a
+   traditional keyframed box-shadow/border animation. This pass drives the glow
+   with inherited custom properties instead: the important declarations stay in
+   control, but their values are animated by --tw-brand-wake.
+   ============================================================ */
+@property --tw-brand-wake {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+@property --tw-brand-glyph-wake {
+  syntax: '<number>';
+  inherits: true;
+  initial-value: 0;
+}
+
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart {
+  --tw-brand-wake: 0;
+  --tw-brand-glyph-wake: 0;
+  position: relative !important;
+  isolation: isolate !important;
+  overflow: visible !important;
+  color: var(--muted) !important;
+  background: transparent !important;
+  transform: none !important;
+  animation: tw-brandmark-wake-driver 5.15s ease var(--tw-intro-glow-delay) both !important;
+
+  /* Direct element glow, driven by the animated custom prop so important
+     cleanup rules no longer block the wake hit. */
+  border-color: rgba(93, 208, 104, calc(0.82 * var(--tw-brand-wake))) !important;
+  box-shadow:
+    0 0 calc(30px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.22 * var(--tw-brand-wake))),
+    0 0 calc(64px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.13 * var(--tw-brand-wake))),
+    inset 0 0 calc(20px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.06 * var(--tw-brand-wake))) !important;
+  filter: brightness(calc(1 + (0.08 * var(--tw-brand-wake)))) !important;
+}
+
+/* Border trace layer: lives above the button border, but below the glyphs. */
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart::before {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -2px !important;
+  z-index: 6 !important;
+  pointer-events: none !important;
+  border-radius: inherit !important;
+  border: 1px solid rgba(93, 208, 104, calc(0.95 * var(--tw-brand-wake))) !important;
+  background: transparent !important;
+  opacity: var(--tw-brand-wake) !important;
+  box-shadow:
+    0 0 calc(24px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.46 * var(--tw-brand-wake))),
+    0 0 calc(58px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.22 * var(--tw-brand-wake))),
+    inset 0 0 calc(18px * var(--tw-brand-wake)) rgba(93, 208, 104, calc(0.075 * var(--tw-brand-wake))) !important;
+  filter: none !important;
+  mix-blend-mode: screen !important;
+  animation: none !important;
+}
+
+/* Soft spill behind the brandmark. This replaces the older hidden ::after
+   without touching the normal button state after tw-system-wake is removed. */
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart::after,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart::after,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: -9px !important;
+  z-index: -1 !important;
+  pointer-events: none !important;
+  border-radius: 10px !important;
+  background:
+    radial-gradient(ellipse at 50% 50%,
+      rgba(93, 208, 104, calc(0.34 * var(--tw-brand-wake))) 0%,
+      rgba(93, 208, 104, calc(0.16 * var(--tw-brand-wake))) 46%,
+      rgba(93, 208, 104, 0) 76%) !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  filter: blur(11px) !important;
+  mix-blend-mode: screen !important;
+  animation: none !important;
+}
+
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb {
+  position: relative !important;
+  z-index: 8 !important;
+  overflow: visible !important;
+  animation: none !important;
+  color: currentColor !important;
+  background: currentColor !important;
+  filter:
+    drop-shadow(0 0 calc(5px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.82 * var(--tw-brand-glyph-wake))))
+    drop-shadow(0 0 calc(16px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.36 * var(--tw-brand-glyph-wake)))) !important;
+}
+
+/* Draw a green duplicate directly on top of the actual logo and wordmark. This
+   makes the hit visible even when the base mark is gray and even if parent
+   box-shadow/filter animation is ignored by the browser. */
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb::after,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb::after,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart .tw-logo-glyph--orb::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  opacity: var(--tw-brand-glyph-wake) !important;
+  -webkit-mask: var(--tw-glyph-url) center / contain no-repeat !important;
+          mask: var(--tw-glyph-url) center / contain no-repeat !important;
+  filter:
+    drop-shadow(0 0 calc(6px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.92 * var(--tw-brand-glyph-wake))))
+    drop-shadow(0 0 calc(18px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.42 * var(--tw-brand-glyph-wake)))) !important;
+  mix-blend-mode: screen !important;
+}
+
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb::after,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart .tw-wordmark-glyph--orb::after {
+  content: '' !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background: var(--accent) !important;
+  opacity: var(--tw-brand-glyph-wake) !important;
+  -webkit-mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+          mask: var(--tw-wordmark-url) center / contain no-repeat !important;
+  filter:
+    drop-shadow(0 0 calc(5px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.82 * var(--tw-brand-glyph-wake))))
+    drop-shadow(0 0 calc(15px * var(--tw-brand-glyph-wake)) rgba(93, 208, 104, calc(0.34 * var(--tw-brand-glyph-wake)))) !important;
+  mix-blend-mode: screen !important;
+}
+
+@keyframes tw-brandmark-wake-driver {
+  0% {
+    --tw-brand-wake: 0;
+    --tw-brand-glyph-wake: 0;
+  }
+  16% {
+    --tw-brand-wake: 1;
+    --tw-brand-glyph-wake: 1;
+  }
+  54% {
+    --tw-brand-wake: 0.48;
+    --tw-brand-glyph-wake: 0.58;
+  }
+  100% {
+    --tw-brand-wake: 0;
+    --tw-brand-glyph-wake: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart,
+  html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart {
+    animation: none !important;
+    --tw-brand-wake: 0;
+    --tw-brand-glyph-wake: 0;
+  }
+}
+
+/* ============================================================
+   TW cleanup — keep brandmark wake overlay locked to the button
+   The forced wake layer reused ::before, which still inherited the old
+   decorative sweep transform from the base logo orb. Reset every transform
+   longhand so the glow border sits squarely on the Thrill Wave button.
+   ============================================================ */
+html body.tw-system-wake .topbar-left button.tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake .topbar-left .tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake button.tw-logo-orb.tw-brandmark.tw-home-restart::before,
+html body.tw-system-wake .tw-logo-orb.tw-brandmark.tw-home-restart::before {
+  transform: none !important;
+  translate: none !important;
+  rotate: none !important;
+  scale: none !important;
+  transform-origin: 50% 50% !important;
+  width: auto !important;
+  height: auto !important;
+  margin: 0 !important;
+  clip-path: none !important;
+  box-sizing: border-box !important;
 }

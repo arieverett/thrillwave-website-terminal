@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thrill Wave / Content Defense</title>
+  <style>
+    :root{--bg:#000;--fg:#f4f3e8;--muted:#777;--dim:#333;--rule:#2d2d2d;--accent:#5dd068;--terminal-bar:#0a0a0a;--hot:#ff6b4a;--warn:#e6c85d;--font:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace}
+    *{box-sizing:border-box} html,body{height:100%;margin:0} body{background:#000;color:var(--fg);font-family:var(--font);overflow:hidden;display:grid;place-items:center;padding:24px}
+    body:before{content:'';position:fixed;inset:24px;border:1px solid var(--rule);border-radius:4px;pointer-events:none;box-shadow:0 0 54px rgba(93,208,104,.07)}body:after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0 1px,rgba(0,0,0,.22) 1px 2px),radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.56));mix-blend-mode:multiply;z-index:10}
+    .shell{width:min(840px,calc(100vw - 60px));height:min(720px,calc(100vh - 72px));display:flex;flex-direction:column;gap:10px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand,.btn{border:1px solid var(--rule);border-radius:4px;height:28px;display:inline-flex;align-items:center;padding:0 13px;color:var(--muted);background:#000;font-size:11px;letter-spacing:1.6px;text-decoration:none;text-transform:lowercase}.brand{font-weight:700;letter-spacing:.6px;text-transform:uppercase}.btn{cursor:pointer;font-family:var(--font)}.btn:hover,.brand:hover{color:var(--accent);border-color:var(--accent)}
+    .terminal{flex:1;border:1px solid var(--rule);border-radius:4px;background:#000;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(93,208,104,.08)}.bar{height:39px;background:var(--terminal-bar);border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:var(--muted);font-size:11px;letter-spacing:1.5px;text-transform:lowercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(93,208,104,.7)}.game{position:relative;flex:1;min-height:0}.hud{height:34px;border-bottom:1px solid #141414;display:flex;align-items:center;gap:16px;padding:0 16px;color:var(--muted);font-size:11px;letter-spacing:.7px}.hud strong{color:var(--fg);font-weight:500}.hud .accent{color:var(--accent)}.hud .hot{color:var(--hot)}canvas{display:block;width:100%;height:calc(100% - 34px);background:#000;cursor:crosshair}.overlay{position:absolute;inset:34px 0 0;display:grid;place-items:center;background:rgba(0,0,0,.72);z-index:4}.panel{width:min(590px,calc(100% - 48px));border:1px solid var(--rule);border-radius:4px;background:#000;box-shadow:0 0 38px rgba(93,208,104,.12);padding:24px 26px;color:var(--fg);line-height:1.75;font-size:14px}.panel h1{margin:0 0 14px;font-size:15px;font-weight:500}.panel p{margin:0 0 8px}.prompt{color:var(--fg)}.accent{color:var(--accent)}.muted{color:var(--muted)}.start{margin-top:18px;border:1px solid var(--rule);border-radius:4px;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:9px 14px;cursor:pointer;text-transform:lowercase}.start:hover{color:var(--accent);border-color:var(--accent)}.impact{animation:impact .14s steps(2,end)}@keyframes impact{0%,100%{filter:none}50%{filter:brightness(1.45) drop-shadow(0 0 8px rgba(255,107,74,.5))}}.footer{color:var(--muted);font-size:10.5px;text-align:center;letter-spacing:.4px}.footer a{color:var(--muted);text-decoration:none}.footer a:hover{color:var(--accent)}@media(max-width:720px){body{padding:10px}.shell{width:calc(100vw - 20px);height:calc(100dvh - 28px)}body:before{inset:8px}.brand{display:none}.hud{font-size:9px;gap:8px;padding:0 10px}.panel{font-size:12px;padding:18px 16px}.footer{display:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <a class="brand" href="index.html">▧ THRILLWAVE</a>
+      <div><button id="mute" class="btn" type="button">audio</button></div>
+    </div>
+    <section class="terminal">
+      <div class="bar"><span>07 / content_defense.exe</span><span class="dot"></span></div>
+      <div class="game" id="game">
+        <div class="hud">
+          <span>score <strong id="score">0000</strong></span>
+          <span>time <strong id="time">45</strong></span>
+          <span>shield <strong id="shield" class="accent">100%</strong></span>
+          <span>ammo <strong id="ammo">strategy</strong></span>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="panel" id="panel">
+            <h1><span class="prompt">&gt;</span> do you want to play a game?</h1>
+            <p><span class="prompt">&gt;</span> initializing <span class="accent">content_defense</span>...</p>
+            <p><span class="prompt">&gt;</span> objective: protect the campaign node from incoming noise.</p>
+            <p><span class="prompt">&gt;</span> move: arrows / wasd / mouse</p>
+            <p><span class="prompt">&gt;</span> fire: space or click</p>
+            <p><span class="prompt">&gt;</span> destroy weak briefs. block generic content. defend the campaign.</p>
+            <button class="start" id="start" type="button">begin_content_defense</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="footer"><a href="signal_breach.html">load signal_breach.exe</a> · <a href="index.html">back to game index</a></div>
+  </main>
+<script>
+(() => {
+  const canvas=document.getElementById('canvas'), ctx=canvas.getContext('2d'), gameEl=document.getElementById('game'), overlay=document.getElementById('overlay'), panel=document.getElementById('panel'), startBtn=document.getElementById('start'), muteBtn=document.getElementById('mute');
+  const scoreEl=document.getElementById('score'), timeEl=document.getElementById('time'), shieldEl=document.getElementById('shield'), ammoEl=document.getElementById('ammo');
+  let dpr=1,w=0,h=0,last=0,state='idle',score=0,shield=100,timeLeft=45,spawnTimer=0,fireTimer=0,muted=false,audioCtx=null,shake=0;
+  const player={x:300,y:300,w:92,h:18}; let keys=new Set(), enemies=[], shots=[], pops=[];
+  const enemyTypes=['generic_ad','bad_brief','trend_chaser','stock_footage','empty_hook','brand_noise','committee_note','make_it_viral'];
+  const ammoTypes=['strategy','taste','story','research','timing']; let ammoIndex=0;
+  function resize(){const r=canvas.getBoundingClientRect(); dpr=Math.min(window.devicePixelRatio||1,2); w=Math.max(1,Math.floor(r.width)); h=Math.max(1,Math.floor(r.height)); canvas.width=Math.floor(w*dpr); canvas.height=Math.floor(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); player.x=w/2; player.y=h-58;}
+  window.addEventListener('resize',resize); resize();
+  function rand(a,b){return a+Math.random()*(b-a)}
+  function beep(freq=480,dur=.055,type='square',gain=.032){ if(muted)return; audioCtx ||= new (window.AudioContext||window.webkitAudioContext)(); const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=type; o.frequency.value=freq; g.gain.value=.0001; o.connect(g); g.connect(audioCtx.destination); const t=audioCtx.currentTime; g.gain.exponentialRampToValueAtTime(gain,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.start(t); o.stop(t+dur+.02); }
+  function spawn(){enemies.push({x:rand(55,w-55),y:-20,vy:rand(62,120)+(45-timeLeft)*1.4,label:enemyTypes[Math.floor(Math.random()*enemyTypes.length)],r:12,hit:false});}
+  function fire(){ if(fireTimer>0 || state!=='playing') return; fireTimer=.16; shots.push({x:player.x,y:player.y-18,vy:-420,ammo:ammoTypes[ammoIndex]}); ammoIndex=(ammoIndex+1)%ammoTypes.length; ammoEl.textContent=ammoTypes[ammoIndex]; beep(740,.05,'square',.03); }
+  function start(){state='playing'; overlay.style.display='none'; score=0;shield=100;timeLeft=45;spawnTimer=0;fireTimer=0;enemies=[];shots=[];pops=[];ammoIndex=0;last=performance.now(); updateHud(); beep(440,.05); requestAnimationFrame(loop)}
+  function updateHud(){scoreEl.textContent=String(score).padStart(4,'0'); timeEl.textContent=String(Math.ceil(timeLeft)).padStart(2,'0'); shieldEl.textContent=Math.max(0,Math.round(shield))+'%'; shieldEl.className=shield<35?'hot':'accent'; ammoEl.textContent=ammoTypes[ammoIndex];}
+  function end(){state='ended'; overlay.style.display='grid'; const status=shield>70?'campaign system operational':shield>30?'campaign system damaged':'campaign system breached'; panel.innerHTML=`<h1><span class="prompt">&gt;</span> defense complete.</h1>
+    <p><span class="prompt">&gt;</span> weak content neutralized: <span class="accent">${Math.round(score/10)}</span></p>
+    <p><span class="prompt">&gt;</span> shield integrity: <span class="accent">${Math.max(0,Math.round(shield))}%</span></p>
+    <p><span class="prompt">&gt;</span> final status: <span class="accent">${status}</span></p>
+    <p><span class="prompt">&gt;</span> recommended action:</p>
+    <p><span class="prompt">&gt;</span> build something that moves people.</p>
+    <button class="start" id="again" type="button">run_again</button> <button class="start" onclick="location.href='signal_breach.html'" type="button">load_signal_breach</button>`; document.getElementById('again').addEventListener('click',start); beep(320,.09,'triangle'); setTimeout(()=>beep(560,.08,'triangle'),90);}
+  function loop(now){ if(state!=='playing')return; const dt=Math.min(.033,(now-last)/1000||0); last=now; timeLeft-=dt; spawnTimer-=dt; fireTimer=Math.max(0,fireTimer-dt); shake=Math.max(0,shake-dt);
+    let dir=(keys.has('arrowright')||keys.has('d')?1:0)-(keys.has('arrowleft')||keys.has('a')?1:0); player.x=Math.max(player.w/2+10,Math.min(w-player.w/2-10,player.x+dir*310*dt)); if((keys.has(' ')||keys.has('spacebar'))) fire();
+    if(spawnTimer<=0){spawn(); spawnTimer=rand(.48,.92);}
+    shots.forEach(s=>s.y+=s.vy*dt); shots=shots.filter(s=>s.y>-30);
+    enemies.forEach(e=>e.y+=e.vy*dt);
+    for(let i=enemies.length-1;i>=0;i--){ const e=enemies[i]; let removed=false; for(let j=shots.length-1;j>=0;j--){ const s=shots[j]; if(Math.abs(s.x-e.x)<34 && Math.abs(s.y-e.y)<24){ enemies.splice(i,1); shots.splice(j,1); score+=10; pops.push({x:e.x,y:e.y,text:'+ '+s.ammo,life:1,color:'#5dd068'}); beep(920,.04,'square',.032); removed=true; break; }} if(removed) continue; if(e.y>h-42){ enemies.splice(i,1); shield-=9; shake=.18; gameEl.classList.add('impact'); setTimeout(()=>gameEl.classList.remove('impact'),140); pops.push({x:e.x,y:h-54,text:'breach -9',life:1,color:'#ff6b4a'}); beep(115,.08,'sawtooth',.055); }}
+    pops.forEach(p=>p.life-=dt); pops=pops.filter(p=>p.life>0); updateHud(); draw(now/1000); if(timeLeft<=0||shield<=0)end(); else requestAnimationFrame(loop); }
+  function draw(t){ ctx.clearRect(0,0,w,h); ctx.save(); if(shake>0){ctx.translate(rand(-4,4)*shake*5,rand(-2,2)*shake*5)} ctx.strokeStyle='rgba(93,208,104,.08)';ctx.lineWidth=1; for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()} for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()} ctx.fillStyle='rgba(93,208,104,.035)';ctx.fillRect(0,(t*45)%h,w,1);
+    enemies.forEach(e=>{ctx.save();ctx.translate(e.x,e.y);ctx.strokeStyle='rgba(255,107,74,.72)';ctx.fillStyle='rgba(255,107,74,.08)';ctx.shadowColor='rgba(255,107,74,.8)';ctx.shadowBlur=10;ctx.beginPath();ctx.moveTo(0,15);ctx.lineTo(-11,-9);ctx.lineTo(11,-9);ctx.closePath();ctx.fill();ctx.stroke();ctx.shadowBlur=0;ctx.font='11px JetBrains Mono, monospace';ctx.fillStyle='#ff6b4a';ctx.fillText(e.label,16,4);ctx.restore();});
+    shots.forEach(s=>{ctx.strokeStyle='#5dd068';ctx.shadowColor='rgba(93,208,104,.8)';ctx.shadowBlur=9;ctx.beginPath();ctx.moveTo(s.x,s.y+10);ctx.lineTo(s.x,s.y-12);ctx.stroke();ctx.shadowBlur=0;ctx.font='9px JetBrains Mono, monospace';ctx.fillStyle='#5dd068';ctx.fillText(s.ammo,s.x+6,s.y-8)});
+    const shieldRatio=Math.max(0,shield/100); ctx.save();ctx.translate(player.x,player.y);ctx.strokeStyle='#f4f3e8';ctx.fillStyle='rgba(93,208,104,.10)';ctx.shadowColor='rgba(93,208,104,.8)';ctx.shadowBlur=10;ctx.strokeRect(-player.w/2,-player.h/2,player.w,player.h);ctx.fillRect(-player.w/2,-player.h/2,player.w*shieldRatio,player.h);ctx.shadowBlur=0;ctx.fillStyle='#5dd068';ctx.font='11px JetBrains Mono, monospace';ctx.fillText('THRILL WAVE NODE',-58,34);ctx.beginPath();ctx.moveTo(0,-36);ctx.lineTo(-10,-18);ctx.lineTo(10,-18);ctx.closePath();ctx.stroke();ctx.restore();
+    pops.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life);ctx.fillStyle=p.color;ctx.font='12px JetBrains Mono, monospace';ctx.fillText(p.text,p.x,p.y-(1-p.life)*24)});ctx.globalAlpha=1;ctx.restore(); }
+  startBtn.addEventListener('click',start); muteBtn.addEventListener('click',()=>{muted=!muted; muteBtn.textContent=muted?'mute':'audio'; if(!muted)beep(440,.05)});
+  window.addEventListener('keydown',e=>{const k=e.key.toLowerCase(); if(['arrowleft','arrowright','a','d',' '].includes(k)) e.preventDefault(); keys.add(k); if(k===' ' && state==='playing') fire();}); window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+  canvas.addEventListener('pointermove',e=>{if(state!=='playing')return; const r=canvas.getBoundingClientRect(); player.x=Math.max(player.w/2+10,Math.min(w-player.w/2-10,e.clientX-r.left));}); canvas.addEventListener('pointerdown',e=>{if(state!=='playing')return; const r=canvas.getBoundingClientRect(); player.x=Math.max(player.w/2+10,Math.min(w-player.w/2-10,e.clientX-r.left)); fire();});
+  draw(0); updateHud();
+})();
+</script>
+</body>
+</html>

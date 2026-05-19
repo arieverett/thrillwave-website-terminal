@@ -1595,7 +1595,12 @@
       e.preventDefault();
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      restartHomeTyping();
+      var runHomeRestart = function(){ restartHomeTyping(); };
+      if (typeof window.twDelayBrandmarkHome === 'function') {
+        window.twDelayBrandmarkHome(runHomeRestart);
+      } else {
+        runHomeRestart();
+      }
       return;
     }
 
@@ -1617,7 +1622,11 @@
     e.preventDefault();
     e.stopPropagation();
     if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-    if (logo) restartHomeTyping();
+    if (logo) {
+      var runHomeRestart = function(){ restartHomeTyping(); };
+      if (typeof window.twDelayBrandmarkHome === 'function') window.twDelayBrandmarkHome(runHomeRestart);
+      else runHomeRestart();
+    }
     else toggleTerminalMinimize();
   }, true);
 
@@ -1632,6 +1641,111 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepDots);
   else prepDots();
+})();
+</script>
+
+
+<!-- TW brandmark press-state patch -->
+<script>
+(function(){
+  var PRESS_CLASS = 'tw-brandmark-pressing';
+  var SELECTOR = '.tw-logo-orb.tw-brandmark, .tw-logo-orb.tw-home-restart';
+  var MIN_PRESS_MS = 0;
+  var releaseTimer = null;
+  var pressedEl = null;
+
+  function closestBrand(target) {
+    return target && target.closest ? target.closest(SELECTOR) : null;
+  }
+
+  function glyphs(el) {
+    return el ? el.querySelectorAll('.tw-logo-glyph--orb, .tw-wordmark-glyph--orb') : [];
+  }
+
+  function clearInline(el) {
+    if (!el) return;
+    el.style.removeProperty('color');
+    el.style.removeProperty('border-color');
+    el.style.removeProperty('background');
+    el.style.removeProperty('box-shadow');
+    glyphs(el).forEach(function(g){
+      g.style.removeProperty('color');
+      g.style.removeProperty('background');
+      g.style.removeProperty('filter');
+    });
+  }
+
+  function paintPressed(el) {
+    if (!el) return;
+    el.classList.add(PRESS_CLASS);
+    el.dataset.twPressStarted = String(performance.now ? performance.now() : Date.now());
+    el.style.setProperty('color', 'var(--muted)', 'important');
+    el.style.setProperty('border-color', 'var(--rule)', 'important');
+    el.style.setProperty('background', 'transparent', 'important');
+    el.style.setProperty('box-shadow', 'none', 'important');
+    glyphs(el).forEach(function(g){
+      g.style.setProperty('color', 'var(--muted)', 'important');
+      g.style.setProperty('background', 'var(--muted)', 'important');
+      g.style.setProperty('filter', 'none', 'important');
+    });
+  }
+
+  function clearPressing(el) {
+    var nodes = el ? [el] : Array.prototype.slice.call(document.querySelectorAll(SELECTOR));
+    nodes.forEach(function(node){
+      node.classList.remove(PRESS_CLASS);
+      delete node.dataset.twPressStarted;
+      clearInline(node);
+    });
+    if (!el || pressedEl === el) pressedEl = null;
+  }
+
+  function releaseAfterMinimum(el) {
+    window.clearTimeout(releaseTimer);
+    clearPressing(el || pressedEl);
+  }
+
+  window.twDelayBrandmarkHome = function(callback) {
+    window.setTimeout(callback, 0);
+  };
+
+  document.addEventListener('pointerdown', function(e){
+    var brand = closestBrand(e.target);
+    if (!brand) return;
+    window.clearTimeout(releaseTimer);
+    clearPressing();
+    pressedEl = brand;
+    paintPressed(brand);
+  }, true);
+
+  document.addEventListener('pointerup', function(e){
+    releaseAfterMinimum(closestBrand(e.target));
+  }, true);
+
+  document.addEventListener('pointercancel', function(){
+    releaseAfterMinimum();
+  }, true);
+
+  document.addEventListener('mouseleave', function(){
+    releaseAfterMinimum();
+  }, true);
+
+  document.addEventListener('keydown', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var brand = closestBrand(e.target);
+    if (!brand) return;
+    window.clearTimeout(releaseTimer);
+    clearPressing();
+    pressedEl = brand;
+    paintPressed(brand);
+  }, true);
+
+  document.addEventListener('keyup', function(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    releaseAfterMinimum(closestBrand(e.target));
+  }, true);
+
+  window.addEventListener('blur', function(){ releaseAfterMinimum(); });
 })();
 </script>
 

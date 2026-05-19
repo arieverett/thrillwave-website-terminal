@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thrill Wave / Signal Breach</title>
+  <style>
+    :root{--bg:#000;--fg:#f4f3e8;--muted:#777;--dim:#333;--rule:#2d2d2d;--accent:#5dd068;--terminal-bar:#0a0a0a;--hot:#ff6b4a;--cyan:#73d6ff;--font:'JetBrains Mono','SF Mono',Menlo,Consolas,monospace}
+    *{box-sizing:border-box} html,body{height:100%;margin:0} body{background:#000;color:var(--fg);font-family:var(--font);overflow:hidden;display:grid;place-items:center;padding:24px}
+    body:before{content:'';position:fixed;inset:24px;border:1px solid var(--rule);border-radius:4px;pointer-events:none;box-shadow:0 0 54px rgba(93,208,104,.07)}
+    body:after{content:'';position:fixed;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent 0 1px,rgba(0,0,0,.22) 1px 2px),radial-gradient(ellipse at center,transparent 45%,rgba(0,0,0,.56));mix-blend-mode:multiply;z-index:10}
+    .shell{width:min(840px,calc(100vw - 60px));height:min(720px,calc(100vh - 72px));display:flex;flex-direction:column;gap:10px}.topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}.brand,.btn{border:1px solid var(--rule);border-radius:4px;height:28px;display:inline-flex;align-items:center;padding:0 13px;color:var(--muted);background:#000;font-size:11px;letter-spacing:1.6px;text-decoration:none;text-transform:lowercase}.brand{font-weight:700;letter-spacing:.6px;text-transform:uppercase}.btn{cursor:pointer;font-family:var(--font)}.btn:hover,.brand:hover{color:var(--accent);border-color:var(--accent)}
+    .terminal{flex:1;border:1px solid var(--rule);border-radius:4px;background:#000;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 40px rgba(93,208,104,.08)}.bar{height:39px;background:var(--terminal-bar);border-bottom:1px solid #1a1a1a;display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:var(--muted);font-size:11px;letter-spacing:1.5px;text-transform:lowercase}.dot{width:8px;height:8px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px rgba(93,208,104,.7)}.game{position:relative;flex:1;min-height:0}.hud{height:34px;border-bottom:1px solid #141414;display:flex;align-items:center;gap:16px;padding:0 16px;color:var(--muted);font-size:11px;letter-spacing:.7px}.hud strong{color:var(--fg);font-weight:500}.hud .accent{color:var(--accent)}canvas{display:block;width:100%;height:calc(100% - 34px);background:#000;cursor:crosshair}.overlay{position:absolute;inset:34px 0 0;display:grid;place-items:center;background:rgba(0,0,0,.72);z-index:4}.panel{width:min(560px,calc(100% - 48px));border:1px solid var(--rule);border-radius:4px;background:#000;box-shadow:0 0 38px rgba(93,208,104,.12);padding:24px 26px;color:var(--fg);line-height:1.75;font-size:14px}.panel h1{margin:0 0 14px;font-size:15px;font-weight:500}.panel p{margin:0 0 8px}.prompt{color:var(--fg)}.accent{color:var(--accent)}.muted{color:var(--muted)}.start{margin-top:18px;border:1px solid var(--rule);border-radius:4px;background:transparent;color:var(--muted);font:inherit;font-size:12px;padding:9px 14px;cursor:pointer;text-transform:lowercase}.start:hover{color:var(--accent);border-color:var(--accent)}.glitch{animation:glitch .18s steps(2,end)}@keyframes glitch{0%,100%{filter:none}25%{filter:drop-shadow(-2px 0 rgba(93,208,104,.8))}50%{filter:drop-shadow(2px 0 rgba(255,107,74,.55)) brightness(1.25)}75%{filter:contrast(1.4)}}.footer{color:var(--muted);font-size:10.5px;text-align:center;letter-spacing:.4px}.footer a{color:var(--muted);text-decoration:none}.footer a:hover{color:var(--accent)}@media(max-width:720px){body{padding:10px}.shell{width:calc(100vw - 20px);height:calc(100dvh - 28px)}body:before{inset:8px}.brand{display:none}.hud{font-size:9px;gap:8px;padding:0 10px}.panel{font-size:12px;padding:18px 16px}.footer{display:none}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <div class="topbar">
+      <a class="brand" href="index.html">▧ THRILLWAVE</a>
+      <div><button id="mute" class="btn" type="button">audio</button></div>
+    </div>
+    <section class="terminal">
+      <div class="bar"><span>07 / signal_breach.exe</span><span class="dot"></span></div>
+      <div class="game" id="game">
+        <div class="hud">
+          <span>score <strong id="score">0000</strong></span>
+          <span>time <strong id="time">45</strong></span>
+          <span>signal <strong id="quality" class="accent">50%</strong></span>
+          <span>static <strong id="staticLevel">low</strong></span>
+        </div>
+        <canvas id="canvas"></canvas>
+        <div id="overlay" class="overlay">
+          <div class="panel" id="panel">
+            <h1><span class="prompt">&gt;</span> do you want to play a game?</h1>
+            <p><span class="prompt">&gt;</span> initializing <span class="accent">signal_breach</span>...</p>
+            <p><span class="prompt">&gt;</span> objective: identify usable market signals before the feed corrupts.</p>
+            <p><span class="prompt">&gt;</span> move scanner: arrows / wasd / mouse</p>
+            <p><span class="prompt">&gt;</span> capture signal: space or click nearby</p>
+            <p><span class="prompt">&gt;</span> avoid <span class="muted">noise</span>. trust pattern recognition.</p>
+            <button class="start" id="start" type="button">begin_signal_breach</button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="footer"><a href="content_defense.html">load content_defense.exe</a> · <a href="index.html">back to game index</a></div>
+  </main>
+<script>
+(() => {
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const gameEl = document.getElementById('game');
+  const overlay = document.getElementById('overlay');
+  const panel = document.getElementById('panel');
+  const startBtn = document.getElementById('start');
+  const muteBtn = document.getElementById('mute');
+  const scoreEl = document.getElementById('score');
+  const timeEl = document.getElementById('time');
+  const qualityEl = document.getElementById('quality');
+  const staticEl = document.getElementById('staticLevel');
+  let dpr=1,w=0,h=0,last=0,state='idle',score=0,quality=50,timeLeft=45,spawnTimer=0,muted=false,flash=0;
+  let scanner={x:240,y:220,r:16,vx:0,vy:0};
+  let keys=new Set(), targets=[], floaters=[];
+  const goodTypes=['audience_signal','competitor_move','market_shift','brand_opportunity','culture_ping','buyer_intent'];
+  const badTypes=['noise','trend_chaser','empty_metric','static'];
+  let audioCtx=null;
+  function beep(freq=520,dur=.055,type='square',gain=.035){
+    if(muted) return; audioCtx ||= new (window.AudioContext||window.webkitAudioContext)();
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain(); o.type=type; o.frequency.value=freq; g.gain.value=0.0001; o.connect(g); g.connect(audioCtx.destination); const t=audioCtx.currentTime; g.gain.exponentialRampToValueAtTime(gain,t+.01); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.start(t); o.stop(t+dur+.02);
+  }
+  function resize(){
+    const r=canvas.getBoundingClientRect(); dpr=Math.min(window.devicePixelRatio||1,2); w=Math.max(1,Math.floor(r.width)); h=Math.max(1,Math.floor(r.height)); canvas.width=Math.floor(w*dpr); canvas.height=Math.floor(h*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); if(!scanner.x){scanner.x=w/2;scanner.y=h/2;}
+  }
+  window.addEventListener('resize',resize); resize();
+  function rand(a,b){return a+Math.random()*(b-a)}
+  function spawn(){
+    const bad=Math.random()<0.27; const label=bad?badTypes[Math.floor(Math.random()*badTypes.length)]:goodTypes[Math.floor(Math.random()*goodTypes.length)];
+    targets.push({x:rand(70,w-70),y:rand(52,h-62),age:0,ttl:rand(4.2,7.2),bad,label,pulse:rand(0,6.28)});
+  }
+  function capture(){
+    let best=-1,bd=9999;
+    for(let i=0;i<targets.length;i++){const t=targets[i]; const d=Math.hypot(t.x-scanner.x,t.y-scanner.y); if(d<bd){bd=d;best=i;}}
+    if(best>=0 && bd<58){
+      const t=targets.splice(best,1)[0];
+      if(t.bad){score=Math.max(0,score-20); quality=Math.max(0,quality-12); flash=.22; gameEl.classList.add('glitch'); setTimeout(()=>gameEl.classList.remove('glitch'),180); floaters.push({x:t.x,y:t.y,text:'- noise',life:1,color:'#ff6b4a'}); beep(120,.09,'sawtooth',.055);} 
+      else {score+=15; quality=Math.min(100,quality+5); floaters.push({x:t.x,y:t.y,text:'+ signal',life:1,color:'#5dd068'}); beep(720,.055,'square',.04); setTimeout(()=>beep(920,.05,'square',.03),45);}
+      updateHud();
+    } else {beep(180,.04,'triangle',.018)}
+  }
+  function updateHud(){scoreEl.textContent=String(score).padStart(4,'0'); timeEl.textContent=String(Math.ceil(timeLeft)).padStart(2,'0'); qualityEl.textContent=Math.round(quality)+'%'; staticEl.textContent=quality>72?'low':quality>42?'moderate':'high';}
+  function start(){state='playing'; overlay.style.display='none'; score=0;quality=50;timeLeft=45;targets=[];floaters=[];scanner.x=w/2;scanner.y=h/2;spawnTimer=0;last=performance.now(); updateHud(); beep(520,.07); requestAnimationFrame(loop)}
+  function end(){state='ended'; overlay.style.display='grid'; const readiness=quality>74?'high':quality>44?'unstable':'compromised'; panel.innerHTML=`<h1><span class="prompt">&gt;</span> breach complete.</h1>
+    <p><span class="prompt">&gt;</span> signals captured: <span class="accent">${Math.max(0,Math.round(score/15))}</span></p>
+    <p><span class="prompt">&gt;</span> signal quality: <span class="accent">${Math.round(quality)}%</span></p>
+    <p><span class="prompt">&gt;</span> campaign readiness: <span class="accent">${readiness}</span></p>
+    <p><span class="prompt">&gt;</span> recommended action:</p>
+    <p><span class="prompt">&gt;</span> turn intelligence into creative advantage.</p>
+    <button class="start" id="again" type="button">run_again</button> <button class="start" onclick="location.href='content_defense.html'" type="button">load_content_defense</button>`;
+    document.getElementById('again').addEventListener('click',start); beep(360,.08,'triangle'); setTimeout(()=>beep(620,.09,'triangle'),90);
+  }
+  function loop(now){
+    if(state!=='playing') return; const dt=Math.min(.033,(now-last)/1000||0); last=now; timeLeft-=dt; spawnTimer-=dt; flash=Math.max(0,flash-dt);
+    if(spawnTimer<=0){spawn(); spawnTimer=rand(.52,1.05); if(targets.length>9) targets.shift();}
+    const speed=250; scanner.vx=(keys.has('arrowright')||keys.has('d')?1:0)-(keys.has('arrowleft')||keys.has('a')?1:0); scanner.vy=(keys.has('arrowdown')||keys.has('s')?1:0)-(keys.has('arrowup')||keys.has('w')?1:0); const mag=Math.hypot(scanner.vx,scanner.vy)||1; scanner.x=Math.max(20,Math.min(w-20,scanner.x+(scanner.vx/mag)*speed*dt)); scanner.y=Math.max(20,Math.min(h-20,scanner.y+(scanner.vy/mag)*speed*dt));
+    for(let i=targets.length-1;i>=0;i--){targets[i].age+=dt;if(targets[i].age>targets[i].ttl){if(!targets[i].bad) quality=Math.max(0,quality-2); targets.splice(i,1);}}
+    for(let i=floaters.length-1;i>=0;i--){floaters[i].life-=dt;if(floaters[i].life<=0)floaters.splice(i,1)}
+    draw(now/1000); updateHud(); if(timeLeft<=0) end(); else requestAnimationFrame(loop);
+  }
+  function draw(t){
+    ctx.clearRect(0,0,w,h); ctx.save();
+    ctx.strokeStyle='rgba(93,208,104,.08)'; ctx.lineWidth=1; for(let x=0;x<w;x+=40){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke()} for(let y=0;y<h;y+=40){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke()}
+    ctx.fillStyle='rgba(93,208,104,.035)'; ctx.fillRect(0,(t*38)%h,w,1);
+    if(flash>0){ctx.fillStyle=`rgba(255,107,74,${flash*.18})`;ctx.fillRect(0,0,w,h)}
+    targets.forEach((tar)=>{const life=1-tar.age/tar.ttl; const r=8+Math.sin(t*5+tar.pulse)*2; ctx.save(); ctx.globalAlpha=Math.max(.2,life); ctx.strokeStyle=tar.bad?'rgba(255,107,74,.68)':'rgba(93,208,104,.85)'; ctx.fillStyle=tar.bad?'rgba(255,107,74,.12)':'rgba(93,208,104,.10)'; ctx.shadowColor=tar.bad?'rgba(255,107,74,.8)':'rgba(93,208,104,.85)'; ctx.shadowBlur=12; ctx.beginPath(); ctx.arc(tar.x,tar.y,r,0,Math.PI*2); ctx.fill(); ctx.stroke(); ctx.shadowBlur=0; ctx.font='11px JetBrains Mono, monospace'; ctx.fillStyle=tar.bad?'#ff6b4a':'#5dd068'; ctx.fillText(tar.label,tar.x+14,tar.y+4); ctx.strokeStyle='rgba(244,243,232,.18)'; ctx.beginPath(); ctx.arc(tar.x,tar.y,18*life,-Math.PI/2,Math.PI*2*life-Math.PI/2); ctx.stroke(); ctx.restore();});
+    ctx.save(); ctx.translate(scanner.x,scanner.y); ctx.strokeStyle='#f4f3e8'; ctx.lineWidth=1.5; ctx.shadowColor='rgba(93,208,104,.9)'; ctx.shadowBlur=9; ctx.beginPath(); ctx.arc(0,0,scanner.r,0,Math.PI*2); ctx.stroke(); ctx.beginPath(); ctx.moveTo(-24,0); ctx.lineTo(-8,0); ctx.moveTo(8,0); ctx.lineTo(24,0); ctx.moveTo(0,-24); ctx.lineTo(0,-8); ctx.moveTo(0,8); ctx.lineTo(0,24); ctx.stroke(); ctx.shadowBlur=0; ctx.fillStyle='#5dd068'; ctx.font='11px JetBrains Mono, monospace'; ctx.fillText('scanner',18,-18); ctx.restore();
+    floaters.forEach(f=>{ctx.globalAlpha=Math.max(0,f.life); ctx.fillStyle=f.color; ctx.font='12px JetBrains Mono, monospace'; ctx.fillText(f.text,f.x,f.y-(1-f.life)*28)}); ctx.globalAlpha=1; ctx.restore();
+  }
+  startBtn.addEventListener('click',start); muteBtn.addEventListener('click',()=>{muted=!muted; muteBtn.textContent=muted?'mute':'audio'; if(!muted) beep(440,.05)});
+  window.addEventListener('keydown',e=>{const k=e.key.toLowerCase(); if(['arrowup','arrowdown','arrowleft','arrowright','w','a','s','d',' '].includes(k)) e.preventDefault(); if(k===' '&&state==='playing')capture(); keys.add(k)});
+  window.addEventListener('keyup',e=>keys.delete(e.key.toLowerCase()));
+  canvas.addEventListener('pointermove',e=>{if(state!=='playing')return; const r=canvas.getBoundingClientRect(); scanner.x=(e.clientX-r.left); scanner.y=(e.clientY-r.top)});
+  canvas.addEventListener('pointerdown',e=>{if(state!=='playing')return; const r=canvas.getBoundingClientRect(); scanner.x=(e.clientX-r.left); scanner.y=(e.clientY-r.top); capture()});
+  draw(0); updateHud();
+})();
+</script>
+</body>
+</html>
