@@ -87,7 +87,7 @@
   var routingHome = false;
 
   function homeTrigger(target){
-    return !!(target && target.closest && target.closest('.tw-home-restart, #title-brand, .frame-label--tl'));
+    return !!(target && target.closest && target.closest('.tw-home-restart, #title-brand, .frame-label--tl:not([data-power-control])'));
   }
 
   function closeMenu(){
