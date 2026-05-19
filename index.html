@@ -492,8 +492,10 @@
     if (!t || !t.closest) return;
     var interactive = t.closest('button,a,[role="button"],.cascade-toggle,.section-jump,.section-end,.dot.live');
     if (!interactive) return;
-    // Only skip things with a different explicit sound or no desired sound
-    if (t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
+    // Only skip things with a different explicit sound or no desired sound.
+    // The audio toggle handles its own click after the mute state flips, so
+    // its feedback never feels inverted.
+    if (t.closest('#audio-toggle-btn,.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) return;
     if (window.twUI) window.twUI.sndClick();
   }, true);
 
@@ -512,7 +514,7 @@
     var interactive = t.closest('button,a,[role="button"],.dot.live');
     if (interactive) {
       // Focused button/link — play sound for that element
-      if (!t.closest('.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) {
+      if (!t.closest('#audio-toggle-btn,.tw-logo-orb,.elf-icon,.viz-bar,[data-power-confirm]')) {
         if (window.twUI) window.twUI.sndClick();
       }
       return;
@@ -1105,6 +1107,7 @@ async function initAudio() {
 
 // --- play helpers — every one is wrapped so a bad call doesn't break the boot ---
 function safe(fn) {
+  if (sessionStorage.getItem('tw_audio_muted') === '1') return;
   try {
     // The browser suspends the Tone.js AudioContext after inactivity.
     // Music keeps playing (HTML audio, separate path) but Web Audio synths
@@ -1773,12 +1776,20 @@ function skipSequence() {
   // Call it now — synths created synchronously, audioReady = true set before
   // any sound plays, safe() handles AudioContext resumption on first gesture.
   initAudio();
-  // Mute SFX immediately — stays off until user explicitly clicks audio button.
-  // applyToneMute is in a different IIFE so write directly via window.twApplyMute.
+  // Keep the system silent when skipping the boot until the user explicitly turns audio on.
+  sessionStorage.setItem('tw_audio_muted', '1');
   if (typeof window.twApplyMute === 'function') window.twApplyMute(true);
-  else try { if (typeof Tone !== 'undefined' && Tone.Destination) Tone.Destination.volume.value = -Infinity; } catch(e) {}
+  else try { if (typeof Tone !== 'undefined' && Tone.Destination) { Tone.Destination.mute = true; if (Tone.Destination.volume) Tone.Destination.volume.value = -Infinity; } } catch(e) {}
+
   // Show full static home content immediately — no typing animation.
-  preFillHome();
+  // preFillHome lives in the main site IIFE, so use the exposed bridge.
+  if (typeof window.twPrefillHome === 'function') {
+    window.twPrefillHome();
+  } else {
+    setTimeout(function() {
+      if (typeof window.twPrefillHome === 'function') window.twPrefillHome();
+    }, 0);
+  }
 }
 
 // ----------------------------------------------------------
@@ -2005,13 +2016,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   function applyToneMute(muted) {
     try {
       if (typeof Tone !== 'undefined') {
-        // Use volume.value (-Infinity / 0) — more reliable than .mute property
-        // across Tone.js versions; works regardless of AudioContext state.
         const dest = typeof Tone.getDestination === 'function'
                    ? Tone.getDestination()
                    : Tone.Destination;
-        if (dest && dest.volume) dest.volume.value = muted ? -Infinity : 0;
-        else if (dest) dest.mute = muted; // fallback
+        if (dest) {
+          dest.mute = !!muted;
+          if (dest.volume) {
+            try {
+              const now = (typeof Tone.now === 'function') ? Tone.now() : 0;
+              if (typeof dest.volume.cancelScheduledValues === 'function') dest.volume.cancelScheduledValues(now);
+            } catch (e) {}
+            dest.volume.value = muted ? -Infinity : 0;
+          }
+        }
       }
     } catch (e) { /* tone not ready yet */ }
   }
@@ -2022,32 +2039,55 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   // are created. (Search for "applyToneMute" in initAudio.)
   applyToneMute(sessionStorage.getItem(MUTE_KEY) === '1');
 
+  function isSystemMuted() {
+    return sessionStorage.getItem(MUTE_KEY) === '1';
+  }
+
+  function isMusicAudible() {
+    return bgAudio && !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0 || bgAudio.dataset.priming === '1');
+  }
+
   function updateAudioState() {
-    if (bgAudio.paused || bgAudio.muted || bgAudio.volume === 0 || bgAudio.dataset.priming === '1') {
+    if (isSystemMuted() || !isMusicAudible()) {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> audio';
     } else {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> mute';
     }
   }
 
+  function playAudioToggleClick() {
+    try {
+      if (window.twUI && typeof window.twUI.sndClick === 'function') window.twUI.sndClick();
+    } catch (e) {}
+  }
+
   audioToggleBtn.addEventListener('click', () => {
     audioToggleBtn.blur(); // release focus immediately so it doesn't latch green
-    if (bgAudio.paused || bgAudio.muted) {
-      // UNMUTE: music + tone fx both come back on.
+    const shouldTurnOn = isSystemMuted() || !isMusicAudible();
+
+    if (shouldTurnOn) {
+      // AUDIO ON: unmute SFX first, then play the button click and resume music.
       bgAudio.muted = false;
       bgAudio.volume = 0.4;
       sessionStorage.setItem(MUTE_KEY, '0');
       applyToneMute(false);
+      playAudioToggleClick();
       bgAudio.play().then(() => {
         sessionStorage.setItem(MUSIC_KEY, '1');
-      }).catch(() => {});
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      }).catch(() => {
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      });
     } else {
-      // MUTE: music pauses AND tone-generated sounds go silent.
+      // MUTE: give the button one last click, then silence music and all SFX.
+      playAudioToggleClick();
       bgAudio.pause();
       sessionStorage.removeItem(MUSIC_KEY);
       sessionStorage.setItem(MUTE_KEY, '1');
       applyToneMute(true);
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
     }
+    updateAudioState();
     audioToggleBtn.blur();
   });
 
@@ -2530,6 +2570,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
           volume: -24
         }).toDestination();
         window.twTypeClick = function() {
+          if (sessionStorage.getItem('tw_audio_muted') === '1') return;
           try { synth.triggerAttackRelease(0.018, Tone.now()); } catch (e) {}
         };
       }
@@ -2687,7 +2728,8 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   function updateMusicButton() {
     if (!bgAudio || !audioToggleBtn) return;
-    const effectivelyPlaying = !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0);
+    const systemMuted = sessionStorage.getItem('tw_audio_muted') === '1';
+    const effectivelyPlaying = !systemMuted && !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0);
     audioToggleBtn.innerHTML = effectivelyPlaying
       ? '<span class="audio-glyph">⏸</span> mute'
       : '<span class="audio-glyph">▶</span> audio';

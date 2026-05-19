@@ -446,37 +446,76 @@
 
   // Apply persisted mute state to Tone.Destination on every page load.
   // The music button mutes both the <audio> element AND all Tone.js synths
-  // (typing clicks, etc.) via a single flag.
+  // via a single flag.
   function applyToneMute(muted) {
     try {
-      if (typeof Tone !== 'undefined' && Tone.Destination) {
-        Tone.Destination.mute = muted;
+      if (typeof Tone !== 'undefined') {
+        const dest = typeof Tone.getDestination === 'function'
+                   ? Tone.getDestination()
+                   : Tone.Destination;
+        if (dest) {
+          dest.mute = !!muted;
+          if (dest.volume) {
+            try {
+              const now = (typeof Tone.now === 'function') ? Tone.now() : 0;
+              if (typeof dest.volume.cancelScheduledValues === 'function') dest.volume.cancelScheduledValues(now);
+            } catch (e) {}
+            dest.volume.value = muted ? -Infinity : 0;
+          }
+        }
       }
     } catch (e) { /* tone not ready */ }
   }
+  window.twApplyMute = applyToneMute;
   applyToneMute(sessionStorage.getItem(MUTE_KEY) === '1');
 
+  function isSystemMuted() {
+    return sessionStorage.getItem(MUTE_KEY) === '1';
+  }
+
+  function isMusicAudible() {
+    return bgAudio && !(bgAudio.paused || bgAudio.muted || bgAudio.volume === 0 || bgAudio.dataset.priming === '1');
+  }
+
   function updateAudioState() {
-    if (bgAudio.paused || bgAudio.muted) {
+    if (isSystemMuted() || !isMusicAudible()) {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">▶</span> audio';
     } else {
       audioToggleBtn.innerHTML = '<span class="audio-glyph">⏸</span> mute';
     }
   }
 
+  function playAudioToggleClick() {
+    try {
+      if (window.twUI && typeof window.twUI.sndClick === 'function') window.twUI.sndClick();
+    } catch (e) {}
+  }
+
   audioToggleBtn.addEventListener('click', () => {
-    if (bgAudio.paused || bgAudio.muted) {
+    audioToggleBtn.blur();
+    const shouldTurnOn = isSystemMuted() || !isMusicAudible();
+
+    if (shouldTurnOn) {
       bgAudio.muted = false;
       bgAudio.volume = 0.4;
       sessionStorage.setItem(MUTE_KEY, '0');
       applyToneMute(false);
-      bgAudio.play().then(() => sessionStorage.setItem(MUSIC_KEY, '1')).catch(() => {});
+      playAudioToggleClick();
+      bgAudio.play().then(() => {
+        sessionStorage.setItem(MUSIC_KEY, '1');
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      }).catch(() => {
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      });
     } else {
+      playAudioToggleClick();
       bgAudio.pause();
       sessionStorage.removeItem(MUSIC_KEY);
       sessionStorage.setItem(MUTE_KEY, '1');
       applyToneMute(true);
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
     }
+    updateAudioState();
     audioToggleBtn.blur();
   });
 
