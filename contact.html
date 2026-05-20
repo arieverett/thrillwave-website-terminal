@@ -2,6 +2,235 @@
 
 <html lang="en">
 <head>
+<script>
+// ============================================================
+// TW BREAK ROOM HARD CONTROLLER
+// Runs before the older page handlers, so game tiles + exit own
+// the interaction before any legacy capture listener can swallow it.
+// ============================================================
+(function twBreakRoomHardController(){
+  'use strict';
+  if (window.__twBreakRoomHardController) return;
+  window.__twBreakRoomHardController = true;
+
+  var lastType = '';
+  var lastAt = 0;
+
+  function $(sel, root){ return (root || document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function body(){ return document.body; }
+  function room(){ return document.getElementById('tw-breakroom'); }
+  function screen(){ var r = room(); return r ? $('[data-breakroom-game-screen]', r) : null; }
+  function frame(){ var s = screen(); return s ? $('[data-breakroom-game-frame]', s) : null; }
+  function loader(){ var s = screen(); return s ? $('[data-breakroom-game-loader]', s) : null; }
+  function open(){ return !!(body() && body().classList.contains('tw-terminal-minimized')); }
+  function muted(){ try { return sessionStorage.getItem('tw_audio_muted') === '1'; } catch(e) { return false; } }
+
+  function absorb(e){
+    if (!e) return;
+    try { e.preventDefault(); } catch(_) {}
+    try { e.stopPropagation(); } catch(_) {}
+    try { if (e.stopImmediatePropagation) e.stopImmediatePropagation(); } catch(_) {}
+  }
+
+  function clickSound(){
+    try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(e) {}
+  }
+
+  function syncGameMute(){
+    var f = frame();
+    if (!f || !f.contentWindow) return;
+    try { f.contentWindow.postMessage({ type: 'tw-game-audio', muted: muted() }, '*'); } catch(e) {}
+  }
+
+  function setReady(){
+    var r = room();
+    if (!r) return;
+    r.setAttribute('aria-hidden', 'false');
+    r.classList.add('tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    $all('.tw-breakroom-card', r).forEach(function(card){
+      card.disabled = false;
+      card.removeAttribute('aria-disabled');
+      card.style.pointerEvents = 'auto';
+    });
+    var exit = $('[data-breakroom-exit]', r);
+    if (exit) exit.style.pointerEvents = 'auto';
+  }
+
+  function enter(){
+    if (!body()) return;
+    body().classList.add('tw-terminal-minimized');
+    setReady();
+    try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.enter) window.twBreakRoomAudio.enter(); } catch(e) {}
+  }
+
+  function unloadGame(){
+    var s = screen();
+    var f = frame();
+    var l = loader();
+    if (f) {
+      try { f.onload = null; f.onerror = null; } catch(e) {}
+      f.dataset.loaded = '0';
+      f.dataset.currentGame = '';
+      try { f.removeAttribute('src'); } catch(e) {}
+      try { f.src = 'about:blank'; } catch(e) {}
+    }
+    if (s) {
+      s.setAttribute('aria-hidden', 'true');
+      s.classList.remove('is-opening','is-closing','is-loading','is-loaded');
+    }
+    if (l) l.setAttribute('aria-hidden', 'true');
+    if (body()) body().classList.remove('tw-breakroom-game-active','tw-breakroom-game-opening');
+    $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
+  }
+
+  function exit(){
+    unloadGame();
+    try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.exit) window.twBreakRoomAudio.exit(); } catch(e) {}
+    if (body()) body().classList.remove('tw-terminal-minimized','tw-breakroom-game-active','tw-breakroom-game-opening');
+    var r = room();
+    if (r) r.setAttribute('aria-hidden', 'true');
+  }
+
+  function back(){
+    clickSound();
+    unloadGame();
+    setReady();
+  }
+
+  function normalizeSrc(raw){
+    raw = raw || '';
+    if (!raw) return '';
+    try {
+      var u = new URL(raw, window.location.href);
+      return u.pathname.split('/').slice(-2).join('/') + (u.search || '');
+    } catch(e) { return raw; }
+  }
+
+  function launch(card){
+    if (!card) return;
+    if (!open()) enter();
+    setReady();
+
+    var src = normalizeSrc(card.getAttribute('data-game-src') || card.dataset.gameSrc || '');
+    if (!src) return;
+
+    var s = screen();
+    var f = frame();
+    var l = loader();
+    if (!s || !f) return;
+
+    var titleEl = $('.tw-breakroom-card__title', card);
+    var numEl = $('.tw-breakroom-card__num', card);
+    var copyEl = $('.tw-breakroom-card__copy', card);
+    var title = titleEl ? titleEl.textContent.trim() : 'game';
+    var num = numEl ? numEl.textContent.trim() : '[--]';
+    var copy = copyEl ? copyEl.textContent.trim() : 'loading cartridge';
+
+    var outTitle = $('[data-breakroom-game-title]', s);
+    var outNum = $('[data-breakroom-game-number]', s);
+    var outNote = $('[data-breakroom-game-note]', s);
+    var status = $('.tw-breakroom-game-status', s);
+    if (outTitle) outTitle.textContent = title;
+    if (outNum) outNum.textContent = num;
+    if (outNote) outNote.textContent = copy + ' loading...';
+    if (status) status.textContent = '> ' + title + ' cartridge';
+
+    $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
+    card.classList.add('is-launching');
+    clickSound();
+
+    body().classList.add('tw-breakroom-game-active','tw-breakroom-game-opening');
+    s.setAttribute('aria-hidden', 'false');
+    s.classList.remove('is-closing','is-loaded');
+    s.classList.add('is-opening','is-loading');
+    if (l) l.setAttribute('aria-hidden','false');
+
+    try { s.getAnimations().forEach(function(a){ a.cancel(); }); } catch(e) {}
+    try {
+      var rRect = room().getBoundingClientRect();
+      var cRect = card.getBoundingClientRect();
+      var sx = cRect.left - rRect.left;
+      var sy = cRect.top - rRect.top;
+      var scaleX = rRect.width ? Math.max(cRect.width / rRect.width, .08) : .25;
+      var scaleY = rRect.height ? Math.max(cRect.height / rRect.height, .08) : .25;
+      s.animate([
+        { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(' + scaleX + ',' + scaleY + ')', opacity: .55, filter: 'brightness(1.35) blur(.8px)' },
+        { transform: 'translate(0,0) scale(1,1)', opacity: 1, filter: 'brightness(1) blur(0)' }
+      ], { duration: 520, easing: 'cubic-bezier(.16,1,.3,1)' }).onfinish = function(){
+        s.classList.remove('is-opening');
+        body().classList.remove('tw-breakroom-game-opening');
+      };
+    } catch(e) {
+      s.classList.remove('is-opening');
+      body().classList.remove('tw-breakroom-game-opening');
+    }
+
+    f.onload = function(){
+      f.dataset.loaded = '1';
+      s.classList.remove('is-loading');
+      s.classList.add('is-loaded');
+      if (l) l.setAttribute('aria-hidden','true');
+      syncGameMute();
+      window.setTimeout(function(){ try { f.focus(); } catch(e) {} }, 80);
+    };
+    f.onerror = function(){
+      s.classList.remove('is-loading');
+      if (outNote) outNote.textContent = 'cartridge did not load. check /games/' ;
+    };
+    f.dataset.loaded = '0';
+    f.dataset.currentGame = src;
+    try { f.src = 'about:blank'; } catch(e) {}
+    window.setTimeout(function(){ f.src = src; }, 35);
+  }
+
+  window.twBreakRoomLaunch = function(card, e){ absorb(e); launch(card); return false; };
+  window.twBreakRoomExit = function(e){ absorb(e); clickSound(); exit(); return false; };
+  window.twBreakRoomBack = function(e){ absorb(e); back(); return false; };
+
+  function shouldDebounce(type){
+    var now = Date.now();
+    if (type === lastType && now - lastAt < 220) return true;
+    lastType = type;
+    lastAt = now;
+    return false;
+  }
+
+  function handle(e){
+    var target = e.target;
+    if (!target || !target.closest) return;
+
+    var card = target.closest('.tw-breakroom-card');
+    if (card && card.closest('#tw-breakroom')) {
+      absorb(e);
+      if (!shouldDebounce('card:' + (card.getAttribute('data-game-src') || ''))) launch(card);
+      return;
+    }
+
+    var backBtn = target.closest('[data-breakroom-back]');
+    if (backBtn && backBtn.closest('#tw-breakroom')) {
+      absorb(e);
+      if (!shouldDebounce('back')) back();
+      return;
+    }
+
+    var exitBtn = target.closest('[data-breakroom-exit]');
+    if (exitBtn && exitBtn.closest('#tw-breakroom')) {
+      absorb(e);
+      if (!shouldDebounce('exit')) { clickSound(); exit(); }
+      return;
+    }
+  }
+
+  window.addEventListener('pointerdown', handle, true);
+  window.addEventListener('click', handle, true);
+  window.addEventListener('touchstart', handle, { capture:true, passive:false });
+
+  window.addEventListener('message', function(e){
+    if (e.data && e.data.type === 'tw-game-ready') syncGameMute();
+  });
+})();
+</script>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Contact | Thrill Wave - Research-driven Marketing Agency</title>
@@ -479,39 +708,43 @@
 <span class="line" data-breakroom-line="Take a load off. Choose a game:">Take a load off. Choose a game:</span>
 </div>
 <div class="tw-breakroom-grid" aria-label="secret break room games">
-<a class="tw-breakroom-card" href="games/one_shot.html">
+<button class="tw-breakroom-card" type="button" data-game-src="games/one_shot.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
 <span class="tw-breakroom-card__sprite" aria-hidden="true">🌵</span>
 <span class="tw-breakroom-card__num">[01]</span>
 <span class="tw-breakroom-card__title">one shot</span>
 <span class="tw-breakroom-card__copy">jump the plant hazards and clear the take.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
-</a>
-<a class="tw-breakroom-card" href="games/going_viral.html">
+</button>
+<button class="tw-breakroom-card" type="button" data-game-src="games/going_viral.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
 <span class="tw-breakroom-card__sprite" aria-hidden="true">⚔️</span>
 <span class="tw-breakroom-card__num">[02]</span>
 <span class="tw-breakroom-card__title">going viral</span>
 <span class="tw-breakroom-card__copy">outrun the algorithm before it outruns you.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
-</a>
-<a class="tw-breakroom-card" href="games/content_defense.html">
+</button>
+<button class="tw-breakroom-card" type="button" data-game-src="games/content_defense.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
 <span class="tw-breakroom-card__sprite" aria-hidden="true">🛡️</span>
 <span class="tw-breakroom-card__num">[03]</span>
 <span class="tw-breakroom-card__title">content defense</span>
 <span class="tw-breakroom-card__copy">protect the campaign core from the chaos.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
-</a>
+</button>
 </div>
-<button class="tw-breakroom-exit" data-breakroom-exit="" data-breakroom-line="&gt; exit break room" type="button">&gt; exit break room</button>
+<a class="tw-breakroom-exit" href="#terminal" data-breakroom-exit="" data-breakroom-line="&gt; exit break room" role="button" onclick="return window.twBreakRoomExit ? window.twBreakRoomExit(event) : false;">&gt; exit break room</a>
 </div>
 <div class="tw-breakroom-game-screen" data-breakroom-game-screen aria-hidden="true">
-<div class="tw-breakroom-game-hud">
-<span class="tw-breakroom-game-status">&gt; selected cartridge</span>
-<button class="tw-breakroom-game-back" data-breakroom-back type="button">&gt; back to games</button>
+<div class="tw-breakroom-game-hud" data-breakroom-game-hud>
+<button class="tw-breakroom-game-action tw-breakroom-game-name" data-breakroom-name type="button">&gt; name</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-scores" data-breakroom-scores type="button">&gt; high scores</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; back</button>
 </div>
-<div class="tw-breakroom-game-placeholder" aria-label="break room game screen placeholder">
+<div class="tw-breakroom-game-placeholder" aria-label="break room playable game screen">
+<div class="tw-breakroom-game-loader" data-breakroom-game-loader aria-hidden="true">
 <span class="tw-breakroom-game-chip" data-breakroom-game-number>[--]</span>
 <span class="tw-breakroom-game-title" data-breakroom-game-title>game screen</span>
-<span class="tw-breakroom-game-note" data-breakroom-game-note>placeholder viewport ready.</span>
+<span class="tw-breakroom-game-note" data-breakroom-game-note>loading cartridge...</span>
+</div>
+<iframe class="tw-breakroom-game-frame" data-breakroom-game-frame title="Break room game" loading="lazy" allow="autoplay; fullscreen; gamepad"></iframe>
 <span class="tw-breakroom-game-gridline" aria-hidden="true"></span>
 </div>
 </div>
@@ -1562,22 +1795,67 @@
 
 <script>
 // ============================================================
-// TW LOGO HOME RESTART + TRAFFIC-LIGHT MINIMIZE EASTER EGG
+// TW LOGO HOME RESTART + TRAFFIC-LIGHT SECRET BREAK ROOM
+// Clean cartridge loader pass: one source of truth for the hidden room.
 // ============================================================
-(function twLogoAndMinimizeEgg(){
-  if (window.__twLogoAndMinimizeEgg) return;
-  window.__twLogoAndMinimizeEgg = true;
+(function twLogoAndSecretBreakRoom(){
+  'use strict';
+  if (window.__twLogoAndSecretBreakRoomClean) return;
+  window.__twLogoAndSecretBreakRoomClean = true;
+
+  var timers = [];
+  var currentGame = null;
+
+  function $(sel, root){ return (root || document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function body(){ return document.body; }
+  function room(){ return $('#tw-breakroom'); }
+  function menu(){ var r = room(); return r ? $('[data-breakroom-menu]', r) : null; }
+  function gameScreen(){ var r = room(); return r ? $('[data-breakroom-game-screen]', r) : null; }
+  function gameFrame(){ var s = gameScreen(); return s ? $('[data-breakroom-game-frame]', s) : null; }
+  function loader(){ var s = gameScreen(); return s ? $('[data-breakroom-game-loader]', s) : null; }
+  function isBreakRoomOpen(){ return !!(body() && body().classList.contains('tw-terminal-minimized')); }
+  function isMuted(){ return sessionStorage.getItem('tw_audio_muted') === '1'; }
+
+  function clearTimers(){
+    timers.forEach(function(t){ clearTimeout(t); });
+    timers = [];
+  }
+
+  function wait(fn, delay){
+    var t = setTimeout(fn, delay || 0);
+    timers.push(t);
+    return t;
+  }
+
+  function reducedMotion(){
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
 
   function closeMenu(){
-    document.body.classList.remove('menu-open');
-    var menuBtn = document.getElementById('menu-btn');
-    var sideMenu = document.getElementById('side-menu');
+    if (!body()) return;
+    body().classList.remove('menu-open');
+    var menuBtn = $('#menu-btn');
+    var sideMenu = $('#side-menu');
     if (menuBtn) {
       menuBtn.setAttribute('aria-expanded', 'false');
       menuBtn.textContent = 'menu';
       menuBtn.classList.remove('active');
     }
     if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+  }
+
+  function clickSound(){
+    try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(e) {}
+  }
+
+  function powerUpOnce(){
+    var r = room();
+    if (!r || r.dataset.jinglePlayed === '1') return;
+    r.dataset.jinglePlayed = '1';
+    wait(function(){
+      try { if (window.twUI && window.twUI.sndBreakRoomOpen) window.twUI.sndBreakRoomOpen(); } catch(e) {}
+    }, 140);
   }
 
   function restartHomeTyping(){
@@ -1587,8 +1865,12 @@
       sessionStorage.removeItem('tw_home_complete');
     } catch (e) {}
 
+    closeBreakRoomGame(false);
     closeMenu();
-    document.body.classList.remove('tw-terminal-minimized');
+    if (body()) body().classList.remove('tw-terminal-minimized', 'tw-breakroom-game-active', 'tw-breakroom-game-opening');
+
+    window.twTypingGen = (window.twTypingGen || 0) + 1;
+    window.twIntroRunning = false;
 
     var onHome = !!document.querySelector('#terminal-body #hero');
     if (onHome && typeof window.twResetAndReplayHome === 'function') {
@@ -1596,29 +1878,27 @@
       return;
     }
 
-    var loader = null;
-    if (typeof window.twLoadPage === 'function') loader = window.twLoadPage;
-    else if (typeof window.twSoftLoadPage === 'function') loader = window.twSoftLoadPage;
+    var loaderFn = null;
+    if (typeof window.twLoadPage === 'function') loaderFn = window.twLoadPage;
+    else if (typeof window.twSoftLoadPage === 'function') loaderFn = window.twSoftLoadPage;
 
-    if (loader && typeof window.twResetAndReplayHome === 'function') {
-      Promise.resolve(loader('index.html')).then(function(){
+    if (loaderFn) {
+      Promise.resolve(loaderFn('index.html')).then(function(){
         window.setTimeout(function(){
-          window.twResetAndReplayHome();
+          if (typeof window.twResetAndReplayHome === 'function') window.twResetAndReplayHome();
+          else window.location.assign('index.html?homeIntro=' + Date.now());
         }, 80);
-      }).catch(function(){
-        window.location.assign('index.html?homeIntro=' + Date.now());
-      });
+      }).catch(function(){ window.location.assign('index.html?homeIntro=' + Date.now()); });
       return;
     }
 
     window.location.assign('index.html?homeIntro=' + Date.now());
   }
 
-
-  // ---------- break room music deck: robot_rock <-> da_funk ----------
+  // ---------- music deck: robot_rock <-> da_funk ----------
   (function twBreakRoomMusicDeck(){
-    if (window.__twBreakRoomAudioDeck) return;
-    window.__twBreakRoomAudioDeck = true;
+    if (window.__twBreakRoomAudioDeckClean) return;
+    window.__twBreakRoomAudioDeckClean = true;
 
     var ROBOT_KEY = 'tw_robot_music_t';
     var FUNK_KEY = 'tw_funk_music_t';
@@ -1628,44 +1908,47 @@
 
     function robot(){ return document.getElementById('bg-audio'); }
     function funk(){ return document.getElementById('break-audio'); }
-    function muted(){ return sessionStorage.getItem(MUTE_KEY) === '1'; }
-    function currentDeck(){ return document.body && document.body.classList.contains('tw-terminal-minimized') ? 'funk' : 'robot'; }
-    function get(deck){ return deck === 'funk' ? funk() : robot(); }
+    function deckEl(deck){ return deck === 'funk' ? funk() : robot(); }
+    function currentDeck(){ return isBreakRoomOpen() ? 'funk' : 'robot'; }
 
     function save(deck){
-      var el = get(deck);
+      var el = deckEl(deck);
       if (!el) return;
       try { sessionStorage.setItem(deck === 'funk' ? FUNK_KEY : ROBOT_KEY, String(el.currentTime || 0)); } catch(e) {}
     }
 
     function restore(deck){
-      var el = get(deck);
+      var el = deckEl(deck);
       if (!el) return;
-      var key = deck === 'funk' ? FUNK_KEY : ROBOT_KEY;
-      var t = parseFloat(sessionStorage.getItem(key));
-      if (!isNaN(t)) {
-        try { el.currentTime = t; } catch(e) {}
-      }
+      var t = parseFloat(sessionStorage.getItem(deck === 'funk' ? FUNK_KEY : ROBOT_KEY));
+      if (!isNaN(t)) { try { el.currentTime = t; } catch(e) {} }
     }
 
     function pause(deck){
-      var el = get(deck);
+      var el = deckEl(deck);
       if (!el) return;
       save(deck);
       try { el.pause(); } catch(e) {}
     }
 
-    function stopOther(deck){
-      pause(deck === 'funk' ? 'robot' : 'funk');
+    function pauseAll(){
+      pause('robot');
+      pause('funk');
+      sessionStorage.removeItem(MUSIC_KEY);
+      syncButton();
+    }
+
+    function audible(){
+      return ['robot','funk'].some(function(deck){
+        var el = deckEl(deck);
+        return !!(el && !el.paused && !el.muted && el.volume > 0);
+      });
     }
 
     function play(deck){
-      var el = get(deck);
-      if (!el || muted()) {
-        window.dispatchEvent(new CustomEvent('tw:music-sync'));
-        return;
-      }
-      stopOther(deck);
+      var el = deckEl(deck);
+      if (!el || isMuted()) { syncButton(); return; }
+      pause(deck === 'funk' ? 'robot' : 'funk');
       restore(deck);
       try {
         el.volume = 0.4;
@@ -1673,64 +1956,51 @@
         sessionStorage.setItem(ACTIVE_KEY, deck);
         sessionStorage.setItem(MUSIC_KEY, '1');
         var p = el.play();
-        if (p && p.catch) p.catch(function(){ window.dispatchEvent(new CustomEvent('tw:music-sync')); });
+        if (p && p.catch) p.catch(function(){ syncButton(); });
       } catch(e) {}
-      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+      syncButton();
     }
 
-    function pauseAll(){
-      pause('robot');
-      pause('funk');
-      sessionStorage.removeItem(MUSIC_KEY);
-      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    function applyMute(muted){
+      sessionStorage.setItem(MUTE_KEY, muted ? '1' : '0');
+      if (typeof window.twApplyMute === 'function') {
+        try { window.twApplyMute(muted); } catch(e) {}
+      }
+      setGameFrameMuted();
     }
 
-    function isAnyAudible(){
-      return ['robot','funk'].some(function(deck){
-        var el = get(deck);
-        return !!(el && !el.paused && !el.muted && el.volume > 0);
-      });
-    }
-
-    function setButton(){
+    function syncButton(){
       var btn = document.getElementById('audio-toggle-btn');
       var viz = document.getElementById('audio-viz');
-      var playing = !muted() && isAnyAudible();
+      var playing = !isMuted() && audible();
       if (btn) btn.innerHTML = playing ? '<span class="audio-glyph">⏸</span> mute' : '<span class="audio-glyph">▶</span> audio';
       if (viz) viz.classList.toggle('active', playing);
-    }
-
-    function setMute(isMuted){
-      sessionStorage.setItem(MUTE_KEY, isMuted ? '1' : '0');
-      if (typeof window.twApplyMute === 'function') {
-        try { window.twApplyMute(isMuted); } catch(e) {}
-      }
     }
 
     window.twBreakRoomAudio = {
       enter: function(){
         sessionStorage.setItem(ACTIVE_KEY, 'funk');
         pause('robot');
-        if (!muted()) play('funk');
-        else setButton();
+        if (!isMuted()) play('funk');
+        else syncButton();
       },
       exit: function(){
         sessionStorage.setItem(ACTIVE_KEY, 'robot');
         pause('funk');
-        if (!muted()) play('robot');
-        else setButton();
+        if (!isMuted()) play('robot');
+        else syncButton();
       },
       muteAll: function(){
         pauseAll();
-        setMute(true);
-        setButton();
+        applyMute(true);
+        syncButton();
       },
       playCurrent: function(){
-        setMute(false);
+        applyMute(false);
         play(currentDeck());
       },
-      isAnyAudible: isAnyAudible,
-      update: setButton
+      isAnyAudible: audible,
+      update: syncButton
     };
 
     document.addEventListener('click', function(e){
@@ -1741,432 +2011,370 @@
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
       try { btn.blur(); } catch(_) {}
 
-      var turningOn = muted() || !isAnyAudible();
+      var turningOn = isMuted() || !audible();
+      clickSound();
       if (turningOn) {
-        setMute(false);
-        try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(_) {}
+        applyMute(false);
         play(currentDeck());
       } else {
-        try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(_) {}
         pauseAll();
-        setMute(true);
+        applyMute(true);
       }
-      setButton();
+      syncButton();
     }, true);
 
     ['play','pause','timeupdate','volumechange'].forEach(function(type){
       document.addEventListener(type, function(e){
-        if (e.target && (e.target.id === 'bg-audio' || e.target.id === 'break-audio')) setButton();
+        if (e.target && (e.target.id === 'bg-audio' || e.target.id === 'break-audio')) syncButton();
       }, true);
     });
-    window.addEventListener('tw:music-sync', setButton);
+    window.addEventListener('tw:music-sync', syncButton);
   })();
 
-  var breakRoomTimers = [];
-
-  function clearBreakRoomTimers(){
-    breakRoomTimers.forEach(function(t){ clearTimeout(t); });
-    breakRoomTimers = [];
-  }
-
-  function queueBreakRoom(fn, delay){
-    var t = setTimeout(fn, delay);
-    breakRoomTimers.push(t);
-    return t;
-  }
-
-  function twReducedMotion(){
-    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  }
-
-  function fillBreakRoomText(room){
-    if (!room) return;
-    var lines = Array.prototype.slice.call(room.querySelectorAll('[data-breakroom-line]'));
-    lines.forEach(function(line){
+  function fillBreakRoomText(r){
+    if (!r) return;
+    $all('[data-breakroom-line]', r).forEach(function(line){
       line.textContent = line.getAttribute('data-breakroom-line') || '';
       line.classList.remove('is-typing', 'cursor-live');
     });
-    if (lines.length) lines[lines.length - 1].classList.add('cursor-live');
-    room.classList.add('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    var exit = $('.tw-breakroom-exit[data-breakroom-line]', r);
+    if (exit) exit.classList.add('cursor-live');
+    r.classList.add('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    r.dataset.typing = '0';
   }
 
-  function resetBreakRoomTextForTyping(room){
-    if (!room) return;
-    room.classList.remove('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
-    room.querySelectorAll('[data-breakroom-line]').forEach(function(line){
+  function resetBreakRoomText(r){
+    if (!r) return;
+    r.classList.remove('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    $all('[data-breakroom-line]', r).forEach(function(line){
       line.textContent = '';
       line.classList.remove('is-typing', 'cursor-live');
     });
   }
 
-  function typeBreakRoom(room){
-    if (!room || room.dataset.typed === '1') return;
-    clearBreakRoomTimers();
+  function typeLine(r, line, done){
+    var full = line ? (line.getAttribute('data-breakroom-line') || '') : '';
+    var i = 0;
+    $all('[data-breakroom-line]', r).forEach(function(l){ l.classList.remove('is-typing', 'cursor-live'); });
+    if (!line) { wait(done, 0); return; }
+    line.classList.add('is-typing');
 
-    if (twReducedMotion()) {
-      fillBreakRoomText(room);
-      room.dataset.typed = '1';
+    function tick(){
+      line.textContent = full.slice(0, i);
+      if (i > 0 && full.charAt(i - 1) !== ' ') {
+        try { if (window.twTypeClick) window.twTypeClick(); } catch(e) {}
+      }
+      if (i <= full.length) {
+        var ch = full.charAt(i - 1);
+        i += 1;
+        var d = ch === ' ' ? 24 : 42 + Math.floor(Math.random() * 16);
+        if (ch === '.' || ch === '!' || ch === ':') d += 135;
+        wait(tick, d);
+      } else {
+        line.classList.remove('is-typing');
+        wait(done, 260);
+      }
+    }
+    tick();
+  }
+
+  function typeBreakRoom(r){
+    if (!r || r.dataset.typed === '1' || r.dataset.typing === '1') return;
+    clearTimers();
+    if (reducedMotion()) {
+      fillBreakRoomText(r);
+      r.dataset.typed = '1';
       return;
     }
 
-    var lines = Array.prototype.slice.call(room.querySelectorAll('.tw-breakroom-copy [data-breakroom-line]'));
-    var exitLine = room.querySelector('.tw-breakroom-exit[data-breakroom-line]');
-    var lineIndex = 0;
-    room.dataset.typing = '1';
-    room.classList.remove('tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready', 'tw-breakroom-typed');
-
-    function click(){
-      try { if (window.twTypeClick) window.twTypeClick(); } catch(e) {}
-    }
-
-    function typeSingleLine(line, done){
-      var full = line.getAttribute('data-breakroom-line') || '';
-      var charIndex = 0;
-      room.querySelectorAll('[data-breakroom-line]').forEach(function(l){ l.classList.remove('is-typing', 'cursor-live'); });
-
-      if (!full) {
-        line.textContent = '';
-        queueBreakRoom(done, 240);
-        return;
-      }
-
-      line.classList.add('is-typing');
-
-      function step(){
-        line.textContent = full.slice(0, charIndex);
-        if (charIndex > 0 && full.charAt(charIndex - 1) !== ' ') click();
-
-        if (charIndex <= full.length) {
-          charIndex += 1;
-          var typedChar = full.charAt(charIndex - 2);
-          var delay = typedChar === ' ' ? 18 : 36 + Math.floor(Math.random() * 22);
-          if (typedChar === '.' || typedChar === '!' || typedChar === ':') delay += 120;
-          queueBreakRoom(step, delay);
-        } else {
-          line.classList.remove('is-typing');
-          queueBreakRoom(done, 260);
-        }
-      }
-
-      step();
-    }
+    var intro = $all('.tw-breakroom-copy [data-breakroom-line]', r);
+    var exit = $('.tw-breakroom-exit[data-breakroom-line]', r);
+    var idx = 0;
+    r.dataset.typing = '1';
+    r.classList.remove('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
 
     function finish(){
-      room.querySelectorAll('[data-breakroom-line]').forEach(function(line){ line.classList.remove('is-typing', 'cursor-live'); });
-      if (exitLine) exitLine.classList.add('cursor-live');
-      room.dataset.typed = '1';
-      room.dataset.typing = '0';
-      room.classList.add('tw-breakroom-typed', 'tw-breakroom-exit-ready');
+      $all('[data-breakroom-line]', r).forEach(function(line){ line.classList.remove('is-typing', 'cursor-live'); });
+      if (exit) exit.classList.add('cursor-live');
+      r.dataset.typed = '1';
+      r.dataset.typing = '0';
+      r.classList.add('tw-breakroom-typed');
     }
 
-    function typeIntroLines(){
-      if (lineIndex >= lines.length) {
-        room.classList.add('tw-breakroom-text-done');
-        queueBreakRoom(function(){
-          room.classList.add('tw-breakroom-cards-ready');
-          queueBreakRoom(function(){
-            room.classList.add('tw-breakroom-exit-ready');
-            if (exitLine) typeSingleLine(exitLine, finish);
+    function nextIntro(){
+      if (idx >= intro.length) {
+        r.classList.add('tw-breakroom-text-done');
+        wait(function(){
+          r.classList.add('tw-breakroom-cards-ready');
+          // Tiles reveal first. Then the exit prompt types and owns the cursor.
+          wait(function(){
+            r.classList.add('tw-breakroom-exit-ready');
+            if (exit) typeLine(r, exit, finish);
             else finish();
-          }, 620);
-        }, 220);
+          }, 950);
+        }, 280);
         return;
       }
-
-      typeSingleLine(lines[lineIndex], function(){
-        lineIndex += 1;
-        queueBreakRoom(typeIntroLines, 140);
+      typeLine(r, intro[idx], function(){
+        idx += 1;
+        wait(nextIntro, 150);
       });
     }
 
-    typeIntroLines();
+    nextIntro();
   }
 
-  function setBreakRoom(open){
-    closeMenu();
-    var room = document.getElementById('tw-breakroom');
+  function setGameFrameMuted(){
+    var frame = gameFrame();
+    if (!frame || !frame.contentWindow) return;
+    try { frame.contentWindow.postMessage({ type: 'tw-game-audio', muted: isMuted() }, '*'); } catch(e) {}
+  }
+  window.twSetGameFrameMuted = setGameFrameMuted;
 
-    if (open) {
-      if (room) {
-        room.setAttribute('aria-hidden', 'false');
-        if (room.dataset.typed !== '1') resetBreakRoomTextForTyping(room);
-        else fillBreakRoomText(room);
-      }
-      document.body.classList.add('tw-terminal-minimized');
-      try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.enter) window.twBreakRoomAudio.enter(); } catch(e) {}
-      if (room && room.dataset.typed !== '1') {
-        queueBreakRoom(function(){ typeBreakRoom(room); }, 260);
-      }
-    } else {
-      clearBreakRoomTimers();
-      closeBreakRoomGame(false);
-      try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.exit) window.twBreakRoomAudio.exit(); } catch(e) {}
-      document.body.classList.remove('tw-terminal-minimized');
-      if (room) {
-        room.setAttribute('aria-hidden', 'true');
-        room.querySelectorAll('[data-breakroom-line]').forEach(function(line){
-          line.classList.remove('is-typing', 'cursor-live');
-        });
-      }
+  function cleanGameScreen(){
+    var s = gameScreen();
+    var f = gameFrame();
+    var l = loader();
+    if (f) {
+      f.onload = null;
+      f.removeAttribute('src');
+      f.src = 'about:blank';
+      f.dataset.loaded = '0';
+      f.dataset.currentGame = '';
     }
-  }
-
-  function toggleTerminalMinimize(){
-    setBreakRoom(!document.body.classList.contains('tw-terminal-minimized'));
-  }
-
-
-  function cleanBreakRoomGameScreen(){
-    var room = document.getElementById('tw-breakroom');
-    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
-    if (!screen) return;
-    screen.setAttribute('aria-hidden', 'true');
-    screen.classList.remove('is-opening', 'is-closing');
-    try { screen.getAnimations().forEach(function(anim){ anim.cancel(); }); } catch(e) {}
-    screen.style.transform = '';
-    screen.style.opacity = '';
-    document.querySelectorAll('.tw-breakroom-card.is-launching').forEach(function(card){
-      card.classList.remove('is-launching');
-      card.dataset.twLaunching = '0';
-    });
+    if (s) {
+      s.setAttribute('aria-hidden', 'true');
+      s.classList.remove('is-opening', 'is-closing', 'is-loading', 'is-loaded');
+    }
+    if (l) l.setAttribute('aria-hidden', 'true');
+    $all('.tw-breakroom-card.is-launching').forEach(function(card){ card.classList.remove('is-launching'); });
+    currentGame = null;
   }
 
   function closeBreakRoomGame(animated){
-    var active = document.body.classList.contains('tw-breakroom-game-active');
-    var room = document.getElementById('tw-breakroom');
-    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
-    if (!active) {
-      cleanBreakRoomGameScreen();
-      return;
-    }
-
-    document.body.classList.remove('tw-breakroom-game-active', 'tw-breakroom-game-opening');
-
-    if (!screen || animated === false || twReducedMotion()) {
-      cleanBreakRoomGameScreen();
-      return;
-    }
-
-    screen.classList.add('is-closing');
+    var s = gameScreen();
+    if (!body()) return;
+    body().classList.remove('tw-breakroom-game-active', 'tw-breakroom-game-opening');
+    if (!s) { cleanGameScreen(); return; }
+    if (!animated || reducedMotion()) { cleanGameScreen(); return; }
     try {
-      var anim = screen.animate([
-        { transform: 'translate(0,0) scale(1)', opacity: 1, filter: 'brightness(1)' },
-        { transform: 'translate(0,10px) scale(0.985)', opacity: 0, filter: 'brightness(0.75) blur(1px)' }
-      ], { duration: 220, easing: 'cubic-bezier(.5,0,.2,1)' });
-      anim.onfinish = function(){ cleanBreakRoomGameScreen(); };
-    } catch(e) {
-      cleanBreakRoomGameScreen();
-    }
+      s.classList.add('is-closing');
+      var anim = s.animate([
+        { opacity: 1, transform: 'scale(1)', filter: 'brightness(1)' },
+        { opacity: 0, transform: 'scale(.985) translateY(8px)', filter: 'brightness(.55) blur(1px)' }
+      ], { duration: 260, easing: 'cubic-bezier(.4,0,.2,1)' });
+      anim.onfinish = cleanGameScreen;
+      anim.oncancel = cleanGameScreen;
+    } catch(e) { cleanGameScreen(); }
   }
+  window.twCloseBreakRoomGame = closeBreakRoomGame;
 
   function openBreakRoomGame(card){
-    if (!card) return;
-    var room = document.getElementById('tw-breakroom');
-    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
-    if (!room || !screen) return;
+    var r = room();
+    var s = gameScreen();
+    var f = gameFrame();
+    var l = loader();
+    if (!r || !s || !f || !card) return;
 
-    var titleEl = card.querySelector('.tw-breakroom-card__title');
-    var numEl = card.querySelector('.tw-breakroom-card__num');
-    var copyEl = card.querySelector('.tw-breakroom-card__copy');
-    var title = titleEl ? titleEl.textContent.trim() : 'game screen';
-    var num = numEl ? numEl.textContent.trim() : '[--]';
-    var copy = copyEl ? copyEl.textContent.trim() : 'placeholder viewport ready.';
+    var src = card.getAttribute('data-game-src') || '';
+    if (!src) return;
+    if (!isBreakRoomOpen()) enterBreakRoom(false);
 
-    var outTitle = screen.querySelector('[data-breakroom-game-title]');
-    var outNum = screen.querySelector('[data-breakroom-game-number]');
-    var outNote = screen.querySelector('[data-breakroom-game-note]');
-    if (outTitle) outTitle.textContent = title;
-    if (outNum) outNum.textContent = num;
-    if (outNote) outNote.textContent = copy + ' game build loads here next.';
+    var title = ($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen';
+    var num = ($('.tw-breakroom-card__num', card) || {}).textContent || '[--]';
+    var copy = ($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge...';
 
-    document.querySelectorAll('.tw-breakroom-card.is-launching').forEach(function(other){
-      other.classList.remove('is-launching');
-      other.dataset.twLaunching = '0';
-    });
+    var outTitle = $('[data-breakroom-game-title]', s);
+    var outNum = $('[data-breakroom-game-number]', s);
+    var outNote = $('[data-breakroom-game-note]', s);
+    var status = $('.tw-breakroom-game-status', s);
+    if (outTitle) outTitle.textContent = title.trim();
+    if (outNum) outNum.textContent = num.trim();
+    if (outNote) outNote.textContent = copy.trim() + ' loading...';
+    if (status) status.textContent = '> ' + title.trim() + ' loaded';
+
+    $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
     card.classList.add('is-launching');
-    card.dataset.twLaunching = '1';
 
-    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+    clickSound();
 
-    var roomRect = room.getBoundingClientRect();
+    s.setAttribute('aria-hidden', 'false');
+    s.classList.remove('is-closing', 'is-loaded');
+    s.classList.add('is-opening', 'is-loading');
+    if (l) l.setAttribute('aria-hidden', 'false');
+    body().classList.add('tw-breakroom-game-active', 'tw-breakroom-game-opening');
+
+    var roomRect = r.getBoundingClientRect();
     var cardRect = card.getBoundingClientRect();
     var sx = cardRect.left - roomRect.left;
     var sy = cardRect.top - roomRect.top;
-    var scaleX = roomRect.width ? Math.max(cardRect.width / roomRect.width, 0.08) : 0.32;
-    var scaleY = roomRect.height ? Math.max(cardRect.height / roomRect.height, 0.08) : 0.32;
+    var scaleX = roomRect.width ? Math.max(cardRect.width / roomRect.width, .08) : .32;
+    var scaleY = roomRect.height ? Math.max(cardRect.height / roomRect.height, .08) : .32;
 
-    screen.setAttribute('aria-hidden', 'false');
-    screen.classList.remove('is-closing');
-    screen.classList.add('is-opening');
-    document.body.classList.add('tw-breakroom-game-active', 'tw-breakroom-game-opening');
+    f.onload = function(){
+      f.dataset.loaded = '1';
+      s.classList.remove('is-loading');
+      s.classList.add('is-loaded');
+      if (l) l.setAttribute('aria-hidden', 'true');
+      setGameFrameMuted();
+      wait(function(){ try { f.focus(); } catch(e) {} }, 80);
+    };
+    f.onerror = function(){
+      if (outNote) outNote.textContent = 'cartridge did not load. check the /games folder path.';
+    };
+    f.dataset.loaded = '0';
+    f.dataset.currentGame = src;
+    f.src = 'about:blank';
+    wait(function(){ f.src = src; }, 30);
+    currentGame = src;
 
-    try { screen.getAnimations().forEach(function(anim){ anim.cancel(); }); } catch(e) {}
-
-    if (twReducedMotion()) {
-      screen.classList.remove('is-opening');
-      document.body.classList.remove('tw-breakroom-game-opening');
+    try { s.getAnimations().forEach(function(a){ a.cancel(); }); } catch(e) {}
+    if (reducedMotion()) {
+      s.classList.remove('is-opening');
+      body().classList.remove('tw-breakroom-game-opening');
       return;
     }
 
     try {
-      var anim = screen.animate([
-        {
-          transform: 'translate(' + sx + 'px,' + sy + 'px) scale(' + scaleX + ',' + scaleY + ')',
-          opacity: 0.62,
-          filter: 'brightness(1.45) blur(0.8px)'
-        },
-        {
-          transform: 'translate(0,0) scale(1,1)',
-          opacity: 1,
-          filter: 'brightness(1) blur(0)'
-        }
+      var anim = s.animate([
+        { transform: 'translate(' + sx + 'px,' + sy + 'px) scale(' + scaleX + ',' + scaleY + ')', opacity: .62, filter: 'brightness(1.45) blur(.8px)' },
+        { transform: 'translate(0,0) scale(1,1)', opacity: 1, filter: 'brightness(1) blur(0)' }
       ], { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' });
       anim.onfinish = function(){
-        screen.classList.remove('is-opening');
-        document.body.classList.remove('tw-breakroom-game-opening');
+        s.classList.remove('is-opening');
+        body().classList.remove('tw-breakroom-game-opening');
+        if (f.dataset.loaded === '1') { try { f.focus(); } catch(e) {} }
       };
     } catch(e) {
-      screen.classList.remove('is-opening');
-      document.body.classList.remove('tw-breakroom-game-opening');
+      s.classList.remove('is-opening');
+      body().classList.remove('tw-breakroom-game-opening');
     }
   }
 
-  function launchBreakRoomCard(card){
-    openBreakRoomGame(card);
+  function enterBreakRoom(withJingle){
+    closeMenu();
+    var r = room();
+    if (r) {
+      r.setAttribute('aria-hidden', 'false');
+      if (r.dataset.typed === '1') fillBreakRoomText(r);
+      else resetBreakRoomText(r);
+    }
+    if (body()) body().classList.add('tw-terminal-minimized');
+    try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.enter) window.twBreakRoomAudio.enter(); } catch(e) {}
+    if (withJingle !== false) powerUpOnce();
+    if (r && r.dataset.typed !== '1') wait(function(){ typeBreakRoom(r); }, 260);
   }
 
-  document.addEventListener('click', function(e){
-    var logo = e.target && e.target.closest ? e.target.closest('.tw-home-restart') : null;
-    if (logo) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      var runHomeRestart = function(){ restartHomeTyping(); };
-      if (typeof window.twDelayBrandmarkHome === 'function') {
-        window.twDelayBrandmarkHome(runHomeRestart);
-      } else {
-        runHomeRestart();
-      }
+  function exitBreakRoom(){
+    clearTimers();
+    closeBreakRoomGame(false);
+    try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.exit) window.twBreakRoomAudio.exit(); } catch(e) {}
+    if (body()) body().classList.remove('tw-terminal-minimized', 'tw-breakroom-game-active', 'tw-breakroom-game-opening');
+    var r = room();
+    if (r) {
+      r.setAttribute('aria-hidden', 'true');
+      $all('[data-breakroom-line]', r).forEach(function(line){ line.classList.remove('is-typing', 'cursor-live'); });
+      r.dataset.typing = '0';
+    }
+  }
+
+  function toggleBreakRoom(){
+    if (isBreakRoomOpen()) exitBreakRoom();
+    else enterBreakRoom(true);
+  }
+
+  window.twSetBreakRoom = function(open){ open ? enterBreakRoom(true) : exitBreakRoom(); };
+  window.twToggleBreakRoom = toggleBreakRoom;
+
+  function absorb(e){
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
+  function handleClick(e){
+    var target = e.target;
+    if (!target || !target.closest) return;
+
+    var card = target.closest('.tw-breakroom-card');
+    if (card && card.closest('#tw-breakroom') && isBreakRoomOpen() && !body().classList.contains('tw-breakroom-game-active')) {
+      absorb(e);
+      openBreakRoomGame(card);
       return;
     }
 
-    var breakRoomBack = e.target && e.target.closest ? e.target.closest('[data-breakroom-back]') : null;
-    if (breakRoomBack) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+    var back = target.closest('[data-breakroom-back]');
+    if (back) {
+      absorb(e);
+      clickSound();
       closeBreakRoomGame(true);
       return;
     }
 
-    var breakRoomExit = e.target && e.target.closest ? e.target.closest('[data-breakroom-exit]') : null;
-    if (breakRoomExit) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
-      setBreakRoom(false);
+    var exit = target.closest('[data-breakroom-exit]');
+    if (exit) {
+      absorb(e);
+      clickSound();
+      exitBreakRoom();
       return;
     }
 
-    var breakRoomCard = e.target && e.target.closest ? e.target.closest('.tw-breakroom-card') : null;
-    if (breakRoomCard) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      launchBreakRoomCard(breakRoomCard);
+    var dots = target.closest('.terminal.main .terminal-bar .terminal-dots');
+    if (dots) {
+      absorb(e);
+      clickSound();
+      toggleBreakRoom();
       return;
     }
 
-    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .terminal-dots') : null;
-    if (greenDot) {
-      e.preventDefault();
-      e.stopPropagation();
-      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-      var openingBreakRoom = !document.body.classList.contains('tw-terminal-minimized');
-      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
-      toggleTerminalMinimize();
-      if (openingBreakRoom) {
-        queueBreakRoom(function(){
-          try { if (window.twUI && window.twUI.sndBreakRoomOpen) window.twUI.sndBreakRoomOpen(); } catch(e) {}
-        }, 150);
-      }
-    }
-  }, true);
-
-  document.addEventListener('keydown', function(e){
-    if (e.key !== 'Enter' && e.key !== ' ') return;
-    var logo = e.target && e.target.closest ? e.target.closest('.tw-home-restart') : null;
-    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .terminal-dots') : null;
-    if (!logo && !greenDot) return;
-
-    e.preventDefault();
-    e.stopPropagation();
-    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+    var logo = target.closest('.tw-home-restart');
     if (logo) {
-      var runHomeRestart = function(){ restartHomeTyping(); };
-      if (typeof window.twDelayBrandmarkHome === 'function') window.twDelayBrandmarkHome(runHomeRestart);
-      else runHomeRestart();
+      absorb(e);
+      try { logo.blur(); } catch(_) {}
+      clickSound();
+      restartHomeTyping();
     }
-    else {
-      var openingBreakRoom = !document.body.classList.contains('tw-terminal-minimized');
-      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
-      toggleTerminalMinimize();
-      if (openingBreakRoom) {
-        queueBreakRoom(function(){
-          try { if (window.twUI && window.twUI.sndBreakRoomOpen) window.twUI.sndBreakRoomOpen(); } catch(e) {}
-        }, 150);
-      }
-    }
-  }, true);
-
-  function prepBreakRoomCards(){
-    document.querySelectorAll('.tw-breakroom-card').forEach(function(card){
-      if (card.dataset.twLaunchBound === '1') return;
-      card.dataset.twLaunchBound = '1';
-      card.setAttribute('aria-label', 'launch ' + (card.querySelector('.tw-breakroom-card__title') ? card.querySelector('.tw-breakroom-card__title').textContent.trim() : 'game'));
-
-      card.addEventListener('click', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-        launchBreakRoomCard(card);
-      }, true);
-
-      card.addEventListener('pointerup', function(e){
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-        launchBreakRoomCard(card);
-      }, true);
-
-      card.addEventListener('keydown', function(e){
-        if (e.key !== 'Enter' && e.key !== ' ') return;
-        e.preventDefault();
-        e.stopPropagation();
-        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
-        launchBreakRoomCard(card);
-      }, true);
-    });
   }
 
-  function prepDots(){
-    document.querySelectorAll('.terminal.main .terminal-bar .terminal-dots').forEach(function(dot){
+  function handleKey(e){
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var target = e.target;
+    if (!target || !target.closest) return;
+
+    var card = target.closest('.tw-breakroom-card');
+    var back = target.closest('[data-breakroom-back]');
+    var exit = target.closest('[data-breakroom-exit]');
+    var dots = target.closest('.terminal.main .terminal-bar .terminal-dots');
+    var logo = target.closest('.tw-home-restart');
+    if (!card && !back && !exit && !dots && !logo) return;
+    handleClick(e);
+  }
+
+  function prepControls(){
+    $all('.terminal.main .terminal-bar .terminal-dots').forEach(function(dot){
       dot.setAttribute('role', 'button');
       dot.setAttribute('tabindex', '0');
       dot.setAttribute('aria-label', 'toggle secret break room');
       dot.setAttribute('title', 'secret break room');
     });
+    $all('.tw-breakroom-card').forEach(function(card){
+      card.setAttribute('role', 'button');
+      card.setAttribute('tabindex', '0');
+      var title = ($('.tw-breakroom-card__title', card) || {}).textContent || 'game';
+      card.setAttribute('aria-label', 'launch ' + title.trim());
+    });
   }
 
-  function prepBreakRoomControls(){
-    prepDots();
-    prepBreakRoomCards();
-  }
+  document.addEventListener('click', handleClick, true);
+  document.addEventListener('keydown', handleKey, true);
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepBreakRoomControls);
-  else prepBreakRoomControls();
+  window.addEventListener('message', function(e){
+    if (!e.data || e.data.type !== 'tw-game-ready') return;
+    setGameFrameMuted();
+  });
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepControls);
+  else prepControls();
 })();
 </script>
 
@@ -2272,6 +2480,598 @@
   }, true);
 
   window.addEventListener('blur', function(){ releaseAfterMinimum(); });
+})();
+</script>
+
+
+<script>
+// ============================================================
+// TW BREAK ROOM HIT LAYER
+// A tiny, isolated interaction layer that sits above the visual
+// terminal stack and mirrors hover/click onto the real cards.
+// This keeps the break room design intact while making every
+// cartridge and the exit prompt reliably clickable.
+// ============================================================
+(function twBreakRoomHitLayer(){
+  'use strict';
+  if (window.__twBreakRoomHitLayer) return;
+  window.__twBreakRoomHitLayer = true;
+
+  var layer = null;
+  var cardProxies = [];
+  var exitProxy = null;
+  var raf = 0;
+  var lastActive = false;
+
+  function $(sel, root){ return (root || document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function body(){ return document.body; }
+  function room(){ return document.getElementById('tw-breakroom'); }
+  function gameScreen(){ var r = room(); return r ? $('[data-breakroom-game-screen]', r) : null; }
+  function gameFrame(){ var s = gameScreen(); return s ? $('[data-breakroom-game-frame]', s) : null; }
+  function loader(){ var s = gameScreen(); return s ? $('[data-breakroom-game-loader]', s) : null; }
+  function isOpen(){ return !!(body() && body().classList.contains('tw-terminal-minimized')); }
+  function inGame(){ return !!(body() && body().classList.contains('tw-breakroom-game-active')); }
+  function cardsReady(){ var r = room(); return !!(r && r.classList.contains('tw-breakroom-cards-ready')); }
+  function exitReady(){ var r = room(); return !!(r && r.classList.contains('tw-breakroom-exit-ready')); }
+
+  function absorb(e){
+    if (!e) return;
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+  }
+
+  function clickSound(){
+    try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(e) {}
+  }
+
+  function muted(){
+    try { return sessionStorage.getItem('tw_audio_muted') === '1'; } catch(e) { return false; }
+  }
+
+  function syncGameMute(){
+    var f = gameFrame();
+    if (!f || !f.contentWindow) return;
+    try { f.contentWindow.postMessage({ type:'tw-game-audio', muted: muted() }, '*'); } catch(e) {}
+  }
+
+  function prepRoom(){
+    var r = room();
+    if (!r || !body()) return;
+    r.setAttribute('aria-hidden', 'false');
+    r.classList.add('tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    body().classList.add('tw-terminal-minimized');
+  }
+
+  function unloadGame(){
+    var s = gameScreen();
+    var f = gameFrame();
+    var l = loader();
+    if (f) {
+      try { f.onload = null; f.onerror = null; } catch(e) {}
+      f.dataset.loaded = '0';
+      f.dataset.currentGame = '';
+      try { f.removeAttribute('src'); } catch(e) {}
+      try { f.src = 'about:blank'; } catch(e) {}
+    }
+    if (s) {
+      s.setAttribute('aria-hidden', 'true');
+      s.classList.remove('is-opening','is-closing','is-loading','is-loaded');
+    }
+    if (l) l.setAttribute('aria-hidden', 'true');
+    if (body()) body().classList.remove('tw-breakroom-game-active','tw-breakroom-game-opening');
+    $all('.tw-breakroom-card.is-launching').forEach(function(card){ card.classList.remove('is-launching'); });
+  }
+
+  function normalizeSrc(src){
+    src = src || '';
+    if (!src) return '';
+    if (src.indexOf('embed=1') === -1) src += (src.indexOf('?') === -1 ? '?' : '&') + 'embed=1';
+    return src;
+  }
+
+  function openGame(card){
+    if (!card) return;
+    prepRoom();
+
+    var src = normalizeSrc(card.getAttribute('data-game-src') || card.dataset.gameSrc || '');
+    var s = gameScreen();
+    var f = gameFrame();
+    var l = loader();
+    if (!src || !s || !f) return;
+
+    var title = (($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen').trim();
+    var num = (($('.tw-breakroom-card__num', card) || {}).textContent || '[--]').trim();
+    var copy = (($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge').trim();
+
+    var outTitle = $('[data-breakroom-game-title]', s);
+    var outNum = $('[data-breakroom-game-number]', s);
+    var outNote = $('[data-breakroom-game-note]', s);
+    var status = $('.tw-breakroom-game-status', s);
+    if (outTitle) outTitle.textContent = title;
+    if (outNum) outNum.textContent = num;
+    if (outNote) outNote.textContent = copy + ' loading...';
+    if (status) status.textContent = '> ' + title + ' cartridge';
+
+    $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
+    card.classList.add('is-launching');
+    clickSound();
+
+    s.setAttribute('aria-hidden', 'false');
+    s.classList.remove('is-closing','is-loaded');
+    s.classList.add('is-opening','is-loading');
+    if (l) l.setAttribute('aria-hidden', 'false');
+    body().classList.add('tw-breakroom-game-active','tw-breakroom-game-opening');
+
+    try { s.getAnimations().forEach(function(a){ a.cancel(); }); } catch(e) {}
+    try {
+      var rRect = room().getBoundingClientRect();
+      var cRect = card.getBoundingClientRect();
+      var sx = cRect.left - rRect.left;
+      var sy = cRect.top - rRect.top;
+      var scaleX = rRect.width ? Math.max(cRect.width / rRect.width, .08) : .3;
+      var scaleY = rRect.height ? Math.max(cRect.height / rRect.height, .08) : .3;
+      var anim = s.animate([
+        { transform:'translate(' + sx + 'px,' + sy + 'px) scale(' + scaleX + ',' + scaleY + ')', opacity:.62, filter:'brightness(1.45) blur(.8px)' },
+        { transform:'translate(0,0) scale(1,1)', opacity:1, filter:'brightness(1) blur(0)' }
+      ], { duration:560, easing:'cubic-bezier(.16,1,.3,1)' });
+      anim.onfinish = function(){
+        s.classList.remove('is-opening');
+        body().classList.remove('tw-breakroom-game-opening');
+      };
+    } catch(e) {
+      s.classList.remove('is-opening');
+      body().classList.remove('tw-breakroom-game-opening');
+    }
+
+    f.onload = function(){
+      f.dataset.loaded = '1';
+      s.classList.remove('is-loading');
+      s.classList.add('is-loaded');
+      if (l) l.setAttribute('aria-hidden', 'true');
+      syncGameMute();
+      window.setTimeout(function(){ try { f.focus(); } catch(e) {} }, 80);
+    };
+    f.onerror = function(){
+      s.classList.remove('is-loading');
+      if (outNote) outNote.textContent = 'cartridge did not load. check /games folder.';
+    };
+    f.dataset.loaded = '0';
+    f.dataset.currentGame = src;
+    try { f.src = 'about:blank'; } catch(e) {}
+    window.setTimeout(function(){ f.src = src; }, 35);
+  }
+
+  function exitRoom(){
+    unloadGame();
+    try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.exit) window.twBreakRoomAudio.exit(); } catch(e) {}
+    if (body()) body().classList.remove('tw-terminal-minimized','tw-breakroom-game-active','tw-breakroom-game-opening');
+    var r = room();
+    if (r) r.setAttribute('aria-hidden', 'true');
+  }
+
+  function backToGames(){
+    clickSound();
+    unloadGame();
+    prepRoom();
+  }
+
+  window.twBreakRoomOpenGameHard = openGame;
+  window.twBreakRoomExitHard = exitRoom;
+  window.twBreakRoomBackHard = backToGames;
+
+  function makeLayer(){
+    if (layer) return;
+    layer = document.createElement('div');
+    layer.id = 'tw-breakroom-hit-layer';
+    layer.setAttribute('aria-hidden', 'true');
+    layer.className = 'tw-breakroom-hit-layer';
+    document.body.appendChild(layer);
+  }
+
+  function clearHover(){
+    $all('.tw-proxy-hover').forEach(function(el){ el.classList.remove('tw-proxy-hover'); });
+  }
+
+  function makeProxy(kind, index){
+    makeLayer();
+    var proxy = document.createElement('button');
+    proxy.type = 'button';
+    proxy.className = 'tw-breakroom-proxy tw-breakroom-proxy--' + kind;
+    proxy.dataset.kind = kind;
+    proxy.dataset.index = String(index || 0);
+    proxy.style.display = 'none';
+    layer.appendChild(proxy);
+    return proxy;
+  }
+
+  function bindProxy(proxy, getTarget, action){
+    proxy.addEventListener('pointerenter', function(){ var t = getTarget(); if (t) t.classList.add('tw-proxy-hover'); });
+    proxy.addEventListener('pointerleave', function(){ var t = getTarget(); if (t) t.classList.remove('tw-proxy-hover'); });
+    proxy.addEventListener('focus', function(){ var t = getTarget(); if (t) t.classList.add('tw-proxy-hover'); });
+    proxy.addEventListener('blur', function(){ var t = getTarget(); if (t) t.classList.remove('tw-proxy-hover'); });
+    proxy.addEventListener('click', function(e){ absorb(e); clearHover(); action(getTarget(), e); });
+    proxy.addEventListener('keydown', function(e){
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      absorb(e); clearHover(); action(getTarget(), e);
+    });
+  }
+
+  function ensureProxies(){
+    makeLayer();
+    var cards = $all('#tw-breakroom .tw-breakroom-card');
+    while (cardProxies.length < cards.length) {
+      (function(i){
+        var p = makeProxy('card', i);
+        bindProxy(p, function(){ return $all('#tw-breakroom .tw-breakroom-card')[i] || null; }, function(card){ openGame(card); });
+        cardProxies.push(p);
+      })(cardProxies.length);
+    }
+    if (!exitProxy) {
+      exitProxy = makeProxy('exit', 0);
+      bindProxy(exitProxy, function(){ return $('#tw-breakroom [data-breakroom-exit]'); }, function(){ clickSound(); exitRoom(); });
+    }
+  }
+
+  function place(proxy, target, active){
+    if (!proxy) return;
+    if (!target || !active) {
+      proxy.style.display = 'none';
+      proxy.setAttribute('tabindex', '-1');
+      return;
+    }
+    var rect = target.getBoundingClientRect();
+    if (rect.width < 2 || rect.height < 2) {
+      proxy.style.display = 'none';
+      proxy.setAttribute('tabindex', '-1');
+      return;
+    }
+    proxy.style.display = 'block';
+    proxy.style.left = rect.left + 'px';
+    proxy.style.top = rect.top + 'px';
+    proxy.style.width = rect.width + 'px';
+    proxy.style.height = rect.height + 'px';
+    proxy.setAttribute('tabindex', '0');
+    var label = target.getAttribute('aria-label') || target.textContent || 'break room control';
+    proxy.setAttribute('aria-label', label.replace(/\s+/g, ' ').trim());
+  }
+
+  function sync(){
+    ensureProxies();
+    var active = isOpen() && !inGame();
+    if (!active && lastActive) clearHover();
+    lastActive = active;
+    if (layer) layer.style.display = active ? 'block' : 'none';
+
+    var cards = $all('#tw-breakroom .tw-breakroom-card');
+    var cardsActive = active && cardsReady();
+    cardProxies.forEach(function(p, i){ place(p, cards[i], cardsActive); });
+    place(exitProxy, $('#tw-breakroom [data-breakroom-exit]'), active && exitReady());
+  }
+
+  function loop(){
+    sync();
+    raf = window.requestAnimationFrame(loop);
+  }
+
+  function init(){
+    ensureProxies();
+    if (!raf) loop();
+
+    document.addEventListener('click', function(e){
+      var t = e.target && e.target.closest ? e.target.closest('[data-breakroom-back]') : null;
+      if (!t) return;
+      absorb(e);
+      backToGames();
+    }, true);
+
+    window.addEventListener('message', function(e){
+      if (e.data && e.data.type === 'tw-game-ready') syncGameMute();
+    });
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+
+<script>
+// ============================================================
+// TW BREAK ROOM NAME + ALL-TIME HIGH SCORES
+// Local arcade profile and score chart for the embedded games.
+// ============================================================
+(function twBreakRoomScores(){
+  'use strict';
+  if (window.__twBreakRoomScores) return;
+  window.__twBreakRoomScores = true;
+
+  var GAMES = {
+    one_shot: { label: 'one shot' },
+    going_viral: { label: 'going viral' },
+    content_defense: { label: 'content defense' }
+  };
+
+  var STORAGE_NAME = 'tw_breakroom_player_name_v1';
+  var STORAGE_PREFIX = 'tw_breakroom_scores_v1_';
+  var DEFAULT_NAME = 'player_1';
+  var panel = null;
+  var panelMode = null;
+
+  function $(sel, root){ return (root || document).querySelector(sel); }
+  function $all(sel, root){ return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+  function gameScreen(){ return $('[data-breakroom-game-screen]'); }
+  function gameFrame(){ var s = gameScreen(); return s ? $('[data-breakroom-game-frame]', s) : null; }
+  function cleanText(v){ return String(v == null ? '' : v).replace(/\s+/g, ' ').trim(); }
+  function escapeHtml(v){
+    return String(v == null ? '' : v).replace(/[&<>"]/g, function(ch){
+      return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]);
+    });
+  }
+
+  function normalizeName(v){
+    return cleanText(v).replace(/[^A-Za-z0-9 ._\-'&]/g, '').slice(0, 16).trim();
+  }
+
+  function naughtyNormalized(v){
+    return cleanText(v).toLowerCase()
+      .replace(/0/g,'o').replace(/[1!|]/g,'i').replace(/3/g,'e').replace(/4/g,'a').replace(/5|\$/g,'s').replace(/7/g,'t')
+      .replace(/[@]/g,'a').replace(/[^a-z0-9]+/g,' ');
+  }
+
+  function hasNaughtyWord(v){
+    var text = naughtyNormalized(v);
+    var tokens = text.split(/\s+/).filter(Boolean);
+    var exact = ['ass','sex','xxx','cum','fuk','fck','wtf'];
+    var contains = ['fuck','shit','bitch','dick','cock','pussy','cunt','porn','nude','slut','whore','horny','balls','boob','tits','penis','vagina','butthole'];
+    for (var i=0;i<tokens.length;i++) if (exact.indexOf(tokens[i]) !== -1) return true;
+    var joined = tokens.join('');
+    for (var j=0;j<contains.length;j++) if (joined.indexOf(contains[j]) !== -1) return true;
+    return false;
+  }
+
+  function validName(v){
+    var n = normalizeName(v);
+    if (!n || n.length < 2) return { ok:false, value:n, message:'use 2–16 characters.' };
+    if (!/^[A-Za-z0-9 ._\-'&]+$/.test(n)) return { ok:false, value:n, message:'use letters, numbers, spaces, dots, dashes, underscores, apostrophes, or &.' };
+    if (hasNaughtyWord(n)) return { ok:false, value:n, message:'keep it clean for the break room.' };
+    return { ok:true, value:n, message:'' };
+  }
+
+  function getPlayerName(){
+    var stored = '';
+    try { stored = localStorage.getItem(STORAGE_NAME) || ''; } catch(e) {}
+    var checked = validName(stored);
+    return checked.ok ? checked.value : DEFAULT_NAME;
+  }
+
+  function setPlayerName(name){
+    var checked = validName(name);
+    if (!checked.ok) return checked;
+    try { localStorage.setItem(STORAGE_NAME, checked.value); } catch(e) {}
+    updateNameButtons();
+    return checked;
+  }
+
+  function gameFromSrc(src){
+    src = String(src || '').toLowerCase();
+    if (src.indexOf('going_viral') !== -1) return 'going_viral';
+    if (src.indexOf('content_defense') !== -1) return 'content_defense';
+    if (src.indexOf('one_shot') !== -1) return 'one_shot';
+    return 'one_shot';
+  }
+
+  function currentGameKey(){
+    var f = gameFrame();
+    var src = (f && (f.dataset.currentGame || f.getAttribute('src') || f.src)) || document.body.dataset.twCurrentGame || '';
+    return gameFromSrc(src);
+  }
+
+  function scoreKey(game){ return STORAGE_PREFIX + (game || currentGameKey()); }
+
+  function readScores(game){
+    try {
+      var rows = JSON.parse(localStorage.getItem(scoreKey(game)) || '[]');
+      if (!Array.isArray(rows)) return [];
+      return rows.filter(function(r){ return r && Number.isFinite(Number(r.score)); })
+        .map(function(r){
+          var nameCheck = validName(r.name || DEFAULT_NAME);
+          return {
+            name: nameCheck.ok ? nameCheck.value : DEFAULT_NAME,
+            score: Math.max(0, Math.floor(Number(r.score) || 0)),
+            date: String(r.date || ''),
+            win: !!r.win
+          };
+        })
+        .sort(function(a,b){ return b.score - a.score; })
+        .slice(0, 10);
+    } catch(e) { return []; }
+  }
+
+  function writeScores(game, rows){
+    try { localStorage.setItem(scoreKey(game), JSON.stringify(rows.slice(0, 10))); } catch(e) {}
+  }
+
+  function saveScore(game, rawScore, win){
+    game = game || currentGameKey();
+    var score = Math.max(0, Math.floor(Number(rawScore) || 0));
+    if (!score) return null;
+    var rows = readScores(game);
+    var entry = { name:getPlayerName(), score:score, date:new Date().toISOString(), win:!!win };
+    rows.push(entry);
+    rows.sort(function(a,b){ return b.score - a.score; });
+    rows = rows.slice(0, 10);
+    writeScores(game, rows);
+    if (panelMode === 'scores') renderScores(game, entry);
+    return entry;
+  }
+
+  function updateNameButtons(){
+    var name = getPlayerName();
+    $all('[data-breakroom-name]').forEach(function(btn){
+      btn.textContent = '> name: ' + name;
+      btn.setAttribute('aria-label', 'current arcade name ' + name + '. click to edit');
+    });
+  }
+
+  function ensurePanel(){
+    var s = gameScreen();
+    if (!s) return null;
+    panel = $('[data-breakroom-score-panel]', s);
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.className = 'tw-breakroom-score-panel';
+      panel.setAttribute('data-breakroom-score-panel', '');
+      panel.setAttribute('aria-hidden', 'true');
+      panel.innerHTML = '<div class="tw-breakroom-score-card" data-breakroom-score-card></div>';
+      s.appendChild(panel);
+    }
+    return panel;
+  }
+
+  function closePanel(){
+    var p = ensurePanel();
+    panelMode = null;
+    if (p) {
+      p.classList.remove('is-open');
+      p.setAttribute('aria-hidden', 'true');
+    }
+    try { var f = gameFrame(); if (f) f.focus(); } catch(e) {}
+  }
+
+  function formatDate(iso){
+    if (!iso) return 'saved';
+    try {
+      return new Date(iso).toLocaleDateString([], { month:'short', day:'numeric' });
+    } catch(e) { return 'saved'; }
+  }
+
+  function renderScores(game, freshEntry){
+    game = game || currentGameKey();
+    var p = ensurePanel();
+    if (!p) return;
+    panelMode = 'scores';
+    var card = $('[data-breakroom-score-card]', p);
+    var rows = readScores(game);
+    var title = (GAMES[game] || GAMES.one_shot).label;
+    var html = '';
+    html += '<div class="tw-score-head"><span>&gt; all time high scores</span><button type="button" data-score-close aria-label="close high scores">×</button></div>';
+    html += '<div class="tw-score-sub">' + escapeHtml(title) + '</div>';
+    if (!rows.length) {
+      html += '<div class="tw-score-empty">no scores yet. play a round and claim the board.</div>';
+    } else {
+      html += '<div class="tw-score-table" role="table" aria-label="all time high scores">';
+      html += '<div class="tw-score-row tw-score-row--head" role="row"><span>#</span><span>name</span><span>score</span><span>date</span></div>';
+      rows.forEach(function(r, i){
+        var isFresh = freshEntry && r.score === freshEntry.score && r.name === freshEntry.name && r.date === freshEntry.date;
+        html += '<div class="tw-score-row' + (isFresh ? ' is-new' : '') + '" role="row">';
+        html += '<span>' + String(i+1).padStart(2,'0') + '</span>';
+        html += '<span>' + escapeHtml(r.name) + '</span>';
+        html += '<span>' + String(r.score).padStart(5,'0') + '</span>';
+        html += '<span>' + escapeHtml(formatDate(r.date)) + '</span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
+    card.innerHTML = html;
+    p.classList.add('is-open');
+    p.setAttribute('aria-hidden', 'false');
+    var close = $('[data-score-close]', p);
+    if (close) close.focus({ preventScroll:true });
+  }
+
+  function renderNameEditor(){
+    var p = ensurePanel();
+    if (!p) return;
+    panelMode = 'name';
+    var card = $('[data-breakroom-score-card]', p);
+    var current = getPlayerName();
+    card.innerHTML = ''+
+      '<form class="tw-name-form" data-name-form novalidate>'+
+        '<div class="tw-score-head"><span>&gt; enter name</span><button type="button" data-score-close aria-label="close name editor">×</button></div>'+
+        '<label class="tw-name-label" for="tw-player-name-input">arcade name</label>'+
+        '<input id="tw-player-name-input" class="tw-name-input" data-name-input maxlength="16" autocomplete="off" spellcheck="false" value="'+escapeHtml(current)+'">'+
+        '<div class="tw-name-rules">letters, numbers, spaces, dots, dashes, underscores, apostrophes, and & only.</div>'+
+        '<div class="tw-name-error" data-name-error aria-live="polite"></div>'+
+        '<div class="tw-name-actions"><button type="submit">&gt; save</button><button type="button" data-score-close>&gt; cancel</button></div>'+
+      '</form>';
+    p.classList.add('is-open');
+    p.setAttribute('aria-hidden', 'false');
+    var input = $('[data-name-input]', p);
+    var err = $('[data-name-error]', p);
+    var form = $('[data-name-form]', p);
+    if (input) {
+      input.focus({ preventScroll:true });
+      input.select();
+      input.addEventListener('input', function(){
+        var caret = input.selectionStart;
+        var cleaned = normalizeName(input.value);
+        if (input.value !== cleaned) {
+          input.value = cleaned;
+          try { input.setSelectionRange(Math.min(caret, cleaned.length), Math.min(caret, cleaned.length)); } catch(e) {}
+        }
+        if (err) err.textContent = '';
+      });
+    }
+    if (form) {
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+        var result = setPlayerName(input ? input.value : '');
+        if (!result.ok) {
+          if (err) err.textContent = result.message;
+          if (input) input.focus({ preventScroll:true });
+          return;
+        }
+        closePanel();
+      });
+    }
+  }
+
+  function bindControls(){
+    updateNameButtons();
+    document.addEventListener('click', function(e){
+      var nameBtn = e.target && e.target.closest ? e.target.closest('[data-breakroom-name]') : null;
+      if (nameBtn) {
+        e.preventDefault(); e.stopPropagation();
+        renderNameEditor();
+        return;
+      }
+      var scoreBtn = e.target && e.target.closest ? e.target.closest('[data-breakroom-scores]') : null;
+      if (scoreBtn) {
+        e.preventDefault(); e.stopPropagation();
+        renderScores(currentGameKey());
+        return;
+      }
+      var closeBtn = e.target && e.target.closest ? e.target.closest('[data-score-close]') : null;
+      if (closeBtn) {
+        e.preventDefault(); e.stopPropagation();
+        closePanel();
+      }
+    }, true);
+
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && panelMode) {
+        e.preventDefault();
+        closePanel();
+      }
+    }, true);
+  }
+
+  window.addEventListener('message', function(e){
+    var data = e.data || {};
+    if (data.type !== 'tw-game-score') return;
+    var game = gameFromSrc(data.game || data.path || data.src || (gameFrame() && gameFrame().dataset.currentGame));
+    document.body.dataset.twCurrentGame = game;
+    saveScore(game, data.score, data.win);
+  });
+
+  window.twBreakRoomSaveScore = saveScore;
+  window.twBreakRoomShowScores = renderScores;
+  window.twBreakRoomSetName = setPlayerName;
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindControls);
+  else bindControls();
 })();
 </script>
 

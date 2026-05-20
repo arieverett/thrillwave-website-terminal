@@ -10163,3 +10163,795 @@ body.tw-terminal-minimized .tw-breakroom.tw-breakroom-typed .tw-breakroom-card:n
     max-height: 39px !important;
   }
 }
+
+/* ============================================================
+   TW break room playable iframe bolt-in
+   The selected cartridge now lives inside the hidden game surface.
+   ============================================================ */
+.tw-breakroom-game-placeholder {
+  display: block !important;
+  min-height: calc(100% - 36px) !important;
+  padding: 0 !important;
+  place-items: initial !important;
+  align-content: initial !important;
+}
+
+.tw-breakroom-game-loader {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  padding: 22px;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(93,208,104,0.085), transparent 40%),
+    rgba(0,0,0,0.78);
+  opacity: 1;
+  pointer-events: none;
+  transition: opacity 260ms ease, filter 260ms ease;
+}
+
+.tw-breakroom-game-screen.is-loaded .tw-breakroom-game-loader {
+  opacity: 0;
+  filter: blur(1px);
+}
+
+.tw-breakroom-game-frame {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: auto;
+  color-scheme: dark;
+  transition: opacity 320ms ease 80ms, filter 320ms ease;
+}
+
+.tw-breakroom-game-screen.is-loaded .tw-breakroom-game-frame {
+  opacity: 1;
+  filter: none;
+}
+
+.tw-breakroom-game-screen.is-loading .tw-breakroom-game-frame {
+  opacity: 0;
+  filter: blur(1px) brightness(0.72);
+}
+
+.tw-breakroom-game-screen .tw-breakroom-game-gridline {
+  z-index: 6;
+}
+
+@media (max-width: 600px) {
+  .tw-breakroom-game-placeholder {
+    min-height: calc(100% - 62px) !important;
+  }
+}
+
+/* ============================================================
+   TW break room cartridge/button launch repair + clean staged reveal
+   ============================================================ */
+.tw-breakroom-card,
+button.tw-breakroom-card {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 1px solid var(--rule);
+  text-align: left !important;
+  width: 100% !important;
+  font-family: var(--font) !important;
+  cursor: pointer !important;
+  user-select: none;
+  pointer-events: auto !important;
+}
+
+button.tw-breakroom-card:disabled {
+  opacity: 0.55 !important;
+  cursor: wait !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom {
+  z-index: 80 !important;
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .terminal.main {
+  z-index: 60 !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-body,
+body.tw-terminal-minimized .terminal.main .terminal-body * {
+  pointer-events: none !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-bar {
+  pointer-events: none !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-dots,
+body.tw-terminal-minimized .terminal.main .terminal-dots *,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live {
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom-grid,
+body.tw-terminal-minimized .tw-breakroom-card,
+body.tw-terminal-minimized .tw-breakroom-card * {
+  pointer-events: auto !important;
+}
+
+/* Reveal cartridges only after the typed copy is finished. */
+body.tw-terminal-minimized .tw-breakroom:not(.tw-breakroom-cards-ready) .tw-breakroom-card,
+.tw-breakroom:not(.tw-breakroom-cards-ready) .tw-breakroom-card {
+  animation: none !important;
+  opacity: 0 !important;
+  transform: translateY(12px) scale(0.982) !important;
+  filter: blur(1px) brightness(0.68) !important;
+  pointer-events: none !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom.tw-breakroom-cards-ready:not(.tw-breakroom-typed) .tw-breakroom-card {
+  animation: tw-breakroom-card-rise 520ms cubic-bezier(.16,1,.3,1) both !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom.tw-breakroom-cards-ready:not(.tw-breakroom-typed) .tw-breakroom-card:nth-child(1) { animation-delay: 0ms !important; }
+body.tw-terminal-minimized .tw-breakroom.tw-breakroom-cards-ready:not(.tw-breakroom-typed) .tw-breakroom-card:nth-child(2) { animation-delay: 145ms !important; }
+body.tw-terminal-minimized .tw-breakroom.tw-breakroom-cards-ready:not(.tw-breakroom-typed) .tw-breakroom-card:nth-child(3) { animation-delay: 290ms !important; }
+
+body.tw-terminal-minimized .tw-breakroom.tw-breakroom-cards-ready.tw-breakroom-typed .tw-breakroom-card {
+  opacity: 1 !important;
+  transform: none !important;
+  filter: none !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom-card.is-launching {
+  pointer-events: none !important;
+}
+
+/* ============================================================
+   TW root bolt-in pass: stable break room controls + iframe game surface
+   ============================================================ */
+body.tw-terminal-minimized .tw-breakroom {
+  background: #000 !important;
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom-menu {
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .tw-breakroom-card {
+  cursor: pointer !important;
+  user-select: none !important;
+  touch-action: manipulation !important;
+}
+
+.tw-breakroom-card:disabled {
+  opacity: .45 !important;
+  cursor: default !important;
+}
+
+.tw-breakroom-exit {
+  position: relative !important;
+  z-index: 20 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: auto !important;
+  min-height: 1.58em !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fg) !important;
+  text-decoration: none !important;
+}
+
+.tw-breakroom-exit:hover,
+.tw-breakroom-exit:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  outline: none !important;
+  text-shadow:
+    0 0 6px rgba(93,208,104,.85),
+    0 0 18px rgba(93,208,104,.36),
+    0 0 28px rgba(255,255,255,.18) !important;
+}
+
+body.tw-breakroom-game-active .tw-breakroom-game-screen {
+  z-index: 30 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+body.tw-breakroom-game-active .tw-breakroom-game-frame {
+  pointer-events: auto !important;
+}
+
+.tw-breakroom-game-frame {
+  border: 0 !important;
+  background: #000 !important;
+}
+
+.tw-breakroom-game-loader[aria-hidden="true"] {
+  pointer-events: none !important;
+}
+
+.tw-breakroom-game-back {
+  position: relative !important;
+  z-index: 35 !important;
+  pointer-events: auto !important;
+  text-decoration: none !important;
+}
+
+.tw-breakroom-game-back:hover,
+.tw-breakroom-game-back:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+}
+
+.tw-breakroom.tw-breakroom-cards-ready .tw-breakroom-grid,
+.tw-breakroom.tw-breakroom-exit-ready .tw-breakroom-exit {
+  pointer-events: auto !important;
+}
+
+
+/* ============================================================
+   TW HARD FIX: reliable break-room controls + cartridge surface
+   ============================================================ */
+body.tw-terminal-minimized #tw-breakroom {
+  z-index: 500 !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  background: transparent !important;
+}
+
+body.tw-terminal-minimized #tw-breakroom .tw-breakroom-inner,
+body.tw-terminal-minimized #tw-breakroom .tw-breakroom-menu,
+body.tw-terminal-minimized #tw-breakroom .tw-breakroom-grid,
+body.tw-terminal-minimized #tw-breakroom .tw-breakroom-card,
+body.tw-terminal-minimized #tw-breakroom .tw-breakroom-card *,
+body.tw-terminal-minimized #tw-breakroom [data-breakroom-exit] {
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .terminal.main {
+  z-index: 600 !important;
+  pointer-events: none !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-bar,
+body.tw-terminal-minimized .terminal.main .terminal-bar *,
+body.tw-terminal-minimized .terminal.main .terminal-dots,
+body.tw-terminal-minimized .terminal.main .terminal-dots * {
+  pointer-events: auto !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-body,
+body.tw-terminal-minimized .terminal.main .terminal-body * {
+  pointer-events: none !important;
+}
+
+#tw-breakroom .tw-breakroom-card {
+  position: relative !important;
+  z-index: 20 !important;
+  cursor: pointer !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: rgba(93,208,104,.18) !important;
+}
+
+#tw-breakroom .tw-breakroom-card:hover,
+#tw-breakroom .tw-breakroom-card:focus-visible,
+#tw-breakroom .tw-breakroom-card.is-launching {
+  border-color: var(--accent) !important;
+  color: var(--accent) !important;
+  outline: none !important;
+}
+
+#tw-breakroom .tw-breakroom-exit,
+#tw-breakroom a.tw-breakroom-exit,
+#tw-breakroom button.tw-breakroom-exit {
+  position: relative !important;
+  z-index: 25 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fg) !important;
+  text-decoration: none !important;
+  width: fit-content !important;
+  min-height: 1.58em !important;
+}
+
+#tw-breakroom .tw-breakroom-exit:hover,
+#tw-breakroom .tw-breakroom-exit:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  outline: none !important;
+  text-shadow:
+    0 0 6px rgba(93,208,104,.9),
+    0 0 18px rgba(93,208,104,.42),
+    0 0 30px rgba(255,255,255,.18) !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-menu {
+  opacity: 0 !important;
+  pointer-events: none !important;
+  transform: scale(.985) translateY(-6px) !important;
+  filter: blur(1px) brightness(.72) !important;
+}
+
+#tw-breakroom .tw-breakroom-game-screen {
+  z-index: 60 !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen {
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  visibility: visible !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-frame {
+  pointer-events: auto !important;
+}
+
+#tw-breakroom .tw-breakroom-game-frame {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  border: 0 !important;
+  background: #000 !important;
+}
+
+#tw-breakroom .tw-breakroom-game-back {
+  position: relative !important;
+  z-index: 80 !important;
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+}
+
+#tw-breakroom .tw-breakroom-game-back:hover,
+#tw-breakroom .tw-breakroom-game-back:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  outline: none !important;
+}
+
+
+/* ============================================================
+   TW BREAK ROOM HIT LAYER
+   Transparent control surface that mirrors hover/click onto the
+   visible cards. This avoids old terminal layers swallowing clicks.
+   ============================================================ */
+.tw-breakroom-hit-layer {
+  position: fixed !important;
+  inset: 0 !important;
+  z-index: 2147483000 !important;
+  pointer-events: none !important;
+  background: transparent !important;
+}
+.tw-breakroom-proxy {
+  position: fixed !important;
+  z-index: 2147483001 !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  display: none;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: transparent !important;
+  opacity: 0.01 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: rgba(93,208,104,.16) !important;
+}
+.tw-breakroom-proxy:focus-visible {
+  outline: 1px solid var(--accent) !important;
+  outline-offset: 3px !important;
+}
+#tw-breakroom .tw-breakroom-card.tw-proxy-hover,
+#tw-breakroom .tw-breakroom-card:hover,
+#tw-breakroom .tw-breakroom-card:focus-visible,
+#tw-breakroom .tw-breakroom-card.is-launching {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-2px) scale(1.012) !important;
+  box-shadow:
+    0 0 16px rgba(255,255,255,0.11),
+    0 0 30px rgba(93,208,104,0.17),
+    inset 0 0 0 1px rgba(93,208,104,0.13),
+    inset 0 0 24px rgba(255,255,255,0.045) !important;
+}
+#tw-breakroom .tw-breakroom-card.tw-proxy-hover .tw-breakroom-card__title,
+#tw-breakroom .tw-breakroom-card.tw-proxy-hover .tw-breakroom-card__launch,
+#tw-breakroom .tw-breakroom-card:hover .tw-breakroom-card__title,
+#tw-breakroom .tw-breakroom-card:hover .tw-breakroom-card__launch,
+#tw-breakroom .tw-breakroom-card:focus-visible .tw-breakroom-card__title,
+#tw-breakroom .tw-breakroom-card:focus-visible .tw-breakroom-card__launch {
+  color: var(--accent) !important;
+  text-shadow: 0 0 8px rgba(93,208,104,0.35) !important;
+}
+#tw-breakroom .tw-breakroom-exit.tw-proxy-hover,
+#tw-breakroom .tw-breakroom-exit:hover,
+#tw-breakroom .tw-breakroom-exit:focus-visible {
+  color: var(--accent) !important;
+  text-decoration: none !important;
+  outline: none !important;
+  text-shadow:
+    0 0 6px rgba(93,208,104,.9),
+    0 0 18px rgba(93,208,104,.42),
+    0 0 30px rgba(255,255,255,.18) !important;
+}
+body.tw-breakroom-game-active .tw-breakroom-hit-layer {
+  display: none !important;
+}
+
+/* ============================================================
+   TW FINAL: frameless break-room cartridge screen
+   Expands the playable iframe to the room edges while keeping
+   the back-to-games row clear and clickable.
+   ============================================================ */
+body.tw-breakroom-game-active #tw-breakroom {
+  background: transparent !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-inner {
+  overflow: hidden !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen {
+  inset: 0 !important;
+  padding: 18px 0 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen::before,
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen::after,
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-gridline {
+  content: none !important;
+  display: none !important;
+  opacity: 0 !important;
+  animation: none !important;
+  background: none !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-hud {
+  height: 30px !important;
+  min-height: 30px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  flex-direction: row !important;
+  gap: 16px !important;
+  margin: 0 0 8px !important;
+  padding: 0 30px !important;
+  box-sizing: border-box !important;
+  z-index: 10 !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-status,
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-back {
+  white-space: nowrap !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-placeholder {
+  position: relative !important;
+  z-index: 2 !important;
+  display: block !important;
+  width: 100% !important;
+  height: calc(100% - 38px) !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #000 !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-loader {
+  inset: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-frame {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 100% !important;
+  min-height: 100% !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: #000 !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 820px) {
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen {
+    padding-top: 14px !important;
+  }
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-hud {
+    height: 28px !important;
+    min-height: 28px !important;
+    margin-bottom: 6px !important;
+    padding: 0 18px !important;
+    font-size: 10.5px !important;
+    line-height: 1.2 !important;
+  }
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-placeholder {
+    height: calc(100% - 34px) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-screen {
+    padding-top: 10px !important;
+  }
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-hud {
+    height: 26px !important;
+    min-height: 26px !important;
+    margin-bottom: 5px !important;
+    padding: 0 12px !important;
+    font-size: 9px !important;
+    letter-spacing: 0.12px !important;
+  }
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-status {
+    max-width: 48% !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+  body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-placeholder {
+    height: calc(100% - 31px) !important;
+  }
+}
+
+
+/* ============================================================
+   TW BREAK ROOM SCOREBOARD + GAME HUD BUTTONS
+   ============================================================ */
+#tw-breakroom .tw-breakroom-game-hud {
+  justify-content: flex-end !important;
+  gap: clamp(10px, 2vw, 22px) !important;
+}
+
+#tw-breakroom .tw-breakroom-game-action {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  border: 0 !important;
+  background: transparent !important;
+  color: var(--fg) !important;
+  font: inherit !important;
+  line-height: 1.1 !important;
+  padding: 0 !important;
+  min-width: 0 !important;
+  height: auto !important;
+  text-align: right !important;
+  text-transform: lowercase !important;
+  letter-spacing: inherit !important;
+  cursor: pointer !important;
+  text-decoration: none !important;
+  text-shadow:
+    0 0 4px rgba(255,255,255,.9),
+    0 0 14px rgba(255,255,255,.3) !important;
+}
+
+#tw-breakroom .tw-breakroom-game-action:hover,
+#tw-breakroom .tw-breakroom-game-action:focus-visible {
+  color: var(--accent) !important;
+  outline: none !important;
+  text-shadow:
+    0 0 6px rgba(93,208,104,.9),
+    0 0 18px rgba(93,208,104,.45) !important;
+}
+
+#tw-breakroom .tw-breakroom-game-name {
+  margin-right: auto !important;
+  text-align: left !important;
+  max-width: 38% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+#tw-breakroom .tw-breakroom-score-panel {
+  position: absolute;
+  inset: 48px clamp(18px, 4vw, 54px) auto;
+  z-index: 80;
+  display: none;
+  pointer-events: none;
+}
+
+#tw-breakroom .tw-breakroom-score-panel.is-open {
+  display: block;
+  pointer-events: auto;
+}
+
+#tw-breakroom .tw-breakroom-score-card {
+  width: min(520px, 100%);
+  margin: 0 auto;
+  padding: 18px 20px 20px;
+  color: var(--fg);
+  font: 12px/1.5 var(--font);
+  letter-spacing: .25px;
+  background:
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px),
+    rgba(0,0,0,.94);
+  background-size: 100% 12px, 14px 100%, auto;
+  border: 1px solid rgba(245,245,245,.18);
+  border-radius: 3px;
+  box-shadow:
+    0 0 0 1px rgba(93,208,104,.08),
+    0 0 32px rgba(93,208,104,.20),
+    0 18px 70px rgba(0,0,0,.72),
+    inset 0 0 34px rgba(255,255,255,.035);
+  text-shadow:
+    0 0 4px rgba(255,255,255,.72),
+    0 0 14px rgba(255,255,255,.18);
+}
+
+#tw-breakroom .tw-score-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 8px;
+  color: var(--fg);
+}
+
+#tw-breakroom .tw-score-head button,
+#tw-breakroom .tw-name-actions button {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  color: var(--fg);
+  font: inherit;
+  cursor: pointer;
+  padding: 0;
+  height: auto;
+  letter-spacing: inherit;
+  text-transform: lowercase;
+}
+
+#tw-breakroom .tw-score-head button:hover,
+#tw-breakroom .tw-score-head button:focus-visible,
+#tw-breakroom .tw-name-actions button:hover,
+#tw-breakroom .tw-name-actions button:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+#tw-breakroom .tw-score-sub,
+#tw-breakroom .tw-name-label {
+  color: var(--muted);
+  margin-bottom: 14px;
+  display: block;
+  text-transform: lowercase;
+}
+
+#tw-breakroom .tw-score-table {
+  display: grid;
+  gap: 5px;
+}
+
+#tw-breakroom .tw-score-row {
+  display: grid;
+  grid-template-columns: 42px 1fr 86px 74px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(245,245,245,.075);
+  color: rgba(245,245,245,.86);
+}
+
+#tw-breakroom .tw-score-row--head {
+  color: var(--muted);
+  border-bottom-color: rgba(93,208,104,.20);
+}
+
+#tw-breakroom .tw-score-row.is-new {
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(93,208,104,.45);
+}
+
+#tw-breakroom .tw-score-empty,
+#tw-breakroom .tw-name-rules,
+#tw-breakroom .tw-name-error {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+#tw-breakroom .tw-name-error {
+  min-height: 20px;
+  margin-top: 8px;
+  color: #ff6b4a;
+}
+
+#tw-breakroom .tw-name-input {
+  width: 100%;
+  height: 42px;
+  margin: 4px 0 10px;
+  padding: 0 12px;
+  border: 1px solid rgba(245,245,245,.20);
+  border-radius: 3px;
+  background: rgba(0,0,0,.72);
+  color: var(--fg);
+  font: 15px/1 var(--font);
+  letter-spacing: .45px;
+  outline: none;
+  box-shadow: inset 0 0 20px rgba(255,255,255,.035);
+}
+
+#tw-breakroom .tw-name-input:focus {
+  border-color: var(--accent);
+  box-shadow:
+    0 0 16px rgba(93,208,104,.22),
+    inset 0 0 20px rgba(255,255,255,.04);
+}
+
+#tw-breakroom .tw-name-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 18px;
+  margin-top: 14px;
+}
+
+@media (max-width: 820px) {
+  #tw-breakroom .tw-breakroom-game-hud {
+    gap: 12px !important;
+  }
+  #tw-breakroom .tw-breakroom-game-name {
+    max-width: 34% !important;
+  }
+  #tw-breakroom .tw-breakroom-score-panel {
+    inset: 40px 12px auto;
+  }
+  #tw-breakroom .tw-breakroom-score-card {
+    padding: 14px 14px 16px;
+    font-size: 10.5px;
+  }
+  #tw-breakroom .tw-score-row {
+    grid-template-columns: 30px 1fr 62px 54px;
+    gap: 7px;
+  }
+}
+
+@media (max-width: 520px) {
+  #tw-breakroom .tw-breakroom-game-hud {
+    font-size: 8.6px !important;
+    gap: 8px !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+  #tw-breakroom .tw-breakroom-game-name {
+    max-width: 32% !important;
+  }
+  #tw-breakroom .tw-breakroom-score-panel {
+    inset: 34px 8px auto;
+  }
+  #tw-breakroom .tw-score-row {
+    grid-template-columns: 24px 1fr 52px;
+  }
+  #tw-breakroom .tw-score-row span:last-child {
+    display: none;
+  }
+}

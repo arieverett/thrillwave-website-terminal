@@ -1,25 +1,47 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><title>CONTENT DEFENSE</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"><link rel="stylesheet" href="arcade.css"></head><body><div class="frame"><div class="frame-label tl">thrill_wave</div><div class="frame-label bl" id="clock">00:00:00</div><div class="frame-label br">07 / content_defense</div></div><main class="wrap"><div class="shell"><div class="topbar"><a class="brand" href="index.html">thrill_wave / break_room</a><div class="controls"><button id="audioBtn">audio</button><button id="resetBtn">reset</button></div></div><section class="terminal"><div class="terminal-bar"><div class="title">content_defense.exe</div><div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot live"></div></div></div><div class="game-wrap"><div class="psx-outer"><canvas class="game" id="c" width="400" height="500"></canvas><div class="scanlines"></div><div class="vignette"></div><div class="phosphor"></div><div class="screen" id="startScr"><div class="psx-box"><div class="psx-eyebrow">— THRILL WAVE ARCADE —</div><div class="psx-title">CONTENT<br><span class="hl">DEFENSE</span></div><div class="psx-sub">PROTECT THE CAMPAIGN CORE.</div><div class="psx-ctrls"><div class="psx-ctrl"><div class="psx-key">WASD</div><div class="psx-ctrl-lbl">MOVE</div></div><div class="psx-ctrl"><div class="psx-key">SPC</div><div class="psx-ctrl-lbl">FIRE</div></div><div class="psx-ctrl"><div class="psx-key">DRAG</div><div class="psx-ctrl-lbl">MOBILE</div></div></div><button class="psx-btn" id="startBtn">▶ START</button><div class="blink">COMPLETE THE RUN IN UNDER 60 SEC</div></div></div><div class="screen hidden" id="endScr"><div class="psx-box"><div class="psx-eyebrow" id="endEye">— RESULT —</div><div class="psx-title" id="endTitle">RUN<br><span class="hl">COMPLETE</span></div><div class="psx-sub" id="endSub">final score 00000</div><button class="psx-btn" id="againBtn">▶ PLAY AGAIN</button></div></div><div class="mobile-pad"><div class="pad-side"><button class="pad-btn" id="leftPad">◀</button><button class="pad-btn" id="rightPad">▶</button></div><div class="pad-side"><button class="pad-btn" id="actionPad">A</button></div></div></div></div></section><div class="foot"><div>arrows / drag <span>move</span></div><div>space / A <span>fire</span></div><div>defend the signal for 58 seconds</div></div></div></main><script>
+<!doctype html>
+<html lang="en" class="tw-game-doc">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>CONTENT DEFENSE / THRILL WAVE ARCADE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="arcade.css">
+</head>
+<body class="tw-game-cartridge" data-game="content_defense">
+  <span id="clock" hidden>00:00:00</span>
+  <button id="audioBtn" type="button" hidden>audio</button>
+  <button id="resetBtn" type="button" hidden>reset</button>
+  <main class="tw-game-root" aria-label="CONTENT DEFENSE playable game cartridge">
+    <section class="tw-game-stage" data-program="PROGRAM_03">
+      <div class="psx-outer"><canvas class="game" height="500" id="c" width="400"></canvas><div class="scanlines"></div><div class="vignette"></div><div class="phosphor"></div><div class="screen" id="startScr"><div class="psx-box"><div class="psx-eyebrow">— THRILL WAVE ARCADE —</div><div class="psx-title">CONTENT<br/><span class="hl">DEFENSE</span></div><div class="psx-sub">PROTECT THE CAMPAIGN CORE.</div><div class="psx-ctrls"><div class="psx-ctrl"><div class="psx-key">WASD</div><div class="psx-ctrl-lbl">MOVE</div></div><div class="psx-ctrl"><div class="psx-key">SPC</div><div class="psx-ctrl-lbl">FIRE</div></div><div class="psx-ctrl"><div class="psx-key">DRAG</div><div class="psx-ctrl-lbl">MOBILE</div></div></div><button class="psx-btn" id="startBtn">▶ START</button><div class="blink">COMPLETE THE RUN IN UNDER 60 SEC</div></div></div><div class="screen hidden" id="endScr"><div class="psx-box"><div class="psx-eyebrow" id="endEye">— RESULT —</div><div class="psx-title" id="endTitle">RUN<br/><span class="hl">COMPLETE</span></div><div class="psx-sub" id="endSub">final score 00000</div><button class="psx-btn" id="againBtn">▶ PLAY AGAIN</button></div></div><div class="mobile-pad"><div class="pad-side"><button class="pad-btn" id="leftPad">◀</button><button class="pad-btn" id="rightPad">▶</button></div><div class="pad-side"><button class="pad-btn" id="actionPad">A</button></div></div></div>
+    </section>
+  </main>
+  <script>
+
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');ctx.imageSmoothingEnabled=false;const W=400,H=500;
 const startScr=document.getElementById('startScr'),endScr=document.getElementById('endScr'),startBtn=document.getElementById('startBtn'),againBtn=document.getElementById('againBtn'),resetBtn=document.getElementById('resetBtn'),audioBtn=document.getElementById('audioBtn');
 const leftPad=document.getElementById('leftPad'),rightPad=document.getElementById('rightPad'),actionPad=document.getElementById('actionPad');
-const C={sky0:'#101830',sky1:'#203c78',sky2:'#4e77ad',sun:'#fff3ad',white:'#fff',ink:'#061020',blue:'#4488ff',navy:'#00114a',green:'#44ff88',green2:'#77dd33',yellow:'#ffee44',orange:'#ff9944',red:'#ff4455',purple:'#aa77ff',cyan:'#66eeff',muted:'#7799cc',grey:'#768090',black:'#000',dark:'#0b1020'};
+const C={sky0:'#040604',sky1:'#0b1710',sky2:'#17251f',sun:'#f7f7f3',white:'#f7f7f3',ink:'#030503',blue:'#7f8580',navy:'#0b0f0c',green:'#5dd068',green2:'#9be36f',yellow:'#e3cf6a',orange:'#c58d54',red:'#ff6b4a',purple:'#b8a0d8',cyan:'#8fe6c1',muted:'#9a9a9a',grey:'#707070',black:'#000',dark:'#060706'};
 let state='idle',frame=0,last=0,score=0,high=Number(localStorage.getItem(location.pathname+'_high')||0),audioOn=true,keys={},pointer={down:false,x:200,y:250};
-function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {hour12:false})}clock();setInterval(clock,1000);
+function clock(){(document.getElementById('clock')||{}).textContent=new Date().toLocaleTimeString([], {hour12:false})}clock();setInterval(clock,1000);
 function pad(n,l=5){return String(Math.max(0,Math.floor(n))).padStart(l,'0')}
 let ac=null;function tone(a,b,d=.08,t='square',v=.06){if(!audioOn)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume();let o=ac.createOscillator(),g=ac.createGain();o.type=t;o.frequency.setValueAtTime(a,ac.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(20,b),ac.currentTime+d*.82);g.gain.setValueAtTime(v,ac.currentTime);g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d+.02)}catch(e){}}
 const sfx={start:()=>{tone(240,520,.13,'square',.08);setTimeout(()=>tone(520,1040,.1,'triangle',.04),80)},jump:()=>tone(180,520,.13,'square',.07),hit:()=>{tone(120,45,.28,'sawtooth',.1);setTimeout(()=>tone(70,35,.22,'square',.05),70)},coin:()=>tone(520,900,.08,'triangle',.06),win:()=>{tone(520,880,.14,'square',.07);setTimeout(()=>tone(700,1320,.18,'triangle',.07),110)},fire:()=>tone(760,440,.05,'square',.04),click:()=>tone(760,520,.04,'square',.035)};
-audioBtn.onclick=()=>{audioOn=!audioOn;audioBtn.textContent=audioOn?'audio':'mute';if(audioOn)sfx.click()};resetBtn.onclick=()=>resetGame();startBtn.onclick=()=>startGame();againBtn.onclick=()=>startGame();
+if(audioBtn)audioBtn.onclick=()=>{audioOn=!audioOn;audioBtn.textContent=audioOn?'audio':'mute';if(audioOn)sfx.click()};if(resetBtn)resetBtn.onclick=()=>resetGame();startBtn.onclick=()=>startGame();againBtn.onclick=()=>startGame();
 addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(e.key.toLowerCase()))e.preventDefault();onKey(e.key.toLowerCase(),true)});addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false;onKey(e.key.toLowerCase(),false)});
 cv.addEventListener('pointerdown',e=>{pointer.down=true;let r=cv.getBoundingClientRect();pointer.x=(e.clientX-r.left)/r.width*W;pointer.y=(e.clientY-r.top)/r.height*H;onPointer(true)});cv.addEventListener('pointermove',e=>{let r=cv.getBoundingClientRect();pointer.x=(e.clientX-r.left)/r.width*W;pointer.y=(e.clientY-r.top)/r.height*H});addEventListener('pointerup',()=>{pointer.down=false;onPointer(false)});
 function bindHold(el,prop){el.addEventListener('pointerdown',e=>{e.preventDefault();keys[prop]=true;onKey(prop,true)});el.addEventListener('pointerup',e=>{e.preventDefault();keys[prop]=false;onKey(prop,false)});el.addEventListener('pointerleave',()=>{keys[prop]=false;onKey(prop,false)})}
 bindHold(leftPad,'arrowleft');bindHold(rightPad,'arrowright');actionPad.addEventListener('pointerdown',e=>{e.preventDefault();onAction(true)});actionPad.addEventListener('pointerup',e=>{e.preventDefault();onAction(false)});
 function clear(){ctx.clearRect(0,0,W,H)}function R(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(x|0,y|0,w|0,h|0)}function S(x,y,w,h,c){ctx.strokeStyle=c;ctx.strokeRect(x|0,y|0,w|0,h|0)}function T(txt,x,y,size=8,c=C.white,align='left'){ctx.font=`${size}px 'Press Start 2P', monospace`;ctx.textAlign=align;ctx.textBaseline='top';ctx.fillStyle='#00114a';ctx.fillText(txt,(x+2)|0,(y+2)|0);ctx.fillStyle=c;ctx.fillText(txt,x|0,y|0)}function P(pts,c){ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(pts[0]|0,pts[1]|0);for(let i=2;i<pts.length;i+=2)ctx.lineTo(pts[i]|0,pts[i+1]|0);ctx.closePath();ctx.fill()}function line(x1,y1,x2,y2,c,w=1){ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(x1|0,y1|0);ctx.lineTo(x2|0,y2|0);ctx.stroke();ctx.lineWidth=1}function circ(x,y,r,c){ctx.fillStyle=c;for(let yy=-r;yy<=r;yy++){let hw=Math.sqrt(Math.max(0,r*r-yy*yy))|0;ctx.fillRect((x-hw)|0,(y+yy)|0,hw*2+1,1)}}
 function dither(cx,cy,rw,rh,a=.45){ctx.fillStyle=`rgba(0,0,0,${a})`;for(let y=(cy-rh)|0;y<(cy+rh);y++)for(let x=(cx-rw+((y)&1))|0;x<(cx+rw);x+=2)ctx.fillRect(x,y,1,1)}
-function drawSky(scroll=0){R(0,0,W,130,C.sky0);R(0,130,W,90,C.sky1);R(0,220,W,90,C.sky2);R(0,310,W,190,'#29435f');circ(330,62,30,C.sun);circ(326,58,20,'#fff');for(let i=0;i<7;i++){let x=((i*88-scroll*.08)%520)-80;P([x,250,x+48,152+(i%3)*18,x+106,250],'#152440');P([x+48,152+(i%3)*18,x+48,250,x+106,250],'#1d2d50')}for(let i=0;i<9;i++){let x=((i*70-scroll*.18)%520)-90;P([x,315,x+38,230+(i%4)*16,x+88,315],'#1d4129');P([x+38,230+(i%4)*16,x+38,315,x+88,315],'#152b22')}}
+function drawSky(scroll=0){R(0,0,W,130,C.sky0);R(0,130,W,90,C.sky1);R(0,220,W,90,C.sky2);R(0,310,W,190,'#1a211b');circ(330,62,30,C.sun);circ(326,58,20,'#fff');for(let i=0;i<7;i++){let x=((i*88-scroll*.08)%520)-80;P([x,250,x+48,152+(i%3)*18,x+106,250],'#0b120d');P([x+48,152+(i%3)*18,x+48,250,x+106,250],'#121a14')}for(let i=0;i<9;i++){let x=((i*70-scroll*.18)%520)-90;P([x,315,x+38,230+(i%4)*16,x+88,315],'#142619');P([x+38,230+(i%4)*16,x+38,315,x+88,315],'#0d1711')}}
 function explode(arr,x,y,c,n=16){for(let i=0;i<n;i++)arr.push({x,y,vx:(Math.random()*2-1)*130,vy:(Math.random()*2-1)*120,life:.6+Math.random()*.4,c})}
 function particles(arr,dt){for(const p of arr){p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=80*dt;p.life-=dt}for(let i=arr.length-1;i>=0;i--)if(arr[i].life<=0)arr.splice(i,1)}function drawParticles(arr){for(const p of arr){ctx.globalAlpha=Math.max(0,p.life);R(p.x,p.y,3,3,p.c);ctx.globalAlpha=1}}
 function hud(title,progress,extra=''){T(title,14,14,8,C.white);T('SCORE '+pad(score),W-14,14,8,C.green,'right');T('BEST '+pad(high),W-14,30,6,C.yellow,'right');R(14,34,110,8,'#111');S(14,34,110,8,'#334');R(15,35,Math.max(0,Math.min(108,108*progress)),6,progress>.85?C.green:C.blue);if(extra)T(extra,14,48,6,C.muted)}
-function end(win,title,sub){state='end';if(score>high){high=score;localStorage.setItem(location.pathname+'_high',high)}document.getElementById('endEye').textContent=win?'— MISSION CLEAR —':'— GAME OVER —';document.getElementById('endTitle').innerHTML=title;document.getElementById('endSub').textContent=sub+'  score '+pad(score);endScr.classList.remove('hidden');win?sfx.win():sfx.hit()}
+function end(win,title,sub){state='end';try{window.parent&&window.parent.postMessage({type:'tw-game-score',game:'content_defense',score:Math.floor(score||0),win:!!win,title:String(title||''),message:String(sub||''),at:new Date().toISOString()},'*')}catch(e){}if(score>high){high=score;localStorage.setItem(location.pathname+'_high',high)}document.getElementById('endEye').textContent=win?'— MISSION CLEAR —':'— GAME OVER —';document.getElementById('endTitle').innerHTML=title;document.getElementById('endSub').textContent=sub+'  score '+pad(score);endScr.classList.remove('hidden');win?sfx.win():sfx.hit()}
 function baseLoop(t){let dt=Math.min(.033,(t-last)/1000||.016);last=t;if(state==='play')update(dt);draw();requestAnimationFrame(baseLoop)}
 function resetGame(){location.reload()}function onKey(k,d){}function onPointer(d){}function onAction(d){}function update(dt){}function draw(){clear()}
 
@@ -33,10 +55,66 @@ function fire(){if(autoT>0)return;shots.push({x:hero.x,y:hero.y-22,vy:-360,w:5,h
 function collide(a,b){return a.x-a.w/2<b.x+b.w/2&&a.x+a.w/2>b.x-b.w/2&&a.y-a.h/2<b.y+b.h/2&&a.y+a.h/2>b.y-b.h/2}
 function damageCore(e){explode(parts,e.x,e.y,e.c,14);core-=e.name==='scope_creep'?16:10;sfx.hit();if(core<=0)return end(false,'SIGNAL<br><span class="hl">LOST</span>',e.name+' reached the campaign core')}
 function update(dt){frame++;timer+=dt;score+=dt*13;let dx=(keys['arrowright']||keys['d']?1:0)-(keys['arrowleft']||keys['a']?1:0),dy=(keys['arrowdown']||keys['s']?1:0)-(keys['arrowup']||keys['w']?1:0);if(pointer.down){hero.x+=(pointer.x-hero.x)*dt*5;hero.y+=(pointer.y-hero.y)*dt*5}hero.x=Math.max(36,Math.min(364,hero.x+dx*hero.spd*dt));hero.y=Math.max(220,Math.min(430,hero.y+dy*hero.spd*dt));if(hero.rapid>0)hero.rapid-=dt;if(hero.shield>0)hero.shield-=dt;autoT=Math.max(0,autoT-dt);spawnT-=dt;powT-=dt;wave=1+Math.floor(timer/15);if(spawnT<=0){spawnEnemy();spawnT=Math.max(.28,.95-timer*.009)}if(powT<=0){spawnPower();powT=6+Math.random()*5}if(timer>40&&!bossSpawned){bossSpawned=true;boss={name:'the_rfp_hydra',x:200,y:50,w:132,h:58,hp:34,max:34,phase:0,c:C.purple};sfx.hit()}for(const e of enemies){e.y+=e.spd*dt;e.x+=Math.sin(timer*2+e.phase)*24*dt;if(e.y>462){e.hit=true;damageCore(e)}}for(const p of pows)p.y+=p.spd*dt;for(const s of shots)s.y+=s.vy*dt;if(boss){boss.phase+=dt;boss.x=200+Math.sin(timer*1.4)*80;if(Math.random()<dt*2.6)enemies.push({name:'rfp_requirement',x:boss.x-50+Math.random()*100,y:boss.y+34,w:25,h:28,hp:1,spd:72,c:C.purple,phase:Math.random()*6,hit:false})}for(const s of shots){for(const e of enemies){if(!e.hit&&collide(s,e)){s.dead=true;e.hp--;explode(parts,s.x,s.y,e.c,6);if(e.hp<=0){e.hit=true;score+=80;sfx.coin();explode(parts,e.x,e.y,e.c,12)}break}}if(boss&&!s.dead&&collide(s,boss)){s.dead=true;boss.hp--;score+=20;explode(parts,s.x,s.y,C.green,5);if(boss.hp<=0){score+=800;explode(parts,boss.x,boss.y,C.yellow,40);boss=null;sfx.win()}}}for(const p of pows){if(!p.hit&&collide({x:hero.x,y:hero.y,w:hero.w,h:hero.h},p)){p.hit=true;sfx.coin();score+=120;explode(parts,p.x,p.y,C.green,15);if(p.type==='rapid')hero.rapid=7;if(p.type==='shield')hero.shield=8;if(p.type==='heal')core=Math.min(100,core+18);if(p.type==='bomb'){for(const e of enemies){e.hit=true;score+=50;explode(parts,e.x,e.y,e.c,8)}enemies=[]}}}if(hero.shield<=0){for(const e of enemies){if(!e.hit&&collide({x:hero.x,y:hero.y,w:hero.w,h:hero.h},e)){e.hit=true;core-=8;sfx.hit();explode(parts,e.x,e.y,e.c,16)}}}else{for(const e of enemies){if(!e.hit&&collide({x:hero.x,y:hero.y,w:hero.w,h:hero.h},e)){e.hit=true;score+=50;explode(parts,e.x,e.y,C.green,12)}}}enemies=enemies.filter(e=>!e.hit&&e.y<520);shots=shots.filter(s=>!s.dead&&s.y>-30);pows=pows.filter(p=>!p.hit&&p.y<520);particles(parts,dt);if(timer>=58&&!boss)return end(true,'SIGNAL<br><span class="hl">DEFENDED</span>','campaign survived the feed')}
-function drawProducer(){let x=hero.x,y=hero.y;dither(x,y+34,30,8,.45);if(hero.shield>0){S(x-30,y-34,60,70,C.green);S(x-34,y-38,68,78,'rgba(68,255,136,.45)')}R(x-11,y-22,22,30,C.blue);R(x-11,y-20,4,28,'#66aaff');R(x-8,y-42,16,18,'#f2b866');R(x-9,y-44,18,6,'#1c0a00');R(x+12,y-18,22,13,C.dark);R(x+32,y-14,12,6,C.black);R(x-18,y+6,9,24,C.orange);R(x+9,y+6,9,24,C.orange);R(x-20,y+30,15,5,C.black);R(x+8,y+30,15,5,C.black);T('TW',x-9,y-13,6,C.white)}
+function drawProducer(){let x=hero.x,y=hero.y;dither(x,y+34,30,8,.45);if(hero.shield>0){S(x-30,y-34,60,70,C.green);S(x-34,y-38,68,78,'rgba(68,255,136,.45)')}R(x-11,y-22,22,30,C.blue);R(x-11,y-20,4,28,'#c8c8c8');R(x-8,y-42,16,18,'#caa06d');R(x-9,y-44,18,6,'#1c0a00');R(x+12,y-18,22,13,C.dark);R(x+32,y-14,12,6,C.black);R(x-18,y+6,9,24,C.orange);R(x+9,y+6,9,24,C.orange);R(x-20,y+30,15,5,C.black);R(x+8,y+30,15,5,C.black);T('TW',x-9,y-13,6,C.white)}
 function drawEnemy(e){dither(e.x,e.y+e.h/2+8,e.w*.42,5,.4);if(e.name.includes('ghost')){ctx.globalAlpha=.7+.2*Math.sin(frame*.2);circ(e.x,e.y,17,e.c);R(e.x-13,e.y,26,18,e.c);ctx.globalAlpha=1;T('rev',e.x-12,e.y-5,5,C.white);return}if(e.name.includes('leech')){P([e.x,e.y-e.h/2,e.x+e.w/2,e.y,e.x,e.y+e.h/2,e.x-e.w/2,e.y],e.c);R(e.x-8,e.y-4,16,8,'#111')}else{R(e.x-e.w/2,e.y-e.h/2,e.w,e.h,e.c);R(e.x-e.w/2+4,e.y-e.h/2+4,e.w-8,5,C.white);R(e.x-5,e.y-3,4,4,C.black);R(e.x+4,e.y-3,4,4,C.black)}T(e.name.split('_')[0],e.x-e.w/2,e.y+e.h/2+4,5,C.white)}
 function drawPower(p){circ(p.x,p.y,13,C.green);R(p.x-11,p.y-4,22,8,C.white);T(p.name.split('_')[0],p.x-18,p.y+15,5,C.yellow)}
 function drawBoss(){if(!boss)return;let x=boss.x,y=boss.y;R(x-66,y-24,132,48,'#332060');R(x-58,y-18,116,10,C.purple);for(let i=-1;i<=1;i++){circ(x+i*43,y-30,17,C.purple);R(x+i*43-6,y-34,5,5,C.white);R(x+i*43+3,y-34,5,5,C.white)}T('THE RFP HYDRA',x-60,y+8,6,C.yellow);R(x-60,y+34,120,5,'#111');R(x-59,y+35,118*(boss.hp/boss.max),3,C.red)}
 function draw(){clear();drawSky(timer*60);R(0,200,W,300,'#111827');for(let y=210;y<500;y+=34)line(0,y,W,y,'rgba(68,136,255,.16)');for(let x=20;x<W;x+=38)line(x,200,x,500,'rgba(68,136,255,.12)');R(110,442,180,28,'#050a11');S(110,442,180,28,C.blue);T('CAMPAIGN CORE',130,452,7,C.white);R(114,474,172,8,'#111');R(115,475,170*(core/100),6,core>40?C.green:C.red);hud('CONTENT_DEFENSE.EXE',timer/58,'CORE '+Math.floor(core)+'%  WAVE '+wave+'  '+(hero.rapid>0?'RAPID':'READY'));drawBoss();for(const p of pows)drawPower(p);for(const e of enemies)drawEnemy(e);for(const s of shots){R(s.x-2,s.y-8,s.w,s.h,s.c);R(s.x-4,s.y-10,s.w+4,4,C.white)}drawParticles(parts);drawProducer();if(state!=='play')T('PRESS START',116,250,8,C.green)}
 requestAnimationFrame(baseLoop);
-</script></body></html>
+
+  </script>
+  <script>
+
+(function(){
+  var meta = {id: 'content_defense',title: 'content defense',program: 'PROGRAM_03',caption: 'protect the campaign core from the chaos.'};
+  window.THRILL_WAVE_GAME = meta;
+  document.documentElement.classList.add('tw-game-doc');
+  document.body.classList.add('tw-game-cartridge');
+
+  function post(type, extra){
+    try { window.parent.postMessage(Object.assign({ type: type, game: meta.id }, extra || {}), '*'); } catch(e) {}
+  }
+
+  function setMuted(isMuted){
+    try {
+      audioOn = !isMuted;
+      if (typeof audioBtn !== 'undefined' && audioBtn) audioBtn.textContent = audioOn ? 'audio' : 'mute';
+      if (isMuted && typeof ac !== 'undefined' && ac && ac.state === 'running') ac.suspend();
+      if (!isMuted && typeof ac !== 'undefined' && ac && ac.state === 'suspended') ac.resume();
+    } catch(e) {}
+  }
+
+  function runCommand(command, value){
+    if (command === 'mute') setMuted(!!value);
+    if (command === 'reset') {
+      try { if (typeof resetGame === 'function') resetGame(); } catch(e) {}
+    }
+    if (command === 'start') {
+      try { if (typeof startGame === 'function') startGame(); } catch(e) {}
+    }
+    if (command === 'focus') {
+      try { window.focus(); } catch(e) {}
+    }
+  }
+
+  window.addEventListener('message', function(e){
+    var data = e.data || {};
+    if (data.type === 'tw-game-audio') setMuted(!!data.muted);
+    if (data.type === 'tw-game-command') runCommand(data.command, data.value);
+  });
+
+  document.addEventListener('pointerdown', function(){
+    try { window.focus(); } catch(e) {}
+    try { if (typeof ac !== 'undefined' && ac && ac.state === 'suspended' && audioOn) ac.resume(); } catch(e) {}
+  }, true);
+
+  document.addEventListener('keydown', function(e){
+    if ([' ', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) e.preventDefault();
+  }, true);
+
+  post('tw-game-ready', { meta: meta });
+})();
+
+  </script>
+</body>
+</html>
