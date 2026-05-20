@@ -440,6 +440,9 @@
 <audio id="bg-audio" loop="" playsinline="" preload="auto" webkit-playsinline="">
 <source src="assets/audio/robot_rock.mp3" type="audio/mpeg"/>
 </audio>
+<audio id="break-audio" loop="" playsinline="" preload="auto" webkit-playsinline="">
+<source src="assets/audio/da_funk.mp3" type="audio/mpeg"/>
+</audio>
 <main class="content">
 <div class="stage-wrap">
 <div class="topbar">
@@ -468,6 +471,52 @@
 </div>
 </div>
 <div class="stage">
+<div aria-hidden="true" class="tw-breakroom" id="tw-breakroom">
+<div class="tw-breakroom-inner">
+<div class="tw-breakroom-menu" data-breakroom-menu>
+<div class="tw-breakroom-copy page-content terminal-copy" aria-live="polite">
+<span class="line" data-breakroom-line="You found the secret break room!">You found the secret break room!</span>
+<span class="line" data-breakroom-line="Take a load off. Choose a game:">Take a load off. Choose a game:</span>
+</div>
+<div class="tw-breakroom-grid" aria-label="secret break room games">
+<a class="tw-breakroom-card" href="games/one_shot.html">
+<span class="tw-breakroom-card__sprite" aria-hidden="true">🌵</span>
+<span class="tw-breakroom-card__num">[01]</span>
+<span class="tw-breakroom-card__title">one shot</span>
+<span class="tw-breakroom-card__copy">jump the plant hazards and clear the take.</span>
+<span class="tw-breakroom-card__launch">&gt; launch</span>
+</a>
+<a class="tw-breakroom-card" href="games/going_viral.html">
+<span class="tw-breakroom-card__sprite" aria-hidden="true">⚔️</span>
+<span class="tw-breakroom-card__num">[02]</span>
+<span class="tw-breakroom-card__title">going viral</span>
+<span class="tw-breakroom-card__copy">outrun the algorithm before it outruns you.</span>
+<span class="tw-breakroom-card__launch">&gt; launch</span>
+</a>
+<a class="tw-breakroom-card" href="games/content_defense.html">
+<span class="tw-breakroom-card__sprite" aria-hidden="true">🛡️</span>
+<span class="tw-breakroom-card__num">[03]</span>
+<span class="tw-breakroom-card__title">content defense</span>
+<span class="tw-breakroom-card__copy">protect the campaign core from the chaos.</span>
+<span class="tw-breakroom-card__launch">&gt; launch</span>
+</a>
+</div>
+<button class="tw-breakroom-exit" data-breakroom-exit="" data-breakroom-line="&gt; exit break room" type="button">&gt; exit break room</button>
+</div>
+<div class="tw-breakroom-game-screen" data-breakroom-game-screen aria-hidden="true">
+<div class="tw-breakroom-game-hud">
+<span class="tw-breakroom-game-status">&gt; selected cartridge</span>
+<button class="tw-breakroom-game-back" data-breakroom-back type="button">&gt; back to games</button>
+</div>
+<div class="tw-breakroom-game-placeholder" aria-label="break room game screen placeholder">
+<span class="tw-breakroom-game-chip" data-breakroom-game-number>[--]</span>
+<span class="tw-breakroom-game-title" data-breakroom-game-title>game screen</span>
+<span class="tw-breakroom-game-note" data-breakroom-game-note>placeholder viewport ready.</span>
+<span class="tw-breakroom-game-gridline" aria-hidden="true"></span>
+</div>
+</div>
+</div>
+</div>
 <div class="terminal main">
 <div class="terminal-bar">
 <span class="title"><a class="title-brand" href="index.html" id="title-brand">thrill_wave</a><span class="title-sep"> — </span><a class="title-page" href="#" id="title-page">work</a></span>
@@ -1573,9 +1622,425 @@
     window.location.assign('index.html?homeIntro=' + Date.now());
   }
 
-  function toggleTerminalMinimize(){
+
+  // ---------- break room music deck: robot_rock <-> da_funk ----------
+  (function twBreakRoomMusicDeck(){
+    if (window.__twBreakRoomAudioDeck) return;
+    window.__twBreakRoomAudioDeck = true;
+
+    var ROBOT_KEY = 'tw_robot_music_t';
+    var FUNK_KEY = 'tw_funk_music_t';
+    var ACTIVE_KEY = 'tw_active_music_deck';
+    var MUSIC_KEY = 'tw_music_on';
+    var MUTE_KEY = 'tw_audio_muted';
+
+    function robot(){ return document.getElementById('bg-audio'); }
+    function funk(){ return document.getElementById('break-audio'); }
+    function muted(){ return sessionStorage.getItem(MUTE_KEY) === '1'; }
+    function currentDeck(){ return document.body && document.body.classList.contains('tw-terminal-minimized') ? 'funk' : 'robot'; }
+    function get(deck){ return deck === 'funk' ? funk() : robot(); }
+
+    function save(deck){
+      var el = get(deck);
+      if (!el) return;
+      try { sessionStorage.setItem(deck === 'funk' ? FUNK_KEY : ROBOT_KEY, String(el.currentTime || 0)); } catch(e) {}
+    }
+
+    function restore(deck){
+      var el = get(deck);
+      if (!el) return;
+      var key = deck === 'funk' ? FUNK_KEY : ROBOT_KEY;
+      var t = parseFloat(sessionStorage.getItem(key));
+      if (!isNaN(t)) {
+        try { el.currentTime = t; } catch(e) {}
+      }
+    }
+
+    function pause(deck){
+      var el = get(deck);
+      if (!el) return;
+      save(deck);
+      try { el.pause(); } catch(e) {}
+    }
+
+    function stopOther(deck){
+      pause(deck === 'funk' ? 'robot' : 'funk');
+    }
+
+    function play(deck){
+      var el = get(deck);
+      if (!el || muted()) {
+        window.dispatchEvent(new CustomEvent('tw:music-sync'));
+        return;
+      }
+      stopOther(deck);
+      restore(deck);
+      try {
+        el.volume = 0.4;
+        el.muted = false;
+        sessionStorage.setItem(ACTIVE_KEY, deck);
+        sessionStorage.setItem(MUSIC_KEY, '1');
+        var p = el.play();
+        if (p && p.catch) p.catch(function(){ window.dispatchEvent(new CustomEvent('tw:music-sync')); });
+      } catch(e) {}
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    }
+
+    function pauseAll(){
+      pause('robot');
+      pause('funk');
+      sessionStorage.removeItem(MUSIC_KEY);
+      window.dispatchEvent(new CustomEvent('tw:music-sync'));
+    }
+
+    function isAnyAudible(){
+      return ['robot','funk'].some(function(deck){
+        var el = get(deck);
+        return !!(el && !el.paused && !el.muted && el.volume > 0);
+      });
+    }
+
+    function setButton(){
+      var btn = document.getElementById('audio-toggle-btn');
+      var viz = document.getElementById('audio-viz');
+      var playing = !muted() && isAnyAudible();
+      if (btn) btn.innerHTML = playing ? '<span class="audio-glyph">⏸</span> mute' : '<span class="audio-glyph">▶</span> audio';
+      if (viz) viz.classList.toggle('active', playing);
+    }
+
+    function setMute(isMuted){
+      sessionStorage.setItem(MUTE_KEY, isMuted ? '1' : '0');
+      if (typeof window.twApplyMute === 'function') {
+        try { window.twApplyMute(isMuted); } catch(e) {}
+      }
+    }
+
+    window.twBreakRoomAudio = {
+      enter: function(){
+        sessionStorage.setItem(ACTIVE_KEY, 'funk');
+        pause('robot');
+        if (!muted()) play('funk');
+        else setButton();
+      },
+      exit: function(){
+        sessionStorage.setItem(ACTIVE_KEY, 'robot');
+        pause('funk');
+        if (!muted()) play('robot');
+        else setButton();
+      },
+      muteAll: function(){
+        pauseAll();
+        setMute(true);
+        setButton();
+      },
+      playCurrent: function(){
+        setMute(false);
+        play(currentDeck());
+      },
+      isAnyAudible: isAnyAudible,
+      update: setButton
+    };
+
+    document.addEventListener('click', function(e){
+      var btn = e.target && e.target.closest ? e.target.closest('#audio-toggle-btn') : null;
+      if (!btn) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      try { btn.blur(); } catch(_) {}
+
+      var turningOn = muted() || !isAnyAudible();
+      if (turningOn) {
+        setMute(false);
+        try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(_) {}
+        play(currentDeck());
+      } else {
+        try { if (window.twUI && window.twUI.sndClick) window.twUI.sndClick(); } catch(_) {}
+        pauseAll();
+        setMute(true);
+      }
+      setButton();
+    }, true);
+
+    ['play','pause','timeupdate','volumechange'].forEach(function(type){
+      document.addEventListener(type, function(e){
+        if (e.target && (e.target.id === 'bg-audio' || e.target.id === 'break-audio')) setButton();
+      }, true);
+    });
+    window.addEventListener('tw:music-sync', setButton);
+  })();
+
+  var breakRoomTimers = [];
+
+  function clearBreakRoomTimers(){
+    breakRoomTimers.forEach(function(t){ clearTimeout(t); });
+    breakRoomTimers = [];
+  }
+
+  function queueBreakRoom(fn, delay){
+    var t = setTimeout(fn, delay);
+    breakRoomTimers.push(t);
+    return t;
+  }
+
+  function twReducedMotion(){
+    return !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }
+
+  function fillBreakRoomText(room){
+    if (!room) return;
+    var lines = Array.prototype.slice.call(room.querySelectorAll('[data-breakroom-line]'));
+    lines.forEach(function(line){
+      line.textContent = line.getAttribute('data-breakroom-line') || '';
+      line.classList.remove('is-typing', 'cursor-live');
+    });
+    if (lines.length) lines[lines.length - 1].classList.add('cursor-live');
+    room.classList.add('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+  }
+
+  function resetBreakRoomTextForTyping(room){
+    if (!room) return;
+    room.classList.remove('tw-breakroom-typed', 'tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready');
+    room.querySelectorAll('[data-breakroom-line]').forEach(function(line){
+      line.textContent = '';
+      line.classList.remove('is-typing', 'cursor-live');
+    });
+  }
+
+  function typeBreakRoom(room){
+    if (!room || room.dataset.typed === '1') return;
+    clearBreakRoomTimers();
+
+    if (twReducedMotion()) {
+      fillBreakRoomText(room);
+      room.dataset.typed = '1';
+      return;
+    }
+
+    var lines = Array.prototype.slice.call(room.querySelectorAll('.tw-breakroom-copy [data-breakroom-line]'));
+    var exitLine = room.querySelector('.tw-breakroom-exit[data-breakroom-line]');
+    var lineIndex = 0;
+    room.dataset.typing = '1';
+    room.classList.remove('tw-breakroom-text-done', 'tw-breakroom-cards-ready', 'tw-breakroom-exit-ready', 'tw-breakroom-typed');
+
+    function click(){
+      try { if (window.twTypeClick) window.twTypeClick(); } catch(e) {}
+    }
+
+    function typeSingleLine(line, done){
+      var full = line.getAttribute('data-breakroom-line') || '';
+      var charIndex = 0;
+      room.querySelectorAll('[data-breakroom-line]').forEach(function(l){ l.classList.remove('is-typing', 'cursor-live'); });
+
+      if (!full) {
+        line.textContent = '';
+        queueBreakRoom(done, 240);
+        return;
+      }
+
+      line.classList.add('is-typing');
+
+      function step(){
+        line.textContent = full.slice(0, charIndex);
+        if (charIndex > 0 && full.charAt(charIndex - 1) !== ' ') click();
+
+        if (charIndex <= full.length) {
+          charIndex += 1;
+          var typedChar = full.charAt(charIndex - 2);
+          var delay = typedChar === ' ' ? 18 : 36 + Math.floor(Math.random() * 22);
+          if (typedChar === '.' || typedChar === '!' || typedChar === ':') delay += 120;
+          queueBreakRoom(step, delay);
+        } else {
+          line.classList.remove('is-typing');
+          queueBreakRoom(done, 260);
+        }
+      }
+
+      step();
+    }
+
+    function finish(){
+      room.querySelectorAll('[data-breakroom-line]').forEach(function(line){ line.classList.remove('is-typing', 'cursor-live'); });
+      if (exitLine) exitLine.classList.add('cursor-live');
+      room.dataset.typed = '1';
+      room.dataset.typing = '0';
+      room.classList.add('tw-breakroom-typed', 'tw-breakroom-exit-ready');
+    }
+
+    function typeIntroLines(){
+      if (lineIndex >= lines.length) {
+        room.classList.add('tw-breakroom-text-done');
+        queueBreakRoom(function(){
+          room.classList.add('tw-breakroom-cards-ready');
+          queueBreakRoom(function(){
+            room.classList.add('tw-breakroom-exit-ready');
+            if (exitLine) typeSingleLine(exitLine, finish);
+            else finish();
+          }, 620);
+        }, 220);
+        return;
+      }
+
+      typeSingleLine(lines[lineIndex], function(){
+        lineIndex += 1;
+        queueBreakRoom(typeIntroLines, 140);
+      });
+    }
+
+    typeIntroLines();
+  }
+
+  function setBreakRoom(open){
     closeMenu();
-    document.body.classList.toggle('tw-terminal-minimized');
+    var room = document.getElementById('tw-breakroom');
+
+    if (open) {
+      if (room) {
+        room.setAttribute('aria-hidden', 'false');
+        if (room.dataset.typed !== '1') resetBreakRoomTextForTyping(room);
+        else fillBreakRoomText(room);
+      }
+      document.body.classList.add('tw-terminal-minimized');
+      try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.enter) window.twBreakRoomAudio.enter(); } catch(e) {}
+      if (room && room.dataset.typed !== '1') {
+        queueBreakRoom(function(){ typeBreakRoom(room); }, 260);
+      }
+    } else {
+      clearBreakRoomTimers();
+      closeBreakRoomGame(false);
+      try { if (window.twBreakRoomAudio && window.twBreakRoomAudio.exit) window.twBreakRoomAudio.exit(); } catch(e) {}
+      document.body.classList.remove('tw-terminal-minimized');
+      if (room) {
+        room.setAttribute('aria-hidden', 'true');
+        room.querySelectorAll('[data-breakroom-line]').forEach(function(line){
+          line.classList.remove('is-typing', 'cursor-live');
+        });
+      }
+    }
+  }
+
+  function toggleTerminalMinimize(){
+    setBreakRoom(!document.body.classList.contains('tw-terminal-minimized'));
+  }
+
+
+  function cleanBreakRoomGameScreen(){
+    var room = document.getElementById('tw-breakroom');
+    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
+    if (!screen) return;
+    screen.setAttribute('aria-hidden', 'true');
+    screen.classList.remove('is-opening', 'is-closing');
+    try { screen.getAnimations().forEach(function(anim){ anim.cancel(); }); } catch(e) {}
+    screen.style.transform = '';
+    screen.style.opacity = '';
+    document.querySelectorAll('.tw-breakroom-card.is-launching').forEach(function(card){
+      card.classList.remove('is-launching');
+      card.dataset.twLaunching = '0';
+    });
+  }
+
+  function closeBreakRoomGame(animated){
+    var active = document.body.classList.contains('tw-breakroom-game-active');
+    var room = document.getElementById('tw-breakroom');
+    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
+    if (!active) {
+      cleanBreakRoomGameScreen();
+      return;
+    }
+
+    document.body.classList.remove('tw-breakroom-game-active', 'tw-breakroom-game-opening');
+
+    if (!screen || animated === false || twReducedMotion()) {
+      cleanBreakRoomGameScreen();
+      return;
+    }
+
+    screen.classList.add('is-closing');
+    try {
+      var anim = screen.animate([
+        { transform: 'translate(0,0) scale(1)', opacity: 1, filter: 'brightness(1)' },
+        { transform: 'translate(0,10px) scale(0.985)', opacity: 0, filter: 'brightness(0.75) blur(1px)' }
+      ], { duration: 220, easing: 'cubic-bezier(.5,0,.2,1)' });
+      anim.onfinish = function(){ cleanBreakRoomGameScreen(); };
+    } catch(e) {
+      cleanBreakRoomGameScreen();
+    }
+  }
+
+  function openBreakRoomGame(card){
+    if (!card) return;
+    var room = document.getElementById('tw-breakroom');
+    var screen = room ? room.querySelector('[data-breakroom-game-screen]') : null;
+    if (!room || !screen) return;
+
+    var titleEl = card.querySelector('.tw-breakroom-card__title');
+    var numEl = card.querySelector('.tw-breakroom-card__num');
+    var copyEl = card.querySelector('.tw-breakroom-card__copy');
+    var title = titleEl ? titleEl.textContent.trim() : 'game screen';
+    var num = numEl ? numEl.textContent.trim() : '[--]';
+    var copy = copyEl ? copyEl.textContent.trim() : 'placeholder viewport ready.';
+
+    var outTitle = screen.querySelector('[data-breakroom-game-title]');
+    var outNum = screen.querySelector('[data-breakroom-game-number]');
+    var outNote = screen.querySelector('[data-breakroom-game-note]');
+    if (outTitle) outTitle.textContent = title;
+    if (outNum) outNum.textContent = num;
+    if (outNote) outNote.textContent = copy + ' game build loads here next.';
+
+    document.querySelectorAll('.tw-breakroom-card.is-launching').forEach(function(other){
+      other.classList.remove('is-launching');
+      other.dataset.twLaunching = '0';
+    });
+    card.classList.add('is-launching');
+    card.dataset.twLaunching = '1';
+
+    try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+
+    var roomRect = room.getBoundingClientRect();
+    var cardRect = card.getBoundingClientRect();
+    var sx = cardRect.left - roomRect.left;
+    var sy = cardRect.top - roomRect.top;
+    var scaleX = roomRect.width ? Math.max(cardRect.width / roomRect.width, 0.08) : 0.32;
+    var scaleY = roomRect.height ? Math.max(cardRect.height / roomRect.height, 0.08) : 0.32;
+
+    screen.setAttribute('aria-hidden', 'false');
+    screen.classList.remove('is-closing');
+    screen.classList.add('is-opening');
+    document.body.classList.add('tw-breakroom-game-active', 'tw-breakroom-game-opening');
+
+    try { screen.getAnimations().forEach(function(anim){ anim.cancel(); }); } catch(e) {}
+
+    if (twReducedMotion()) {
+      screen.classList.remove('is-opening');
+      document.body.classList.remove('tw-breakroom-game-opening');
+      return;
+    }
+
+    try {
+      var anim = screen.animate([
+        {
+          transform: 'translate(' + sx + 'px,' + sy + 'px) scale(' + scaleX + ',' + scaleY + ')',
+          opacity: 0.62,
+          filter: 'brightness(1.45) blur(0.8px)'
+        },
+        {
+          transform: 'translate(0,0) scale(1,1)',
+          opacity: 1,
+          filter: 'brightness(1) blur(0)'
+        }
+      ], { duration: 560, easing: 'cubic-bezier(.16,1,.3,1)' });
+      anim.onfinish = function(){
+        screen.classList.remove('is-opening');
+        document.body.classList.remove('tw-breakroom-game-opening');
+      };
+    } catch(e) {
+      screen.classList.remove('is-opening');
+      document.body.classList.remove('tw-breakroom-game-opening');
+    }
+  }
+
+  function launchBreakRoomCard(card){
+    openBreakRoomGame(card);
   }
 
   document.addEventListener('click', function(e){
@@ -1593,19 +2058,55 @@
       return;
     }
 
-    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .dot.live') : null;
+    var breakRoomBack = e.target && e.target.closest ? e.target.closest('[data-breakroom-back]') : null;
+    if (breakRoomBack) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+      closeBreakRoomGame(true);
+      return;
+    }
+
+    var breakRoomExit = e.target && e.target.closest ? e.target.closest('[data-breakroom-exit]') : null;
+    if (breakRoomExit) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+      setBreakRoom(false);
+      return;
+    }
+
+    var breakRoomCard = e.target && e.target.closest ? e.target.closest('.tw-breakroom-card') : null;
+    if (breakRoomCard) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      launchBreakRoomCard(breakRoomCard);
+      return;
+    }
+
+    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .terminal-dots') : null;
     if (greenDot) {
       e.preventDefault();
       e.stopPropagation();
       if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+      var openingBreakRoom = !document.body.classList.contains('tw-terminal-minimized');
+      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
       toggleTerminalMinimize();
+      if (openingBreakRoom) {
+        queueBreakRoom(function(){
+          try { if (window.twUI && window.twUI.sndBreakRoomOpen) window.twUI.sndBreakRoomOpen(); } catch(e) {}
+        }, 150);
+      }
     }
   }, true);
 
   document.addEventListener('keydown', function(e){
     if (e.key !== 'Enter' && e.key !== ' ') return;
     var logo = e.target && e.target.closest ? e.target.closest('.tw-home-restart') : null;
-    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .dot.live') : null;
+    var greenDot = e.target && e.target.closest ? e.target.closest('.terminal.main .terminal-bar .terminal-dots') : null;
     if (!logo && !greenDot) return;
 
     e.preventDefault();
@@ -1616,20 +2117,64 @@
       if (typeof window.twDelayBrandmarkHome === 'function') window.twDelayBrandmarkHome(runHomeRestart);
       else runHomeRestart();
     }
-    else toggleTerminalMinimize();
+    else {
+      var openingBreakRoom = !document.body.classList.contains('tw-terminal-minimized');
+      try { if (window.twUI) window.twUI.sndClick(); } catch(e) {}
+      toggleTerminalMinimize();
+      if (openingBreakRoom) {
+        queueBreakRoom(function(){
+          try { if (window.twUI && window.twUI.sndBreakRoomOpen) window.twUI.sndBreakRoomOpen(); } catch(e) {}
+        }, 150);
+      }
+    }
   }, true);
 
-  function prepDots(){
-    document.querySelectorAll('.terminal.main .terminal-bar .dot.live').forEach(function(dot){
-      dot.setAttribute('role', 'button');
-      dot.setAttribute('tabindex', '0');
-      dot.setAttribute('aria-label', 'minimize terminal');
-      dot.setAttribute('title', 'minimize terminal');
+  function prepBreakRoomCards(){
+    document.querySelectorAll('.tw-breakroom-card').forEach(function(card){
+      if (card.dataset.twLaunchBound === '1') return;
+      card.dataset.twLaunchBound = '1';
+      card.setAttribute('aria-label', 'launch ' + (card.querySelector('.tw-breakroom-card__title') ? card.querySelector('.tw-breakroom-card__title').textContent.trim() : 'game'));
+
+      card.addEventListener('click', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        launchBreakRoomCard(card);
+      }, true);
+
+      card.addEventListener('pointerup', function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        launchBreakRoomCard(card);
+      }, true);
+
+      card.addEventListener('keydown', function(e){
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+        launchBreakRoomCard(card);
+      }, true);
     });
   }
 
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepDots);
-  else prepDots();
+  function prepDots(){
+    document.querySelectorAll('.terminal.main .terminal-bar .terminal-dots').forEach(function(dot){
+      dot.setAttribute('role', 'button');
+      dot.setAttribute('tabindex', '0');
+      dot.setAttribute('aria-label', 'toggle secret break room');
+      dot.setAttribute('title', 'secret break room');
+    });
+  }
+
+  function prepBreakRoomControls(){
+    prepDots();
+    prepBreakRoomCards();
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', prepBreakRoomControls);
+  else prepBreakRoomControls();
 })();
 </script>
 

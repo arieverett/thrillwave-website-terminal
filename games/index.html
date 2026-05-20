@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="robots" content="noindex,nofollow">
+  <title>thrill_wave / secret_break_room</title>
+  <link rel="stylesheet" href="arcade.css">
+</head>
+<body class="break-room-home">
+  <div class="frame">
+    <div class="frame-label tl">thrill_wave</div>
+    <div class="frame-label bl" id="clock">00:00:00</div>
+    <div class="frame-label br">secret / break_room</div>
+  </div>
+
+  <main class="wrap">
+    <div class="shell">
+      <div class="topbar">
+        <a class="brand" href="../index.html">thrill_wave / secret_break_room</a>
+        <div class="controls"><a class="btn" href="../index.html">exit</a></div>
+      </div>
+
+      <section class="terminal">
+        <div class="terminal-bar">
+          <div class="title">break_room.exe</div>
+          <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot live"></div></div>
+        </div>
+
+        <div class="break-room-intro">
+          <div class="secret-tag">secret area found</div>
+          <h1>You found the secret break room.</h1>
+          <p>Take a load off. Pick a distraction.</p>
+          <div class="choose-line">&gt; choose a game</div>
+        </div>
+
+        <div class="arcade-grid">
+          <a class="game-card" href="one_shot.html">
+            <div>
+              <div class="card-id">PROGRAM_01</div>
+              <div class="card-title">ONE<br>SHOT</div>
+              <div class="card-copy">Side-scroller production chaos. Jump the cables, duck the notes, and get the take.</div>
+            </div>
+            <div class="card-launch">&gt; launch one_shot</div>
+          </a>
+
+          <a class="game-card" href="going_viral.html">
+            <div>
+              <div class="card-id">PROGRAM_02</div>
+              <div class="card-title">GOING<br>VIRAL</div>
+              <div class="card-copy">Outrun the algorithm before it outruns you.</div>
+            </div>
+            <div class="card-launch">&gt; launch going_viral</div>
+          </a>
+
+          <a class="game-card" href="content_defense.html">
+            <div>
+              <div class="card-id">PROGRAM_03</div>
+              <div class="card-title">CONTENT<br>DEFENSE</div>
+              <div class="card-copy">Protect the campaign core from brief goblins, revision ghosts, and the RFP hydra.</div>
+            </div>
+            <div class="card-launch">&gt; launch content_defense</div>
+          </a>
+        </div>
+      </section>
+
+      <div class="foot">
+        <div>classified recreational system unlocked</div>
+        <div><span>/</span></div>
+        <div>all games clear in under sixty seconds</div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    function clock(){document.getElementById('clock').textContent=new Date().toLocaleTimeString([], {hour12:false})}
+    clock();setInterval(clock,1000);
+  </script>
+</body>
+</html>
