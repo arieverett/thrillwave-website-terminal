@@ -11282,3 +11282,47 @@ body.page-index #hero {
     line-height: 1.64 !important;
   }
 }
+
+/* ============================================================
+   TW HOTFIX — mobile menu overlay position repair
+   The integrated break-room layer makes .terminal.side position:relative
+   later in the cascade. On phones that pushes the menu back into the
+   flex/stage layout, leaving it visible only at the far right edge.
+   Restore the mobile menu as a centered fixed overlay.
+   ============================================================ */
+@media (max-width: 720px) {
+  .terminal.side {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--menu-w) !important;
+    height: min(calc(100dvh - 96px), 520px) !important;
+    max-height: 0 !important;
+    z-index: 9999 !important;
+    overflow: hidden !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    clip-path: inset(0 0 100% 0) !important;
+    box-shadow: 0 0 0 1px var(--bg), 0 14px 60px rgba(0,0,0,0.72) !important;
+  }
+
+  body.menu-open .terminal.side {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: translate(-50%, -50%) !important;
+    width: var(--menu-w) !important;
+    height: min(calc(100dvh - 96px), 520px) !important;
+    max-height: min(calc(100dvh - 96px), 520px) !important;
+    clip-path: inset(0 0 0 0) !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
