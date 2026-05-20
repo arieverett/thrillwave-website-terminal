@@ -1,0 +1,664 @@
+:root {
+  --bg: #000;
+  --fg: #f5f5f5;
+  --muted: #777;
+  --dim: #343434;
+  --rule: #2a2a2a;
+  --terminal-rule: #2e2e2e;
+  --terminal-bar: #0a0a0a;
+  --accent: #5dd068;
+  --hot: #ff735c;
+  --warn: #e8d76a;
+  --cyan: #73f2c2;
+  --font: "JetBrains Mono", "SF Mono", "Menlo", "Consolas", monospace;
+  --game-font: "Press Start 2P", "SF Mono", "Menlo", monospace;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html,
+body {
+  height: 100%;
+  background: #000;
+  color: var(--fg);
+  font-family: var(--font);
+  overflow: hidden;
+}
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 44%,
+      rgba(0, 0, 0, 0.64) 100%
+    ),
+    repeating-linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.035) 0 1px,
+      rgba(0, 0, 0, 0.2) 1px 2px
+    );
+  z-index: 10;
+  mix-blend-mode: screen;
+  opacity: 0.32;
+}
+.frame {
+  position: fixed;
+  inset: 24px;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 2;
+}
+.frame:after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border: 1px solid transparent;
+  border-radius: inherit;
+  background: linear-gradient(
+      90deg,
+      transparent 0 17%,
+      rgba(93, 208, 104, 0.95) 22%,
+      transparent 29%
+    )
+    border-box;
+  -webkit-mask:
+    linear-gradient(#000 0 0) padding-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: frameBeam 22s linear infinite;
+  opacity: 0.62;
+  filter: drop-shadow(0 0 6px rgba(93, 208, 104, 0.72));
+}
+@keyframes frameBeam {
+  0% {
+    clip-path: inset(0 80% 98% 0);
+  }
+  24% {
+    clip-path: inset(0 0 98% 80%);
+  }
+  25% {
+    clip-path: inset(0 0 80% 98%);
+  }
+  49% {
+    clip-path: inset(80% 0 0 98%);
+  }
+  50% {
+    clip-path: inset(98% 0 0 80%);
+  }
+  74% {
+    clip-path: inset(98% 80% 0 0);
+  }
+  75% {
+    clip-path: inset(80% 98% 0 0);
+  }
+  100% {
+    clip-path: inset(0 98% 80% 0);
+  }
+}
+.frame-label {
+  position: absolute;
+  background: #000;
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 2.5px;
+  padding: 0 10px;
+  line-height: 1.2;
+}
+.frame-label.tl {
+  top: -7px;
+  left: 22px;
+}
+.frame-label.bl {
+  bottom: -7px;
+  left: 22px;
+}
+.frame-label.br {
+  bottom: -7px;
+  right: 22px;
+  text-transform: uppercase;
+}
+.wrap {
+  position: relative;
+  z-index: 3;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 56px 36px;
+}
+.shell {
+  width: min(920px, calc(100vw - 86px));
+  max-width: 920px;
+}
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  gap: 12px;
+}
+.brand {
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 12px;
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1.6px;
+  text-transform: lowercase;
+  text-decoration: none;
+}
+.brand:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.controls {
+  display: flex;
+  gap: 8px;
+}
+button,
+.btn {
+  appearance: none;
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--muted);
+  height: 28px;
+  padding: 0 13px;
+  font: 500 11px/1 var(--font);
+  letter-spacing: 1.6px;
+  text-transform: lowercase;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+button:hover,
+button:focus-visible,
+.btn:hover,
+.btn:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
+  outline: none;
+}
+button:active,
+.btn:active {
+  color: var(--muted);
+  border-color: var(--rule);
+}
+.terminal {
+  border: 1px solid var(--terminal-rule);
+  border-radius: 4px;
+  overflow: hidden;
+  background: #000;
+  box-shadow: 0 0 40px rgba(93, 208, 104, 0.05);
+}
+.terminal-bar {
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--terminal-bar);
+  border-bottom: 1px solid #1a1a1a;
+  padding: 0 16px;
+}
+.title {
+  color: var(--muted);
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  text-transform: lowercase;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.dots {
+  display: flex;
+  gap: 5px;
+  margin-left: 14px;
+}
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #2e2e2e;
+}
+.dot.live {
+  background: var(--accent);
+  box-shadow: 0 0 4px rgba(93, 208, 104, 0.5);
+}
+.game-wrap {
+  position: relative;
+  height: min(640px, calc(100dvh - 190px));
+  min-height: 440px;
+  display: grid;
+  place-items: center;
+  background: #000;
+  padding: 10px;
+}
+.psx-outer {
+  position: relative;
+  height: 100%;
+  max-height: 100%;
+  aspect-ratio: 4/5;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
+  box-shadow:
+    0 0 0 5px #070907,
+    0 0 0 9px #121612,
+    0 0 46px rgba(93, 208, 104, 0.18),
+    0 18px 70px rgba(0, 0, 0, 0.92);
+}
+canvas.game {
+  display: block;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  background: #000;
+}
+.scanlines,
+.vignette,
+.phosphor {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.scanlines {
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0) 3px,
+    rgba(0, 0, 0, 0.2) 3px,
+    rgba(0, 0, 0, 0.2) 4px
+  );
+}
+.vignette {
+  z-index: 11;
+  background: radial-gradient(
+    ellipse 88% 78% at 50% 50%,
+    transparent 52%,
+    rgba(0, 0, 8, 0.66) 100%
+  );
+}
+.phosphor {
+  z-index: 12;
+  background: rgba(10, 30, 70, 0.07);
+  mix-blend-mode: screen;
+}
+.screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  pointer-events: auto;
+  background: rgba(0, 8, 2, 0.76);
+  padding: 18px;
+}
+.screen.hidden {
+  display: none;
+}
+.psx-box {
+  border: 3px solid rgba(93, 208, 104, 0.95);
+  background: rgba(0, 12, 7, 0.96);
+  padding: 26px 30px;
+  text-align: center;
+  position: relative;
+  max-width: 92%;
+  font-family: var(--game-font);
+  box-shadow: 0 8px 0 rgba(0, 0, 0, 0.45);
+}
+.psx-box:before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border: 1px solid rgba(93, 208, 104, 0.24);
+  pointer-events: none;
+}
+.psx-eyebrow {
+  color: #83b98a;
+  font-size: 7px;
+  letter-spacing: 4px;
+  margin-bottom: 14px;
+}
+.psx-title {
+  color: #fff;
+  font-size: 22px;
+  line-height: 1.45;
+  margin-bottom: 5px;
+  text-shadow:
+    3px 3px #00170a,
+    -1px -1px #00170a;
+}
+.psx-title .hl {
+  color: #44ff88;
+}
+.psx-sub {
+  color: #87a68b;
+  font-size: 7px;
+  letter-spacing: 2px;
+  line-height: 1.8;
+  margin-bottom: 18px;
+}
+.psx-ctrls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.psx-ctrl {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.psx-key {
+  background: #07180c;
+  border: 2px solid #2a7a36;
+  color: #bcefc4;
+  font-size: 8px;
+  padding: 5px 8px;
+  font-family: var(--game-font);
+}
+.psx-ctrl-lbl {
+  color: #5d8b64;
+  font-size: 6px;
+  letter-spacing: 1px;
+}
+.psx-btn {
+  background: #063f1d;
+  border: 3px solid #5dd068;
+  color: #fff;
+  font-size: 9px;
+  padding: 12px 22px;
+  cursor: pointer;
+  font-family: var(--game-font);
+  letter-spacing: 2px;
+  position: relative;
+  height: auto;
+  text-transform: uppercase;
+  display: inline-block;
+}
+.psx-btn:after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  left: 3px;
+  top: 3px;
+  background: #02170a;
+  z-index: -1;
+}
+.psx-btn:hover {
+  background: #0a5a2a;
+  color: #fff;
+  border-color: #8cff96;
+}
+.psx-btn:active {
+  transform: translate(3px, 3px);
+}
+.psx-btn:active:after {
+  display: none;
+}
+.blink {
+  color: #44ff88;
+  font-size: 7px;
+  margin-top: 14px;
+  letter-spacing: 1px;
+  animation: blk 0.9s steps(1) infinite;
+}
+@keyframes blk {
+  0%,
+  49% {
+    opacity: 1;
+  }
+  50%,
+  100% {
+    opacity: 0;
+  }
+}
+.mobile-pad {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 10px;
+  z-index: 15;
+  display: none;
+  justify-content: space-between;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.pad-side {
+  display: flex;
+  gap: 10px;
+}
+.pad-btn {
+  width: 52px;
+  height: 44px;
+  background: rgba(9, 55, 24, 0.42);
+  border: 2px solid rgba(93, 208, 104, 0.72);
+  color: #fff;
+  font-family: var(--game-font);
+  font-size: 9px;
+  pointer-events: auto;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+.foot {
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 10.5px;
+  letter-spacing: 0.3px;
+  gap: 8px;
+  text-align: center;
+  flex-wrap: wrap;
+}
+.foot span {
+  color: var(--dim);
+}
+.arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  padding: 20px;
+}
+.game-card {
+  border: 1px solid rgba(93, 208, 104, 0.38);
+  background: linear-gradient(
+    180deg,
+    rgba(7, 18, 8, 0.92),
+    rgba(0, 0, 0, 0.98)
+  );
+  min-height: 260px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 0 22px rgba(93, 208, 104, 0.08);
+  text-decoration: none;
+  color: var(--fg);
+}
+.game-card:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(93, 208, 104, 0.16);
+}
+.card-id {
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+.card-title {
+  font-size: 20px;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.card-copy {
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--muted);
+  margin-top: 16px;
+}
+.card-launch {
+  font-size: 11px;
+  color: var(--accent);
+  margin-top: 18px;
+}
+@media (max-width: 720px) {
+  .frame {
+    inset: 8px;
+  }
+  .frame-label {
+    font-size: 8.5px;
+    letter-spacing: 0.95px;
+    padding: 0 5px;
+  }
+  .frame-label.tl {
+    top: -6px;
+    left: 10px;
+  }
+  .frame-label.bl {
+    bottom: -6px;
+    left: 10px;
+  }
+  .frame-label.br {
+    bottom: -6px;
+    right: 10px;
+  }
+  .wrap {
+    padding: 30px 10px;
+  }
+  .shell {
+    width: calc(100vw - 22px);
+  }
+  .game-wrap {
+    height: calc(100dvh - 128px);
+    min-height: 430px;
+    padding: 6px;
+  }
+  .brand {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    padding: 0 9px;
+  }
+  button,
+  .btn {
+    font-size: 9.5px;
+    letter-spacing: 1px;
+    padding: 0 10px;
+  }
+  .psx-box {
+    padding: 20px 18px;
+  }
+  .psx-title {
+    font-size: 18px;
+  }
+  .psx-sub {
+    font-size: 6px;
+  }
+  .mobile-pad {
+    display: flex;
+  }
+  .foot {
+    display: none;
+  }
+  .arcade-grid {
+    grid-template-columns: 1fr;
+    padding: 12px;
+  }
+  .game-card {
+    min-height: 150px;
+  }
+  .card-title {
+    font-size: 17px;
+  }
+}
+
+/* Embedded mode for Thrill Wave secret break room iframe */
+body.tw-embedded-game {
+  background: #000;
+  overflow: hidden;
+}
+body.tw-embedded-game::before,
+body.tw-embedded-game .frame,
+body.tw-embedded-game .topbar,
+body.tw-embedded-game .foot {
+  display: none !important;
+}
+body.tw-embedded-game .wrap {
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  padding: 0;
+  display: block;
+}
+body.tw-embedded-game .shell {
+  width: 100%;
+  max-width: none;
+  height: 100%;
+}
+body.tw-embedded-game .terminal {
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: #000;
+}
+body.tw-embedded-game .terminal-bar {
+  display: none;
+}
+body.tw-embedded-game .game-wrap {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  padding: clamp(5px, 1.4vw, 10px);
+  background: #000;
+}
+body.tw-embedded-game .psx-outer {
+  height: 100%;
+  max-height: 100%;
+  max-width: 100%;
+  border-radius: 4px;
+  box-shadow:
+    0 0 0 1px rgba(245, 245, 245, 0.12),
+    0 0 30px rgba(93, 208, 104, 0.18),
+    inset 0 0 30px rgba(255, 255, 255, 0.035);
+}
+body.tw-embedded-game .screen {
+  padding: clamp(10px, 2vw, 18px);
+}
+body.tw-embedded-game .psx-box {
+  transform: scale(0.92);
+}
+body.tw-embedded-game .mobile-pad {
+  display: flex;
+}
+@media (max-width: 720px) {
+  body.tw-embedded-game .wrap {
+    padding: 0;
+  }
+  body.tw-embedded-game .game-wrap {
+    height: 100dvh;
+    padding: 4px;
+  }
+  body.tw-embedded-game .psx-box {
+    transform: scale(0.84);
+  }
+}
