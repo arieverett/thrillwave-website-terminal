@@ -1205,7 +1205,7 @@
 <div class="terminal-bar">
 <span class="title">menu</span>
 <div class="terminal-dots">
-<span class="dot"></span><span class="dot"></span><span class="dot live"></span>
+<span class="dot"></span><span class="dot"></span><span aria-label="close menu" class="dot live" role="button" tabindex="0"></span>
 </div>
 </div>
 <div class="terminal-body">
@@ -5283,6 +5283,47 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
       }
     }, true);
   });
+})();
+</script>
+
+<script>
+(function twMenuTrafficLightClose(){
+  if (window.__twMenuTrafficLightCloseBound) return;
+  window.__twMenuTrafficLightCloseBound = true;
+
+  function closeMenu(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+
+    var body = document.body;
+    var menuBtn = document.getElementById('menu-btn');
+    var sideMenu = document.getElementById('side-menu');
+
+    if (body) body.classList.remove('menu-open');
+    if (menuBtn) {
+      menuBtn.setAttribute('aria-expanded', 'false');
+      menuBtn.textContent = 'menu';
+      menuBtn.classList.remove('active');
+    }
+    if (sideMenu) sideMenu.setAttribute('aria-hidden', 'true');
+  }
+
+  document.addEventListener('click', function(event) {
+    var target = event.target;
+    if (!target || !target.closest) return;
+    if (!target.closest('#side-menu .terminal-bar .terminal-dots, #side-menu .terminal-bar .dot.live')) return;
+    closeMenu(event);
+  }, true);
+
+  document.addEventListener('keydown', function(event) {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    var target = event.target;
+    if (!target || !target.closest) return;
+    if (!target.closest('#side-menu .terminal-bar .dot.live')) return;
+    closeMenu(event);
+  }, true);
 })();
 </script>
 
