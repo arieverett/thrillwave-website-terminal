@@ -125,7 +125,7 @@
     var copyEl = $('.tw-breakroom-card__copy', card);
     var title = titleEl ? titleEl.textContent.trim() : 'game';
     var num = numEl ? numEl.textContent.trim() : '[--]';
-    var copy = copyEl ? copyEl.textContent.trim() : 'loading cartridge';
+    var copy = copyEl ? copyEl.textContent.trim() : 'loading game';
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -134,7 +134,7 @@
     if (outTitle) outTitle.textContent = title;
     if (outNum) outNum.textContent = num;
     if (outNote) outNote.textContent = copy + ' loading...';
-    if (status) status.textContent = '> ' + title + ' cartridge';
+    if (status) status.textContent = '> ' + title;
 
     $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
     card.classList.add('is-launching');
@@ -234,7 +234,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Thrill Wave - Research-driven Marketing Agency</title>
-<meta content="Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people." name="description"/>
+<meta content="Thrill Wave is a research-driven marketing agency that turns insight into content people actually care about." name="description"/>
 <meta content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" name="robots"/>
 <meta content="Thrill Wave" name="author"/>
 <meta content="#000000" name="theme-color"/>
@@ -245,7 +245,7 @@
 <link href="/assets/fav-icon/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
 <link href="/assets/fav-icon/site.webmanifest" rel="manifest"/>
 <meta content="Thrill Wave - Research-driven Marketing Agency" property="og:title"/>
-<meta content="Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people." property="og:description"/>
+<meta content="Thrill Wave is a research-driven marketing agency that turns insight into content people actually care about." property="og:description"/>
 <meta content="https://thrillwave-website-terminal.netlify.app/" property="og:url"/>
 <meta content="website" property="og:type"/>
 <meta content="Thrill Wave" property="og:site_name"/>
@@ -256,7 +256,7 @@
 <meta content="Thrill Wave logo" property="og:image:alt"/>
 <meta content="summary_large_image" name="twitter:card"/>
 <meta content="Thrill Wave - Research-driven Marketing Agency" name="twitter:title"/>
-<meta content="Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people." name="twitter:description"/>
+<meta content="Thrill Wave is a research-driven marketing agency that turns insight into content people actually care about." name="twitter:description"/>
 <meta content="https://thrillwave-website-terminal.netlify.app/assets/seo/og-image.jpg" name="twitter:image"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -289,7 +289,7 @@
     "@type": "WebSite",
     "name": "Thrill Wave",
     "url": "https://thrillwave-website-terminal.netlify.app/",
-    "description": "Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people.",
+    "description": "Thrill Wave is a research-driven marketing agency that turns insight into content people actually care about.",
     "inLanguage": "en-US"
   },
   {
@@ -297,7 +297,7 @@
     "@type": "WebPage",
     "name": "Thrill Wave - Research-driven Marketing Agency",
     "url": "https://thrillwave-website-terminal.netlify.app/",
-    "description": "Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people.",
+    "description": "Thrill Wave is a research-driven marketing agency that turns insight into content people actually care about.",
     "isPartOf": {
       "@type": "WebSite",
       "name": "Thrill Wave",
@@ -380,7 +380,7 @@
     }
     if (iframe && iframe.dataset && iframe.dataset.src) iframe.setAttribute('src', iframe.dataset.src);
     if (post && !post.innerHTML.trim()) {
-      post.innerHTML = '&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.<br>&gt;<br>&gt; press enter or scroll down to go to the next section, or click menu to jump to a page.<br>';
+      post.innerHTML = 'we are a research-driven marketing agency that turns insight into content people actually care about.<br><br>press enter or scroll to continue.<br>use menu to jump to any page.<br>';
     }
   }
 
@@ -661,7 +661,7 @@
   })();
   </script>
 </head>
-<body class="booting">
+<body class="booting page-index">
 <!-- ============================================================
      BOOT INTRO OVERLAY (removed from DOM after intro completes)
      ============================================================ -->
@@ -941,12 +941,12 @@
 <div class="tw-breakroom-inner">
 <div class="tw-breakroom-menu" data-breakroom-menu>
 <div class="tw-breakroom-copy page-content terminal-copy" aria-live="polite">
-<span class="line" data-breakroom-line="You found the secret break room!">You found the secret break room!</span>
-<span class="line" data-breakroom-line="Take a load off. Choose a game:">Take a load off. Choose a game:</span>
+<span class="line" data-breakroom-line="&gt; You found the secret break room!">&gt; You found the secret break room!</span>
+<span class="line" data-breakroom-line="&gt; Take a load off. Choose a game:">&gt; Take a load off. Choose a game:</span>
 </div>
 <div class="tw-breakroom-grid" aria-label="secret break room games">
 <button class="tw-breakroom-card" type="button" data-game-src="games/one_shot.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
-<span class="tw-breakroom-card__sprite" aria-hidden="true">🌵</span>
+<span class="tw-breakroom-card__sprite" aria-hidden="true">📷</span>
 <span class="tw-breakroom-card__num">[01]</span>
 <span class="tw-breakroom-card__title">one shot</span>
 <span class="tw-breakroom-card__copy">jump the plant hazards and clear the take.</span>
@@ -973,13 +973,13 @@
 <div class="tw-breakroom-game-hud" data-breakroom-game-hud>
 <button class="tw-breakroom-game-action tw-breakroom-game-name" data-breakroom-name type="button">&gt; name</button>
 <button class="tw-breakroom-game-action tw-breakroom-game-scores" data-breakroom-scores type="button">&gt; high scores</button>
-<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; back</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; exit</button>
 </div>
 <div class="tw-breakroom-game-placeholder" aria-label="break room playable game screen">
 <div class="tw-breakroom-game-loader" data-breakroom-game-loader aria-hidden="true">
 <span class="tw-breakroom-game-chip" data-breakroom-game-number>[--]</span>
 <span class="tw-breakroom-game-title" data-breakroom-game-title>game screen</span>
-<span class="tw-breakroom-game-note" data-breakroom-game-note>loading cartridge...</span>
+<span class="tw-breakroom-game-note" data-breakroom-game-note>loading game...</span>
 </div>
 <iframe class="tw-breakroom-game-frame" data-breakroom-game-frame title="Break room game" loading="lazy" allow="autoplay; fullscreen; gamepad"></iframe>
 <span class="tw-breakroom-game-gridline" aria-hidden="true"></span>
@@ -2411,6 +2411,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   window.twUI = window.twUI || {};
   window.twUI.sndScroll        = sndScroll;
   window.twUI.sndClick         = sndMouseClick;
+  window.twUI.sndTypeClick     = sndTypeClick;
   window.twUI.sndBreakRoomOpen = sndBreakRoomOpen;
   window.twUI.sndShutdown      = sndThud;
   // Kill audio cleanly on power-off so the new boot starts fresh.
@@ -2776,13 +2777,10 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
   ];
 
   const introPostLines = [
-    { t: "> we are a research-driven marketing agency", p: 170 },
-    { t: "> that turns audience, competitor, and category", p: 170 },
-    { t: "> intelligence into high-impact content built to move", p: 170 },
-    { t: "> people.", p: 500 },
-    { t: '>', p: 280 },
-    { t: '> press enter or scroll down to move forward.', p: 120 },
-    { t: '> click menu to jump to a page.', p: 0 },
+    { t: "we are a research-driven marketing agency that turns insight into content people actually care about.", p: 500 },
+    { t: '', p: 280 },
+    { t: 'press enter or scroll to continue.', p: 120 },
+    { t: 'use menu to jump to any page.', p: 0 },
   ];
 
   function escHtml(ch) { return ch === '<' ? '&lt;' : ch === '>' ? '&gt;' : ch === '&' ? '&amp;' : ch; }
@@ -4219,7 +4217,10 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     function tick(){
       line.textContent = full.slice(0, i);
       if (i > 0 && full.charAt(i - 1) !== ' ') {
-        try { if (window.twTypeClick) window.twTypeClick(); } catch(e) {}
+        try {
+          if (window.twUI && typeof window.twUI.sndTypeClick === 'function') window.twUI.sndTypeClick();
+          else if (window.twTypeClick) window.twTypeClick();
+        } catch(e) {}
       }
       if (i <= full.length) {
         var ch = full.charAt(i - 1);
@@ -4339,7 +4340,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     var title = ($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen';
     var num = ($('.tw-breakroom-card__num', card) || {}).textContent || '[--]';
-    var copy = ($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge...';
+    var copy = ($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading game...';
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -4740,7 +4741,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
     var title = (($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen').trim();
     var num = (($('.tw-breakroom-card__num', card) || {}).textContent || '[--]').trim();
-    var copy = (($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge').trim();
+    var copy = (($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading game').trim();
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -4749,7 +4750,7 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (outTitle) outTitle.textContent = title;
     if (outNum) outNum.textContent = num;
     if (outNote) outNote.textContent = copy + ' loading...';
-    if (status) status.textContent = '> ' + title + ' cartridge';
+    if (status) status.textContent = '> ' + title;
 
     $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
     card.classList.add('is-launching');
@@ -5229,6 +5230,59 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindControls);
   else bindControls();
+})();
+</script>
+
+
+<script>
+/* TW patch: stop the home typing loop/sound immediately when the break room opens. */
+(function twBreakRoomKillsHomeTyping(){
+  if (window.__twBreakRoomKillsHomeTyping) return;
+  window.__twBreakRoomKillsHomeTyping = true;
+
+  function trafficTarget(target){
+    return !!(target && target.closest && target.closest('.terminal.main .terminal-bar .dot.live, .terminal.main .terminal-bar .terminal-dots'));
+  }
+
+  function stopToneClicks(){
+    try {
+      if (window.Tone && Tone.Transport) Tone.Transport.cancel();
+    } catch(e) {}
+  }
+
+  window.twKillHomeIntroForBreakRoom = function(){
+    window.twHomeIntroKilledForBreakRoom = true;
+    try { window.twTypingGen = (window.twTypingGen || 0) + 1; } catch(e) {}
+    try { window.twIntroRunning = false; } catch(e) {}
+    try { sessionStorage.setItem('tw_typing_done', '1'); } catch(e) {}
+    try {
+      document.body.classList.remove('home-intro-running');
+      document.body.classList.add('home-intro-complete');
+    } catch(e) {}
+    try {
+      if (typeof window.twPrefillHome === 'function') window.twPrefillHome();
+    } catch(e) {}
+    stopToneClicks();
+  };
+
+  if (typeof window.twTypeClick === 'function' && !window.twTypeClick.__breakRoomSafe) {
+    var originalTypeClick = window.twTypeClick;
+    var safeTypeClick = function(){
+      if (window.twHomeIntroKilledForBreakRoom || document.body.classList.contains('tw-terminal-minimized')) return;
+      return originalTypeClick.apply(this, arguments);
+    };
+    safeTypeClick.__breakRoomSafe = true;
+    window.twTypeClick = safeTypeClick;
+  }
+
+  ['pointerdown','click'].forEach(function(evt){
+    document.addEventListener(evt, function(e){
+      if (!trafficTarget(e.target)) return;
+      if (!document.body.classList.contains('tw-terminal-minimized')) {
+        try { window.twKillHomeIntroForBreakRoom(); } catch(err) {}
+      }
+    }, true);
+  });
 })();
 </script>
 

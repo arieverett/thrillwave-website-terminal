@@ -125,7 +125,7 @@
     var copyEl = $('.tw-breakroom-card__copy', card);
     var title = titleEl ? titleEl.textContent.trim() : 'game';
     var num = numEl ? numEl.textContent.trim() : '[--]';
-    var copy = copyEl ? copyEl.textContent.trim() : 'loading cartridge';
+    var copy = copyEl ? copyEl.textContent.trim() : 'loading game';
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -134,7 +134,7 @@
     if (outTitle) outTitle.textContent = title;
     if (outNum) outNum.textContent = num;
     if (outNote) outNote.textContent = copy + ' loading...';
-    if (status) status.textContent = '> ' + title + ' cartridge';
+    if (status) status.textContent = '> ' + title;
 
     $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
     card.classList.add('is-launching');
@@ -704,12 +704,12 @@
 <div class="tw-breakroom-inner">
 <div class="tw-breakroom-menu" data-breakroom-menu>
 <div class="tw-breakroom-copy page-content terminal-copy" aria-live="polite">
-<span class="line" data-breakroom-line="You found the secret break room!">You found the secret break room!</span>
-<span class="line" data-breakroom-line="Take a load off. Choose a game:">Take a load off. Choose a game:</span>
+<span class="line" data-breakroom-line="&gt; You found the secret break room!">&gt; You found the secret break room!</span>
+<span class="line" data-breakroom-line="&gt; Take a load off. Choose a game:">&gt; Take a load off. Choose a game:</span>
 </div>
 <div class="tw-breakroom-grid" aria-label="secret break room games">
 <button class="tw-breakroom-card" type="button" data-game-src="games/one_shot.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
-<span class="tw-breakroom-card__sprite" aria-hidden="true">🌵</span>
+<span class="tw-breakroom-card__sprite" aria-hidden="true">📷</span>
 <span class="tw-breakroom-card__num">[01]</span>
 <span class="tw-breakroom-card__title">one shot</span>
 <span class="tw-breakroom-card__copy">jump the plant hazards and clear the take.</span>
@@ -736,13 +736,13 @@
 <div class="tw-breakroom-game-hud" data-breakroom-game-hud>
 <button class="tw-breakroom-game-action tw-breakroom-game-name" data-breakroom-name type="button">&gt; name</button>
 <button class="tw-breakroom-game-action tw-breakroom-game-scores" data-breakroom-scores type="button">&gt; high scores</button>
-<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; back</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; exit</button>
 </div>
 <div class="tw-breakroom-game-placeholder" aria-label="break room playable game screen">
 <div class="tw-breakroom-game-loader" data-breakroom-game-loader aria-hidden="true">
 <span class="tw-breakroom-game-chip" data-breakroom-game-number>[--]</span>
 <span class="tw-breakroom-game-title" data-breakroom-game-title>game screen</span>
-<span class="tw-breakroom-game-note" data-breakroom-game-note>loading cartridge...</span>
+<span class="tw-breakroom-game-note" data-breakroom-game-note>loading game...</span>
 </div>
 <iframe class="tw-breakroom-game-frame" data-breakroom-game-frame title="Break room game" loading="lazy" allow="autoplay; fullscreen; gamepad"></iframe>
 <span class="tw-breakroom-game-gridline" aria-hidden="true"></span>
@@ -2081,7 +2081,10 @@
     function tick(){
       line.textContent = full.slice(0, i);
       if (i > 0 && full.charAt(i - 1) !== ' ') {
-        try { if (window.twTypeClick) window.twTypeClick(); } catch(e) {}
+        try {
+          if (window.twUI && typeof window.twUI.sndTypeClick === 'function') window.twUI.sndTypeClick();
+          else if (window.twTypeClick) window.twTypeClick();
+        } catch(e) {}
       }
       if (i <= full.length) {
         var ch = full.charAt(i - 1);
@@ -2201,7 +2204,7 @@
 
     var title = ($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen';
     var num = ($('.tw-breakroom-card__num', card) || {}).textContent || '[--]';
-    var copy = ($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge...';
+    var copy = ($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading game...';
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -2602,7 +2605,7 @@
 
     var title = (($('.tw-breakroom-card__title', card) || {}).textContent || 'game screen').trim();
     var num = (($('.tw-breakroom-card__num', card) || {}).textContent || '[--]').trim();
-    var copy = (($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading cartridge').trim();
+    var copy = (($('.tw-breakroom-card__copy', card) || {}).textContent || 'loading game').trim();
 
     var outTitle = $('[data-breakroom-game-title]', s);
     var outNum = $('[data-breakroom-game-number]', s);
@@ -2611,7 +2614,7 @@
     if (outTitle) outTitle.textContent = title;
     if (outNum) outNum.textContent = num;
     if (outNote) outNote.textContent = copy + ' loading...';
-    if (status) status.textContent = '> ' + title + ' cartridge';
+    if (status) status.textContent = '> ' + title;
 
     $all('.tw-breakroom-card.is-launching').forEach(function(c){ c.classList.remove('is-launching'); });
     card.classList.add('is-launching');
@@ -3091,6 +3094,59 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bindControls);
   else bindControls();
+})();
+</script>
+
+
+<script>
+/* TW patch: stop the home typing loop/sound immediately when the break room opens. */
+(function twBreakRoomKillsHomeTyping(){
+  if (window.__twBreakRoomKillsHomeTyping) return;
+  window.__twBreakRoomKillsHomeTyping = true;
+
+  function trafficTarget(target){
+    return !!(target && target.closest && target.closest('.terminal.main .terminal-bar .dot.live, .terminal.main .terminal-bar .terminal-dots'));
+  }
+
+  function stopToneClicks(){
+    try {
+      if (window.Tone && Tone.Transport) Tone.Transport.cancel();
+    } catch(e) {}
+  }
+
+  window.twKillHomeIntroForBreakRoom = function(){
+    window.twHomeIntroKilledForBreakRoom = true;
+    try { window.twTypingGen = (window.twTypingGen || 0) + 1; } catch(e) {}
+    try { window.twIntroRunning = false; } catch(e) {}
+    try { sessionStorage.setItem('tw_typing_done', '1'); } catch(e) {}
+    try {
+      document.body.classList.remove('home-intro-running');
+      document.body.classList.add('home-intro-complete');
+    } catch(e) {}
+    try {
+      if (typeof window.twPrefillHome === 'function') window.twPrefillHome();
+    } catch(e) {}
+    stopToneClicks();
+  };
+
+  if (typeof window.twTypeClick === 'function' && !window.twTypeClick.__breakRoomSafe) {
+    var originalTypeClick = window.twTypeClick;
+    var safeTypeClick = function(){
+      if (window.twHomeIntroKilledForBreakRoom || document.body.classList.contains('tw-terminal-minimized')) return;
+      return originalTypeClick.apply(this, arguments);
+    };
+    safeTypeClick.__breakRoomSafe = true;
+    window.twTypeClick = safeTypeClick;
+  }
+
+  ['pointerdown','click'].forEach(function(evt){
+    document.addEventListener(evt, function(e){
+      if (!trafficTarget(e.target)) return;
+      if (!document.body.classList.contains('tw-terminal-minimized')) {
+        try { window.twKillHomeIntroForBreakRoom(); } catch(err) {}
+      }
+    }, true);
+  });
 })();
 </script>
 

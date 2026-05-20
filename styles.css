@@ -10955,3 +10955,330 @@ body.tw-breakroom-game-active #tw-breakroom .tw-breakroom-game-frame {
     display: none;
   }
 }
+
+
+/* TW patch: softer break room type, plain traffic dot hover/click, easier score close. */
+#tw-breakroom .tw-breakroom-copy.page-content.terminal-copy {
+  text-shadow:
+    0 0 3px rgba(255,255,255,0.48),
+    0 0 9px rgba(255,255,255,0.16),
+    0 0 14px rgba(93,208,104,0.08) !important;
+}
+#tw-breakroom .tw-breakroom-exit {
+  text-shadow:
+    0 0 3px rgba(255,255,255,0.46),
+    0 0 9px rgba(255,255,255,0.14) !important;
+}
+.terminal.main .terminal-bar .dot.live,
+.terminal.main .terminal-bar .dot.live:hover,
+.terminal.main .terminal-bar .dot.live:focus-visible,
+.terminal.main .terminal-bar .dot.live:active,
+.terminal.main .terminal-bar .terminal-dots:hover .dot.live,
+.terminal.main .terminal-bar .terminal-dots:focus-visible .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:hover,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:focus-visible,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:hover,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:focus-visible {
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+#tw-breakroom .tw-score-head button[data-score-close] {
+  width: 46px !important;
+  height: 46px !important;
+  min-width: 46px !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  margin: -12px -12px -8px 8px !important;
+  font-size: 34px !important;
+  line-height: 1 !important;
+  border: 1px solid rgba(245,245,245,.16) !important;
+  border-radius: 3px !important;
+  background: rgba(0,0,0,.28) !important;
+  text-shadow: 0 0 8px rgba(255,255,255,.42) !important;
+}
+#tw-breakroom .tw-score-head button[data-score-close]:hover,
+#tw-breakroom .tw-score-head button[data-score-close]:focus-visible {
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+}
+
+
+/* TW surgical pass: traffic light has no green hover/click halo. */
+.terminal.main .terminal-bar .terminal-dots,
+.terminal.main .terminal-bar .terminal-dots:hover,
+.terminal.main .terminal-bar .terminal-dots:focus-visible,
+.terminal.main .terminal-bar .terminal-dots:active {
+  background: transparent !important;
+  filter: none !important;
+  box-shadow: none !important;
+  outline: 0 !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+.terminal.main .terminal-bar .terminal-dots::before,
+.terminal.main .terminal-bar .terminal-dots::after {
+  content: none !important;
+  display: none !important;
+}
+.terminal.main .terminal-bar .terminal-dots:hover .dot,
+.terminal.main .terminal-bar .terminal-dots:focus-visible .dot,
+.terminal.main .terminal-bar .terminal-dots:active .dot {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+.terminal.main .terminal-bar .dot.live,
+.terminal.main .terminal-bar .dot.live:hover,
+.terminal.main .terminal-bar .dot.live:focus-visible,
+.terminal.main .terminal-bar .dot.live:active,
+.terminal.main .terminal-bar .terminal-dots:hover .dot.live,
+.terminal.main .terminal-bar .terminal-dots:focus-visible .dot.live,
+.terminal.main .terminal-bar .terminal-dots:active .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:hover,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:focus-visible,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:hover,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:focus-visible {
+  background: #ff5f56 !important;
+  box-shadow: none !important;
+  filter: none !important;
+  transform: none !important;
+  animation: none !important;
+}
+
+
+/* ============================================================
+   TW traffic light state polish: green open, red minimized.
+   Tiny realistic glow only on the dot; no group halo.
+   ============================================================ */
+@keyframes twTrafficPulseGreen {
+  0%,100% {
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,.50),
+      inset 0 1px 1px rgba(255,255,255,.34),
+      0 0 2px rgba(93,208,104,.62),
+      0 0 5px rgba(93,208,104,.26) !important;
+  }
+  50% {
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,.46),
+      inset 0 1px 1px rgba(255,255,255,.40),
+      0 0 3px rgba(93,208,104,.78),
+      0 0 7px rgba(93,208,104,.32) !important;
+  }
+}
+@keyframes twTrafficPulseRed {
+  0%,100% {
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,.50),
+      inset 0 1px 1px rgba(255,255,255,.32),
+      0 0 2px rgba(255,95,86,.62),
+      0 0 5px rgba(255,95,86,.24) !important;
+  }
+  50% {
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,.46),
+      inset 0 1px 1px rgba(255,255,255,.38),
+      0 0 3px rgba(255,95,86,.78),
+      0 0 7px rgba(255,95,86,.30) !important;
+  }
+}
+.terminal.main .terminal-bar .terminal-dots,
+.terminal.main .terminal-bar .terminal-dots:hover,
+.terminal.main .terminal-bar .terminal-dots:focus-visible,
+.terminal.main .terminal-bar .terminal-dots:active {
+  background: transparent !important;
+  box-shadow: none !important;
+  filter: none !important;
+  outline: 0 !important;
+}
+.terminal.main .terminal-bar .terminal-dots:hover .dot:not(.live),
+.terminal.main .terminal-bar .terminal-dots:focus-visible .dot:not(.live),
+.terminal.main .terminal-bar .terminal-dots:active .dot:not(.live) {
+  background: #2e2e2e !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live {
+  background: #5dd068 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: twTrafficPulseGreen 2.85s ease-in-out infinite !important;
+}
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .terminal-dots:hover .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:hover,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:focus-visible {
+  background: #ff5f56 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: twTrafficPulseRed 2.85s ease-in-out infinite !important;
+}
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .terminal-dots:active .dot.live,
+body:not(.tw-terminal-minimized) .terminal.main .terminal-bar .dot.live:active {
+  background: #b8423c !important;
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
+  box-shadow:
+    inset 0 -1px 2px rgba(0,0,0,.62),
+    inset 0 1px 1px rgba(255,255,255,.20),
+    0 0 2px rgba(184,66,60,.60),
+    0 0 5px rgba(184,66,60,.22) !important;
+}
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live {
+  background: #ff5f56 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: twTrafficPulseRed 2.85s ease-in-out infinite !important;
+}
+body.tw-terminal-minimized .terminal.main .terminal-bar .terminal-dots:hover .dot.live,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:hover,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:focus-visible {
+  background: #5dd068 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: twTrafficPulseGreen 2.85s ease-in-out infinite !important;
+}
+body.tw-terminal-minimized .terminal.main .terminal-bar .terminal-dots:active .dot.live,
+body.tw-terminal-minimized .terminal.main .terminal-bar .dot.live:active {
+  background: #3f9b48 !important;
+  transform: none !important;
+  filter: none !important;
+  animation: none !important;
+  box-shadow:
+    inset 0 -1px 2px rgba(0,0,0,.62),
+    inset 0 1px 1px rgba(255,255,255,.20),
+    0 0 2px rgba(63,155,72,.58),
+    0 0 5px rgba(63,155,72,.20) !important;
+}
+
+
+/* ============================================================
+   TW patch: stable minimized title bar + audible break-room typing
+   ============================================================ */
+.terminal.main .terminal-bar,
+body.tw-terminal-minimized .terminal.main .terminal-bar {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  align-items: center !important;
+  box-sizing: border-box !important;
+}
+
+.terminal.main .terminal-bar .title,
+.terminal.main .terminal-bar .title-page,
+.terminal.main .terminal-bar .title-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  line-height: 1 !important;
+  transform: none !important;
+}
+
+body.tw-terminal-minimized .terminal.main {
+  height: 42px !important;
+  min-height: 42px !important;
+  max-height: 42px !important;
+}
+
+body.tw-terminal-minimized .terminal.main .terminal-bar .title,
+body.tw-terminal-minimized .terminal.main .terminal-bar .title-page,
+body.tw-terminal-minimized .terminal.main .terminal-bar .title-brand {
+  transform: none !important;
+  translate: none !important;
+}
+
+
+/* ============================================================
+   TW PATCH — 2026-05-20 homepage + break room typing fixes
+   - raises the home lander content closer to the terminal title bar
+   - lets the home post-copy type as full-width sentences with natural wraps
+   - keeps a white prompt visible on every visual wrapped line
+   - prevents the break room's second prompt from appearing before its line types
+   ============================================================ */
+
+#hero {
+  padding-top: 16px !important;
+  padding-bottom: 74px !important;
+}
+
+body.page-index #hero {
+  padding-top: 10px !important;
+  padding-bottom: 80px !important;
+}
+
+#hero > .page-content:first-child {
+  margin-top: 0 !important;
+}
+
+#intro-post {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: 2.05ch !important;
+  white-space: pre-wrap !important;
+  overflow: hidden !important;
+  overflow-wrap: normal !important;
+  word-break: normal !important;
+  hyphens: none !important;
+  line-height: inherit !important;
+  text-align: left !important;
+}
+
+#intro-post::before {
+  content: ">\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>\A>";
+  position: absolute !important;
+  left: 0 !important;
+  top: 0 !important;
+  z-index: 0 !important;
+  white-space: pre !important;
+  line-height: inherit !important;
+  font: inherit !important;
+  color: var(--tw-prompt, #f4f3e8) !important;
+  pointer-events: none !important;
+}
+
+#intro-post > * {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+/* The break room now types literal prompt characters from the HTML data attrs.
+   Disable the automatic prompt rail here so empty/future lines stay invisible. */
+#tw-breakroom .tw-breakroom-copy.page-content.terminal-copy {
+  padding-left: 0 !important;
+  overflow: visible !important;
+}
+
+#tw-breakroom .tw-breakroom-copy.page-content.terminal-copy::before {
+  content: none !important;
+  display: none !important;
+}
+
+#tw-breakroom .tw-breakroom-copy.page-content.terminal-copy .line:empty:not(.is-typing):not(.cursor-live) {
+  display: none !important;
+  min-height: 0 !important;
+}
+
+@media (max-width: 720px) {
+  #hero {
+    padding-top: 14px !important;
+    padding-bottom: 62px !important;
+  }
+
+  body.page-index #hero {
+    padding-top: 8px !important;
+    padding-bottom: 68px !important;
+  }
+
+  #intro-post {
+    padding-left: 2.05ch !important;
+    line-height: 1.64 !important;
+  }
+}
