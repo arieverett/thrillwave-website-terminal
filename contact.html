@@ -836,16 +836,55 @@
 </div>
 </div>
 <div class="terminal-body" id="terminal-body">
+
+<style id="tw-contact-pjax-alignment-fix">
+#terminal-body .contact-copy .line.contact-row,
+#terminal-body .follow-copy .line.follow-row {
+  display: block !important;
+  white-space: normal !important;
+  overflow: visible !important;
+}
+#terminal-body .contact-copy .contact-label,
+#terminal-body .follow-copy .follow-label {
+  color: var(--fg) !important;
+  display: inline-block !important;
+  width: 10.5ch !important;
+  min-width: 10.5ch !important;
+}
+#terminal-body .contact-copy .contact-sep,
+#terminal-body .follow-copy .follow-sep {
+  color: var(--fg) !important;
+  display: inline-block !important;
+  width: 2ch !important;
+  margin-right: 6.5ch !important;
+}
+#terminal-body .contact-copy .contact-value,
+#terminal-body .follow-copy .follow-value {
+  display: inline !important;
+  min-width: 0 !important;
+}
+@media (max-width: 720px) {
+  #terminal-body .contact-copy .contact-label,
+  #terminal-body .follow-copy .follow-label {
+    width: 9.2ch !important;
+    min-width: 9.2ch !important;
+  }
+  #terminal-body .contact-copy .contact-sep,
+  #terminal-body .follow-copy .follow-sep {
+    margin-right: 2.5ch !important;
+  }
+}
+</style>
 <section class="page reveal" data-nav-section="" id="hero">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06</span><span class="hdr-slash"> // </span><span class="hdr-name">contact</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy contact-copy">
 <span class="line">tell us about the project, what it needs to accomplish, and when you need it done.</span>
 <span class="line">we will respond quickly and keep the conversation simple, useful, and transparent.</span>
 <span class="line"></span>
-<span class="line contact-row"><span class="contact-label">email</span><span class="contact-sep">//</span><span class="contact-value"><a href="mailto:hi@thrillwave.com">hi@thrillwave.com</a></span></span>
-<span class="line contact-row"><span class="contact-label">call/text</span><span class="contact-sep">//</span><span class="contact-value"><a href="tel:+14802697155">480.269.7155</a></span></span>
-<span class="line contact-row"><span class="contact-label">location</span><span class="contact-sep">//</span><span class="contact-value">Phoenix, AZ</span></span>
-<span class="line contact-row"><span class="contact-label">mail</span><span class="contact-sep">//</span><span class="contact-value">6929 N Hayden Rd #262, Scottsdale AZ 85250, USA (don't actually go here, it's just our PO box)</span></span>
+<span class="line contact-row"><span class="contact-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">email</span><span class="contact-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="contact-value" style="display:inline !important;min-width:0 !important;"><a href="mailto:hi@thrillwave.com">hi@thrillwave.com</a></span></span>
+<span class="line contact-row"><span class="contact-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">call/text</span><span class="contact-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="contact-value" style="display:inline !important;min-width:0 !important;"><a href="tel:+14802697155">480.269.7155</a></span></span>
+<span class="line contact-row"><span class="contact-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">location</span><span class="contact-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="contact-value" style="display:inline !important;min-width:0 !important;">Phoenix, AZ</span></span>
+<span class="line contact-row"><span class="contact-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">mail</span><span class="contact-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="contact-value" style="display:inline !important;min-width:0 !important;">6929 N Hayden Rd #262, Scottsdale AZ 85250, USA (don't actually go here, it's just our PO box)</span></span>
 <span class="line"></span>
 </div>
 <div class="cascade contact-cascade map-cascade" data-expanded="true"><span aria-expanded="true" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">open</span><span class="cmd-name">phoenix_metro_map_pin</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="embed-frame map-frame"><iframe loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=6929%20N%20Hayden%20Rd%20%23262%20Scottsdale%20AZ%2085250%20USA&amp;z=10&amp;output=embed"></iframe></div></div></div>
@@ -862,12 +901,12 @@
 <section class="page reveal" data-nav-section="" id="follow">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">06B</span><span class="hdr-slash"> // </span><span class="hdr-name">follow</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy follow-copy">
-<span class="line follow-row"><span class="follow-label">instagram</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://www.instagram.com/thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
-<span class="line follow-row"><span class="follow-label">x</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://x.com/thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
-<span class="line follow-row"><span class="follow-label">tiktok</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://www.tiktok.com/@thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
-<span class="line follow-row"><span class="follow-label">linkedin</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://www.linkedin.com/company/thrillwave" rel="noopener" target="_blank">thrillwave</a></span></span>
-<span class="line follow-row"><span class="follow-label">vimeo</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://vimeo.com/thrillwave" rel="noopener" target="_blank">vimeo.com/thrillwave</a></span></span>
-<span class="line follow-row"><span class="follow-label">youtube</span><span class="follow-sep">//</span><span class="follow-value"><a href="https://www.youtube.com/@thrillwave" rel="noopener" target="_blank">@thrillwave</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">instagram</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://www.instagram.com/thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">x</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://x.com/thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">tiktok</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://www.tiktok.com/@thrillwave_" rel="noopener" target="_blank">@thrillwave_</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">linkedin</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://www.linkedin.com/company/thrillwave" rel="noopener" target="_blank">thrillwave</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">vimeo</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://vimeo.com/thrillwave" rel="noopener" target="_blank">vimeo.com/thrillwave</a></span></span>
+<span class="line follow-row"><span class="follow-label" style="display:inline-block !important;width:10.5ch !important;min-width:10.5ch !important;color:var(--fg) !important;">youtube</span><span class="follow-sep" style="display:inline-block !important;width:2ch !important;margin-right:6.5ch !important;color:var(--fg) !important;">//</span><span class="follow-value" style="display:inline !important;min-width:0 !important;"><a href="https://www.youtube.com/@thrillwave" rel="noopener" target="_blank">@thrillwave</a></span></span>
 </div>
 </section>
 <section class="page reveal" data-nav-section="" id="loop">
