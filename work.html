@@ -270,7 +270,7 @@
     "name": "Thrill Wave",
     "url": "https://thrillwave-website-terminal.netlify.app/",
     "logo": "https://thrillwave-website-terminal.netlify.app/assets/seo/og-image.jpg",
-    "description": "Research-driven marketing agency turning audience, competitor, and category intelligence into high-impact content.",
+    "description": "Research-driven marketing agency blending strategy, intelligence, and production to create high-impact content built to move people.",
     "email": "hi@thrillwave.com",
     "telephone": "+1-480-269-7155",
     "foundingDate": "2018",
@@ -288,7 +288,7 @@
     "@type": "WebSite",
     "name": "Thrill Wave",
     "url": "https://thrillwave-website-terminal.netlify.app/",
-    "description": "Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content.",
+    "description": "Thrill Wave is a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content built to move people.",
     "inLanguage": "en-US"
   },
   {
@@ -379,7 +379,7 @@
     }
     if (iframe && iframe.dataset && iframe.dataset.src) iframe.setAttribute('src', iframe.dataset.src);
     if (post && !post.innerHTML.trim()) {
-      post.innerHTML = '&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content.<br>&gt;<br>&gt; press enter or scroll down to go to the next section, or click menu to jump to a page.<br>';
+      post.innerHTML = '&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.<br>&gt;<br>&gt; press enter or scroll down to go to the next section, or click menu to jump to a page.<br>';
     }
   }
 
@@ -659,6 +659,114 @@
     window.addEventListener('touchstart', handleMenuPress, { capture: true, passive: false });
   })();
   </script>
+<style>
+/* Work archive rack: 18-file two-column terminal matrix, sorted alphabetically down each column, regular text, no truncation. */
+#terminal-body #selected .work-archive-grid,
+#selected .work-archive-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: clamp(0.55rem, 1.6vw, 1.05rem) !important;
+  row-gap: 0.08rem !important;
+  align-items: start !important;
+  justify-content: stretch !important;
+  margin-top: 0.15rem !important;
+  padding: 0.35rem 0 0 !important;
+  font-size: clamp(0.96rem, 1.16vw, 1.06rem) !important;
+  line-height: 1.42 !important;
+  max-width: 100% !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade,
+#selected .work-archive-grid .archive-cascade {
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.42 !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle,
+#selected .work-archive-grid .cascade-toggle {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 0.28em !important;
+  width: auto !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  line-height: 1.42 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  letter-spacing: -0.025em !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle .prompt,
+#selected .work-archive-grid .cascade-toggle .prompt,
+#terminal-body #selected .work-archive-grid .cascade-toggle .cmd-action,
+#selected .work-archive-grid .cascade-toggle .cmd-action,
+#terminal-body #selected .work-archive-grid .cascade-toggle .toggle-mark,
+#selected .work-archive-grid .cascade-toggle .toggle-mark {
+  flex: 0 0 auto !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle .cmd-name,
+#selected .work-archive-grid .cascade-toggle .cmd-name {
+  color: var(--accent) !important;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"],
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] {
+  grid-column: 1 / -1 !important;
+  margin: 0.45rem 0 0.62rem !important;
+  padding: 0.5rem 0 0 !important;
+  border-top: 1px solid rgba(95, 255, 129, 0.22) !important;
+  border-bottom: 1px solid rgba(95, 255, 129, 0.12) !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content {
+  max-height: min(38vh, 300px) !important;
+  margin: 0.35rem 0 0.5rem !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-video .vid-frame,
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-video .vid-frame {
+  max-width: 720px !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-title] .cascade-content::before,
+#selected .work-archive-grid .archive-cascade[data-title] .cascade-content::before {
+  content: attr(data-title);
+  display: block;
+  color: var(--muted);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.35rem;
+  text-transform: lowercase;
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    font-size: clamp(0.84rem, 1.5vw, 0.98rem) !important;
+    column-gap: 0.65rem !important;
+    row-gap: 0.02rem !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle { gap: 0.23em !important; letter-spacing: -0.035em !important; }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content { max-height: 34vh !important; }
+}
+@media (max-width: 720px) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    grid-template-columns: 1fr !important;
+    font-size: 0.9rem !important;
+    column-gap: 0 !important;
+    row-gap: 0.05rem !important;
+  }
+}
+
+</style>
 </head>
 <body>
 <div aria-hidden="true" class="frame">
@@ -702,50 +810,50 @@
 <div class="stage">
 <div aria-hidden="true" class="tw-breakroom" id="tw-breakroom">
 <div class="tw-breakroom-inner">
-<div class="tw-breakroom-menu" data-breakroom-menu>
-<div class="tw-breakroom-copy page-content terminal-copy" aria-live="polite">
+<div class="tw-breakroom-menu" data-breakroom-menu="">
+<div aria-live="polite" class="tw-breakroom-copy page-content terminal-copy">
 <span class="line" data-breakroom-line="&gt; You found the secret break room!">&gt; You found the secret break room!</span>
 <span class="line" data-breakroom-line="&gt; Take a load off. Choose a game:">&gt; Take a load off. Choose a game:</span>
 </div>
-<div class="tw-breakroom-grid" aria-label="secret break room games">
-<button class="tw-breakroom-card" type="button" data-game-src="games/one_shot.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
-<span class="tw-breakroom-card__sprite" aria-hidden="true">📷</span>
+<div aria-label="secret break room games" class="tw-breakroom-grid">
+<button class="tw-breakroom-card" data-game-src="games/one_shot.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;" type="button">
+<span aria-hidden="true" class="tw-breakroom-card__sprite">📷</span>
 <span class="tw-breakroom-card__num">[01]</span>
 <span class="tw-breakroom-card__title">one shot</span>
 <span class="tw-breakroom-card__copy">jump the plant hazards and clear the shot.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
 </button>
-<button class="tw-breakroom-card" type="button" data-game-src="games/going_viral.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
-<span class="tw-breakroom-card__sprite" aria-hidden="true">⚔️</span>
+<button class="tw-breakroom-card" data-game-src="games/going_viral.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;" type="button">
+<span aria-hidden="true" class="tw-breakroom-card__sprite">⚔️</span>
 <span class="tw-breakroom-card__num">[02]</span>
 <span class="tw-breakroom-card__title">going viral</span>
 <span class="tw-breakroom-card__copy">outrun the algorithm before it outruns you.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
 </button>
-<button class="tw-breakroom-card" type="button" data-game-src="games/content_defense.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;">
-<span class="tw-breakroom-card__sprite" aria-hidden="true">🛡️</span>
+<button class="tw-breakroom-card" data-game-src="games/content_defense.html?embed=1" onclick="return window.twBreakRoomLaunch ? window.twBreakRoomLaunch(this,event) : false;" type="button">
+<span aria-hidden="true" class="tw-breakroom-card__sprite">🛡️</span>
 <span class="tw-breakroom-card__num">[03]</span>
 <span class="tw-breakroom-card__title">content defense</span>
 <span class="tw-breakroom-card__copy">protect the campaign core from the chaos.</span>
 <span class="tw-breakroom-card__launch">&gt; launch</span>
 </button>
 </div>
-<a class="tw-breakroom-exit" href="#terminal" data-breakroom-exit="" data-breakroom-line="&gt; exit break room" role="button" onclick="return window.twBreakRoomExit ? window.twBreakRoomExit(event) : false;">&gt; exit break room</a>
+<a class="tw-breakroom-exit" data-breakroom-exit="" data-breakroom-line="&gt; exit break room" href="#terminal" onclick="return window.twBreakRoomExit ? window.twBreakRoomExit(event) : false;" role="button">&gt; exit break room</a>
 </div>
-<div class="tw-breakroom-game-screen" data-breakroom-game-screen aria-hidden="true">
-<div class="tw-breakroom-game-hud" data-breakroom-game-hud>
-<button class="tw-breakroom-game-action tw-breakroom-game-name" data-breakroom-name type="button">&gt; name</button>
-<button class="tw-breakroom-game-action tw-breakroom-game-scores" data-breakroom-scores type="button">&gt; high scores</button>
-<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back type="button" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;">&gt; exit</button>
+<div aria-hidden="true" class="tw-breakroom-game-screen" data-breakroom-game-screen="">
+<div class="tw-breakroom-game-hud" data-breakroom-game-hud="">
+<button class="tw-breakroom-game-action tw-breakroom-game-name" data-breakroom-name="" type="button">&gt; name</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-scores" data-breakroom-scores="" type="button">&gt; high scores</button>
+<button class="tw-breakroom-game-action tw-breakroom-game-back" data-breakroom-back="" onclick="return window.twBreakRoomBack ? window.twBreakRoomBack(event) : false;" type="button">&gt; exit</button>
 </div>
-<div class="tw-breakroom-game-placeholder" aria-label="break room playable game screen">
-<div class="tw-breakroom-game-loader" data-breakroom-game-loader aria-hidden="true">
-<span class="tw-breakroom-game-chip" data-breakroom-game-number>[--]</span>
-<span class="tw-breakroom-game-title" data-breakroom-game-title>game screen</span>
-<span class="tw-breakroom-game-note" data-breakroom-game-note>loading game...</span>
+<div aria-label="break room playable game screen" class="tw-breakroom-game-placeholder">
+<div aria-hidden="true" class="tw-breakroom-game-loader" data-breakroom-game-loader="">
+<span class="tw-breakroom-game-chip" data-breakroom-game-number="">[--]</span>
+<span class="tw-breakroom-game-title" data-breakroom-game-title="">game screen</span>
+<span class="tw-breakroom-game-note" data-breakroom-game-note="">loading game...</span>
 </div>
-<iframe class="tw-breakroom-game-frame" data-breakroom-game-frame title="Break room game" loading="lazy" allow="autoplay; fullscreen; gamepad"></iframe>
-<span class="tw-breakroom-game-gridline" aria-hidden="true"></span>
+<iframe allow="autoplay; fullscreen; gamepad" class="tw-breakroom-game-frame" data-breakroom-game-frame="" loading="lazy" title="Break room game"></iframe>
+<span aria-hidden="true" class="tw-breakroom-game-gridline"></span>
 </div>
 </div>
 </div>
@@ -761,52 +869,227 @@
 <section class="page reveal" data-nav-section="" id="hero">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04</span><span class="hdr-slash"> // </span><span class="hdr-name">work</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy work-hero-copy">
-<span class="line"><span class="accent">case files from the field.</span></span>
-<span class="line"> </span>
-<span class="line">these are not trophies in a glass box.</span>
-<span class="line">they are working stories, built for launches, rooms, feeds, patients, travelers, teams, and fans who needed a reason to care.</span>
-<span class="line"> </span>
-<span class="line">some are polished. some are scrappy. all of them start the same way:</span>
-<span class="line">find the signal, shape the story, and build the assets with care.</span>
+<span class="line">we make films, campaigns, and content systems for brands that need the story to do real work.</span>
+<span class="line"></span>
+<span class="line">the process is simple: find the signal, shape the story, and build the assets with care.</span>
+<span class="line"></span>
+<span class="line">what follows is a small cut of the archive across launches, events, healthcare, sports, travel, and brand work.</span>
 </div>
 </section>
 <section class="page reveal" data-nav-section="" id="selected">
+<style class="work-archive-inline-style">
+/* Work archive rack: 18-file two-column terminal matrix, sorted alphabetically down each column, regular text, no truncation. */
+#terminal-body #selected .work-archive-grid,
+#selected .work-archive-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  column-gap: clamp(0.55rem, 1.6vw, 1.05rem) !important;
+  row-gap: 0.08rem !important;
+  align-items: start !important;
+  justify-content: stretch !important;
+  margin-top: 0.15rem !important;
+  padding: 0.35rem 0 0 !important;
+  font-size: clamp(0.96rem, 1.16vw, 1.06rem) !important;
+  line-height: 1.42 !important;
+  max-width: 100% !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade,
+#selected .work-archive-grid .archive-cascade {
+  min-width: 0 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  line-height: 1.42 !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle,
+#selected .work-archive-grid .cascade-toggle {
+  display: inline-flex !important;
+  align-items: baseline !important;
+  gap: 0.28em !important;
+  width: auto !important;
+  max-width: 100% !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+  line-height: 1.42 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  letter-spacing: -0.025em !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle .prompt,
+#selected .work-archive-grid .cascade-toggle .prompt,
+#terminal-body #selected .work-archive-grid .cascade-toggle .cmd-action,
+#selected .work-archive-grid .cascade-toggle .cmd-action,
+#terminal-body #selected .work-archive-grid .cascade-toggle .toggle-mark,
+#selected .work-archive-grid .cascade-toggle .toggle-mark {
+  flex: 0 0 auto !important;
+}
+#terminal-body #selected .work-archive-grid .cascade-toggle .cmd-name,
+#selected .work-archive-grid .cascade-toggle .cmd-name {
+  color: var(--accent) !important;
+  flex: 0 0 auto !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
+  white-space: nowrap !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"],
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] {
+  grid-column: 1 / -1 !important;
+  margin: 0.45rem 0 0.62rem !important;
+  padding: 0.5rem 0 0 !important;
+  border-top: 1px solid rgba(95, 255, 129, 0.22) !important;
+  border-bottom: 1px solid rgba(95, 255, 129, 0.12) !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content {
+  max-height: min(38vh, 300px) !important;
+  margin: 0.35rem 0 0.5rem !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-video .vid-frame,
+#selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-video .vid-frame {
+  max-width: 720px !important;
+}
+#terminal-body #selected .work-archive-grid .archive-cascade[data-title] .cascade-content::before,
+#selected .work-archive-grid .archive-cascade[data-title] .cascade-content::before {
+  content: attr(data-title);
+  display: block;
+  color: var(--muted);
+  font-size: 0.74em;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.35rem;
+  text-transform: lowercase;
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    font-size: clamp(0.84rem, 1.5vw, 0.98rem) !important;
+    column-gap: 0.65rem !important;
+    row-gap: 0.02rem !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle { gap: 0.23em !important; letter-spacing: -0.035em !important; }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content { max-height: 34vh !important; }
+}
+@media (max-width: 720px) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    grid-template-columns: 1fr !important;
+    font-size: 0.9rem !important;
+    column-gap: 0 !important;
+    row-gap: 0.05rem !important;
+  }
+}
+</style>
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04A</span><span class="hdr-slash"> // </span><span class="hdr-name">selected files</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy selected-copy">
-<span class="line">a few files from the archive.</span>
-<span class="line">open one when you want to see the story move.</span>
-<span class="line"> </span>
+<span class="line">files from the archive.</span>
+<span class="line"></span>
 </div>
-<div class="cascade work-cascade" data-expanded="true">
-<span aria-expanded="true" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_01</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0"></iframe></div></div></div></div>
-<div class="cascade work-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_02</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169820728?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank"></iframe></div></div></div></div>
-<div class="cascade work-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_03</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/pDk121-TCto?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank"></iframe></div></div></div></div>
-<div class="cascade work-cascade" data-expanded="false"><span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">film_04</span><span class="toggle-mark"></span></span><div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/QlP7wPaFcVU?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank"></iframe></div></div></div></div>
+<div aria-label="selected work archive" class="work-archive-grid">
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Goldrush - Sonoran Skies Aftermovie">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">events_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/UnXd015bM5U?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Goldrush - Sonoran Skies Aftermovie"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="High Vibe Kitchen - Take A Little Trip">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">product_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/D46bYNK_lvw?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="High Vibe Kitchen - Take A Little Trip"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Decadence Arizona - Aftermovie">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">events_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/HiQ8cERv32U?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Decadence Arizona - Aftermovie"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Neighbor - Sustainable Furniture">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">product_03</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/ACgPMAyPQeI?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Neighbor - Sustainable Furniture"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Decadence Arizona - Ancient Future">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">events_03</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/91Lz7NKrmqw?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Decadence Arizona - Ancient Future"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Fuji Sports - Brand Video">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">product_04</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/HkZKshgwslI?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Fuji Sports - Brand Video"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Aurelio Physical Therapy - Fitness Forward Performance">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">healthcare_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169833679?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank" title="Aurelio Physical Therapy - Fitness Forward Performance"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Training Mask - Learn To Breathe">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">sports_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/jduIrHZT0og?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Training Mask - Learn To Breathe"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Aurelio Physical Therapy - Mission Statement">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">healthcare_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169820728?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank" title="Aurelio Physical Therapy - Mission Statement"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Training Mask - CrossFit">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">sports_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/lEdEdWhsi8g?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Training Mask - CrossFit"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Andres Plastic Surgery - Your Body, High Standards">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">healthcare_03</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1169831417?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank" title="Andres Plastic Surgery - Your Body, High Standards"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Golf Digest - Bubba Watson">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">sports_03</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/2g7dOnDKYZo?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Golf Digest - Bubba Watson"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="UMOM New Day Centers - Kelly Story">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">nonprofit_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/mEfrDfPj_TA?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="UMOM New Day Centers - Kelly Story"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Integrated Modular Solutions - Built To Last">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">tech_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/4bg9VjczCXg?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Integrated Modular Solutions - Built To Last"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="New Pathways For Youth - It Begins With Me">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">nonprofit_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/uPjYjRDq_qU?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="New Pathways For Youth - It Begins With Me"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Opendoor - No Trick, All Treat Case Study">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">tech_02</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/B615WegPglg?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Opendoor - No Trick, All Treat Case Study"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="High Vibe Kitchen - Dinner Party">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">product_01</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/bDNn4kDE3H4?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="High Vibe Kitchen - Dinner Party"></iframe></div></div></div>
+</div>
+<div class="cascade work-cascade archive-cascade" data-expanded="false" data-title="Uber - Pitch Arizona">
+<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">tech_03</span><span class="toggle-mark"></span></span>
+<div class="cascade-content"><div class="cascade-video"><div class="vid-frame"><iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://www.youtube.com/embed/-0MCt3qjIWs?autoplay=1&amp;mute=1&amp;modestbranding=1&amp;rel=0" src="about:blank" title="Uber - Pitch Arizona"></iframe></div></div></div>
+</div>
+
+</div>
 </section>
 <section class="page reveal" data-nav-section="" id="what-we-make">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04B</span><span class="hdr-slash"> // </span><span class="hdr-name">what we make</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy make-copy">
 <span class="line"><span class="accent">campaign films</span></span>
-<span class="line">hero stories built to introduce, persuade, launch, or reposition.</span>
-<span class="line"> </span>
+<span class="line">hero stories built to introduce, launch, reposition, recruit, or sell.</span>
+<span class="line"></span>
 <span class="line"><span class="accent">documentary shorts</span></span>
 <span class="line">human-centered pieces with texture, pacing, and emotional proof.</span>
-<span class="line"> </span>
+<span class="line"></span>
 <span class="line"><span class="accent">content systems</span></span>
-<span class="line">cutdowns, social, paid, web, sales tools, motion, post, and finishing.</span>
-<span class="line"> </span>
-<span class="line"><span class="accent">interviews</span></span>
-<span class="line">clean, confident talking-head production that does not feel like homework.</span>
+<span class="line">cutdowns, paid social, web, sales tools, motion, post, and finishing.</span>
+<span class="line"></span>
+<span class="line"><span class="accent">industries</span></span>
+<span class="line">brand · product · lifestyle · sports · fitness · healthcare · travel · gov · nonprofit · tech</span>
+<span class="line"></span>
+<span class="line"><span class="accent">mediums</span></span>
+<span class="line">documentary · commercials · long-form · tv/film · photography · print · digital/social</span>
 </div>
 </section>
 <section class="page reveal" data-nav-section="" id="landing">
-<div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04D</span><span class="hdr-slash"> // </span><span class="hdr-name">how it lands</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
+<div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">04D</span><span class="hdr-slash"> // </span><span class="hdr-name">the numbers</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy wide-copy">
-<span class="line">great production should feel effortless.</span>
-<span class="line">the strategy underneath it should not.</span>
-<span class="line"> </span>
-<span class="line">the film should look good, carry meaning, and do a real job once it leaves the edit bay.</span>
-<span class="line">it should give sales a sharper tool, recruiting a truer story, leadership a clearer message, and the audience a reason to stay.</span>
+<span class="line">the work should look good, carry meaning, and do a real job once it leaves the edit bay.</span>
+<span class="line"></span>
+<span class="line">do not just take our word for it. the case studies will break out the proof in numbers like <span class="accent">$1.37M</span> in attributed revenue, <span class="accent">8,420,000</span> campaign impressions, and a <span class="accent">31.6%</span> lift in conversion rate across campaign activations.</span>
 </div>
 <div class="next-link reveal work-intel-next">&gt; <button class="tw-page-link" data-page="intel.html" data-tw-page-link="true" type="button">next: intel (our way of saying blog)</button></div>
 </section>
@@ -1383,7 +1666,7 @@
       cascade.style.opacity = '1';
     }
     if (iframe && iframe.dataset.src) iframe.setAttribute('src', iframe.dataset.src);
-    if (post) post.innerHTML = `&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high-impact content.
+    if (post) post.innerHTML = `&gt; we are a research-driven marketing agency that turns audience, competitor, and category intelligence into high impact content built to move people.
 &gt;
 &gt; press enter or scroll down to go to the next section, or click menu to jump to a page.
 `;
@@ -1596,7 +1879,6 @@
   window.twBindCleanCascades = bindCleanToggles;
 })();
 </script>
-
 <script>
 // THRILL_WAVE BUTTON ROUTER
 // Internal page navigation is routed through buttons instead of anchors so
@@ -1650,7 +1932,6 @@
   }, true);
 })();
 </script>
-
 <script>
 // ============================================================
 // TW SECTION SNAP CONTROLLER V5
@@ -1799,8 +2080,6 @@
   }, { passive:false, capture:true });
 })();
 </script>
-
-
 <script>
 // ============================================================
 // TW LOGO HOME RESTART + TRAFFIC-LIGHT SECRET BREAK ROOM
@@ -2388,8 +2667,6 @@
   else prepControls();
 })();
 </script>
-
-
 <!-- TW brandmark press-state patch -->
 <script>
 (function(){
@@ -2493,8 +2770,6 @@
   window.addEventListener('blur', function(){ releaseAfterMinimum(); });
 })();
 </script>
-
-
 <script>
 // ============================================================
 // TW BREAK ROOM HIT LAYER
@@ -2786,8 +3061,6 @@
   else init();
 })();
 </script>
-
-
 <script>
 // ============================================================
 // TW BREAK ROOM NAME + ALL-TIME HIGH SCORES
@@ -3085,8 +3358,6 @@
   else bindControls();
 })();
 </script>
-
-
 <script>
 /* TW patch: stop the home typing loop/sound immediately when the break room opens. */
 (function twBreakRoomKillsHomeTyping(){
@@ -3138,7 +3409,6 @@
   });
 })();
 </script>
-
 <script>
 (function twMenuTrafficLightClose(){
   if (window.__twMenuTrafficLightCloseBound) return;
@@ -3179,6 +3449,24 @@
   }, true);
 })();
 </script>
-
+<script>
+(function twWorkArchiveOneOpen(){
+  if (window.__twWorkArchiveOneOpen) return;
+  window.__twWorkArchiveOneOpen = true;
+  document.addEventListener('click', function(e){
+    var toggle = e.target && e.target.closest ? e.target.closest('#selected .work-archive-grid .cascade-toggle') : null;
+    if (!toggle) return;
+    var current = toggle.closest('.work-cascade');
+    if (!current) return;
+    document.querySelectorAll('#selected .work-archive-grid .work-cascade[data-expanded="true"]').forEach(function(other){
+      if (other === current) return;
+      other.dataset.expanded = 'false';
+      var otherToggle = other.querySelector('.cascade-toggle');
+      if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+      other.querySelectorAll('iframe[data-src]').forEach(function(frame){ frame.setAttribute('src', 'about:blank'); });
+    });
+  }, true);
+})();
+</script>
 </body>
 </html>
