@@ -759,10 +759,55 @@
 @media (max-width: 720px) {
   #terminal-body #selected .work-archive-grid,
   #selected .work-archive-grid {
-    grid-template-columns: 1fr !important;
-    font-size: 0.9rem !important;
-    column-gap: 0 !important;
-    row-gap: 0.05rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: clamp(0.25rem, 1.7vw, 0.48rem) !important;
+    row-gap: 0.02rem !important;
+    font-size: clamp(0.56rem, 2.25vw, 0.72rem) !important;
+    line-height: 1.34 !important;
+    padding-top: 0.22rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade,
+  #selected .work-archive-grid .archive-cascade {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle {
+    gap: 0.12em !important;
+    letter-spacing: -0.06em !important;
+    line-height: 1.34 !important;
+    max-width: 100% !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle .cmd-name,
+  #selected .work-archive-grid .cascade-toggle .cmd-name {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"],
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] {
+    grid-column: 1 / -1 !important;
+    overflow: visible !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content {
+    max-height: 34vh !important;
+  }
+}
+@media (max-width: 380px) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    column-gap: 0.18rem !important;
+    font-size: clamp(0.5rem, 2.18vw, 0.62rem) !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle {
+    gap: 0.08em !important;
+    letter-spacing: -0.075em !important;
   }
 }
 
@@ -977,10 +1022,55 @@
 @media (max-width: 720px) {
   #terminal-body #selected .work-archive-grid,
   #selected .work-archive-grid {
-    grid-template-columns: 1fr !important;
-    font-size: 0.9rem !important;
-    column-gap: 0 !important;
-    row-gap: 0.05rem !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    column-gap: clamp(0.25rem, 1.7vw, 0.48rem) !important;
+    row-gap: 0.02rem !important;
+    font-size: clamp(0.56rem, 2.25vw, 0.72rem) !important;
+    line-height: 1.34 !important;
+    padding-top: 0.22rem !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade,
+  #selected .work-archive-grid .archive-cascade {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle {
+    gap: 0.12em !important;
+    letter-spacing: -0.06em !important;
+    line-height: 1.34 !important;
+    max-width: 100% !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle .cmd-name,
+  #selected .work-archive-grid .cascade-toggle .cmd-name {
+    max-width: none !important;
+    overflow: visible !important;
+    text-overflow: clip !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"],
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] {
+    grid-column: 1 / -1 !important;
+    overflow: visible !important;
+  }
+  #terminal-body #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content,
+  #selected .work-archive-grid .archive-cascade[data-expanded="true"] .cascade-content {
+    max-height: 34vh !important;
+  }
+}
+@media (max-width: 380px) {
+  #terminal-body #selected .work-archive-grid,
+  #selected .work-archive-grid {
+    column-gap: 0.18rem !important;
+    font-size: clamp(0.5rem, 2.18vw, 0.62rem) !important;
+  }
+  #terminal-body #selected .work-archive-grid .cascade-toggle,
+  #selected .work-archive-grid .cascade-toggle {
+    gap: 0.08em !important;
+    letter-spacing: -0.075em !important;
   }
 }
 </style>

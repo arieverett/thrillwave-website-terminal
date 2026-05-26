@@ -263,21 +263,25 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="styles.css" rel="stylesheet"/>
 <style id="tw-contact-calendly-scale-pass">
-/* Contact page: compact Calendly and terminal rows so the page reads cleanly without internal widget scrolling. */
+/* Contact page: align terminal rows and scale Calendly down so the widget stays cleaner inside the terminal. */
 #hero .contact-copy .line.contact-row,
 #follow .follow-copy .line.follow-row {
   display: grid !important;
   grid-template-columns: 10ch 2ch minmax(0, 1fr) !important;
-  column-gap: 1.1ch !important;
+  column-gap: 1.65ch !important;
   align-items: baseline !important;
   white-space: normal !important;
   overflow: visible !important;
 }
 #hero .contact-copy .contact-label,
-#follow .follow-copy .follow-label,
+#follow .follow-copy .follow-label {
+  color: var(--fg) !important;
+  min-width: 0 !important;
+}
 #hero .contact-copy .contact-sep,
 #follow .follow-copy .follow-sep {
   color: var(--fg) !important;
+  text-align: left !important;
 }
 #hero .contact-copy .contact-value,
 #follow .follow-copy .follow-value {
@@ -291,18 +295,18 @@
   overflow: hidden !important;
 }
 #booking .calendly-cascade .calendly-frame iframe {
-  width: 200% !important;
-  height: 900px !important;
-  min-height: 900px !important;
-  transform: scale(0.5) !important;
+  width: 232.56% !important;
+  height: 1040px !important;
+  min-height: 1040px !important;
+  transform: scale(0.43) !important;
   transform-origin: 0 0 !important;
   border: 0 !important;
 }
 @media (max-width: 720px) {
   #hero .contact-copy .line.contact-row,
   #follow .follow-copy .line.follow-row {
-    grid-template-columns: 9ch 2ch minmax(0, 1fr) !important;
-    column-gap: .9ch !important;
+    grid-template-columns: 9.5ch 2ch minmax(0, 1fr) !important;
+    column-gap: 1.15ch !important;
   }
   #booking .calendly-cascade .calendly-frame {
     height: 360px !important;
@@ -310,10 +314,10 @@
     min-height: 0 !important;
   }
   #booking .calendly-cascade .calendly-frame iframe {
-    width: 217.4% !important;
-    height: 820px !important;
-    min-height: 820px !important;
-    transform: scale(0.46) !important;
+    width: 250% !important;
+    height: 980px !important;
+    min-height: 980px !important;
+    transform: scale(0.4) !important;
   }
 }
 @media (max-width: 920px) and (orientation: landscape) {
@@ -323,10 +327,10 @@
     min-height: 0 !important;
   }
   #booking .calendly-cascade .calendly-frame iframe {
-    width: 222.22% !important;
-    height: 620px !important;
-    min-height: 620px !important;
-    transform: scale(0.45) !important;
+    width: 250% !important;
+    height: 700px !important;
+    min-height: 700px !important;
+    transform: scale(0.4) !important;
   }
 }
 </style>

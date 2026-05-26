@@ -1343,6 +1343,20 @@
         const c = tg.closest('.cascade');
         if (!c) return;
         const opening = c.dataset.expanded !== 'true';
+        const mutualGroup = c.classList.contains('work-cascade') ? 'work-cascade'
+          : c.classList.contains('intel-cascade') ? 'intel-cascade'
+          : '';
+        if (opening && mutualGroup) {
+          terminalBody.querySelectorAll('.' + mutualGroup + '[data-expanded="true"]').forEach(function(other){
+            if (other === c) return;
+            other.dataset.expanded = 'false';
+            var otherToggle = other.querySelector('.cascade-toggle');
+            if (otherToggle) otherToggle.setAttribute('aria-expanded', 'false');
+            if (mutualGroup === 'work-cascade') {
+              other.querySelectorAll('iframe[data-src]').forEach(function(frame){ frame.setAttribute('src', 'about:blank'); });
+            }
+          });
+        }
         c.dataset.expanded = opening ? 'true' : 'false';
         tg.setAttribute('aria-expanded', opening ? 'true' : 'false');
         c.querySelectorAll('iframe[data-src]').forEach(function(frame){

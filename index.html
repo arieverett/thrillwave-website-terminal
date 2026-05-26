@@ -1078,9 +1078,7 @@
 <section class="page reveal" id="our_work">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">01C</span><span class="hdr-slash"> // </span><span class="hdr-name">our work</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy">
-<span class="line">every project started with a sitrep. research</span>
-<span class="line">first. story second. camera third. here's what</span>
-<span class="line">came out the other side.</span>
+<span class="line">every project started with a sitrep. research first. story second. camera third. here's what came out the other side.</span>
 <span class="line"></span>
 </div>
 <div class="cascade work-cascade" data-expanded="true">
@@ -1129,8 +1127,7 @@
 <section class="page reveal" id="who_we_work_with">
 <div class="section-header"><span class="hdr-bracket">[ </span><span class="hdr-num">01D</span><span class="hdr-slash"> // </span><span class="hdr-name">who we work with</span><span class="hdr-bracket"> ]</span><span class="hdr-eq">==================================================</span></div>
 <div class="page-content terminal-copy">
-<span class="line">we work with the people building what comes next.</span>
-<span class="line">80+ organizations across 6 industries and 41 verticals.</span>
+<span class="line">we work with the people building what comes next. 80+ organizations across 6 industries and 41 verticals.</span>
 <span class="line"></span>
 <span class="line"><span class="accent">brand + product + lifestyle</span></span>
 <span class="line"><a href="https://rumcoaz.com" rel="noopener" target="_blank">rumco</a> · <a href="https://woodsidehomes.com" rel="noopener" target="_blank">woodside_homes</a> · <a href="https://www.ubs.com" rel="noopener" target="_blank">ubs</a></span>
@@ -1176,9 +1173,7 @@
 <div class="page-content terminal-copy">
 <span class="line">30-min intro. no pitch deck.</span>
 <span class="line"></span>
-<span class="line">we arrive with intel already pulled on your sector.</span>
-<span class="line">we'll tell you what we're seeing, then decide</span>
-<span class="line">together which story is the most worth making.</span>
+<span class="line">we arrive with intel already pulled on your sector. we'll tell you what we're seeing, then decide together which story is the most worth making.</span>
 <span class="line"></span>
 <span class="line"><button class="cta-link tw-page-link" data-page="contact.html" data-tw-page-link="true" type="button">start a project</button></span>
 <span class="line"></span>
@@ -3534,13 +3529,19 @@ document.getElementById('skip-btn').addEventListener('click', skipSequence);
     if (!c) return;
     const opening = c.dataset.expanded !== 'true';
 
-    if (opening && c.classList.contains('work-cascade')) {
-      document.querySelectorAll('.work-cascade[data-expanded="true"]').forEach(other => {
+    const mutualGroup = c.classList.contains('work-cascade') ? 'work-cascade'
+      : c.classList.contains('intel-cascade') ? 'intel-cascade'
+      : '';
+
+    if (opening && mutualGroup) {
+      document.querySelectorAll('.' + mutualGroup + '[data-expanded="true"]').forEach(other => {
         if (other === c) return;
         other.dataset.expanded = 'false';
         const t = other.querySelector('.cascade-toggle');
         if (t) t.setAttribute('aria-expanded','false');
-        other.querySelectorAll('iframe[data-src]').forEach(frame => frame.setAttribute('src','about:blank'));
+        if (mutualGroup === 'work-cascade') {
+          other.querySelectorAll('iframe[data-src]').forEach(frame => frame.setAttribute('src','about:blank'));
+        }
       });
     }
 
