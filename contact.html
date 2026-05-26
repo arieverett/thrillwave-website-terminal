@@ -263,31 +263,32 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="styles.css" rel="stylesheet"/>
 <style id="tw-contact-calendly-scale-pass">
-/* Contact page: align terminal rows and scale Calendly down so the widget stays cleaner inside the terminal. */
+/* Contact page: align the // rows like a terminal table and keep Calendly compact. */
 #hero .contact-copy .line.contact-row,
 #follow .follow-copy .line.follow-row {
-  display: grid !important;
-  grid-template-columns: 10ch 2ch minmax(0, 1fr) !important;
-  column-gap: 1.65ch !important;
-  align-items: baseline !important;
+  display: block !important;
   white-space: normal !important;
   overflow: visible !important;
 }
 #hero .contact-copy .contact-label,
 #follow .follow-copy .follow-label {
   color: var(--fg) !important;
-  min-width: 0 !important;
+  display: inline-block !important;
+  width: 10.5ch !important;
+  min-width: 10.5ch !important;
 }
 #hero .contact-copy .contact-sep,
 #follow .follow-copy .follow-sep {
   color: var(--fg) !important;
-  text-align: left !important;
+  display: inline-block !important;
+  width: 2ch !important;
+  margin-right: 6.5ch !important;
 }
 #hero .contact-copy .contact-value,
 #follow .follow-copy .follow-value {
+  display: inline !important;
   min-width: 0 !important;
 }
-
 #booking .calendly-cascade .calendly-frame {
   height: 430px !important;
   max-height: min(430px, calc(100vh - 360px)) !important;
@@ -303,10 +304,14 @@
   border: 0 !important;
 }
 @media (max-width: 720px) {
-  #hero .contact-copy .line.contact-row,
-  #follow .follow-copy .line.follow-row {
-    grid-template-columns: 9.5ch 2ch minmax(0, 1fr) !important;
-    column-gap: 1.15ch !important;
+  #hero .contact-copy .contact-label,
+  #follow .follow-copy .follow-label {
+    width: 9.5ch !important;
+    min-width: 9.5ch !important;
+  }
+  #hero .contact-copy .contact-sep,
+  #follow .follow-copy .follow-sep {
+    margin-right: 3ch !important;
   }
   #booking .calendly-cascade .calendly-frame {
     height: 360px !important;

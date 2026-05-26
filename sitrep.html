@@ -262,6 +262,81 @@
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
 <link href="styles.css" rel="stylesheet"/>
+<style id="tw-sitrep-hero-demo-compact">
+/* Sitrep 03: keep the triptych, copy, and demo in one clean terminal page. */
+#hero .sitrep-triptych {
+  margin: 8px 0 8px !important;
+  gap: 10px !important;
+}
+#hero .sitrep-triptych .tile {
+  padding: 8px 9px 7px !important;
+  min-height: 0 !important;
+}
+#hero .sitrep-triptych .tile-graphic {
+  height: 20px !important;
+  font-size: 15px !important;
+  margin: 1px 0 5px !important;
+}
+#hero .sitrep-triptych .tile-title {
+  font-size: 12px !important;
+  letter-spacing: 3px !important;
+  margin-bottom: 5px !important;
+}
+#hero .sitrep-triptych .tile-list {
+  font-size: 12px !important;
+  line-height: 1.22 !important;
+}
+#hero .sitrep-copy {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+#hero .sitrep-copy .line {
+  line-height: 1.34 !important;
+}
+#hero .sitrep-demo-cascade {
+  margin-top: 0 !important;
+}
+#hero .sitrep-demo-cascade .cascade-toggle {
+  margin-top: 0 !important;
+}
+#hero .sitrep-demo-cascade[data-expanded="true"] .cascade-content {
+  margin: 5px 0 0 !important;
+  max-height: none !important;
+}
+#hero .sitrep-demo-cascade .cascade-video .vid-frame {
+  max-width: 430px !important;
+  aspect-ratio: 16 / 9 !important;
+}
+@media (max-width: 720px) {
+  #hero .sitrep-triptych {
+    gap: 5px !important;
+    margin: 6px 0 7px !important;
+  }
+  #hero .sitrep-triptych .tile {
+    padding: 7px 4px 6px !important;
+  }
+  #hero .sitrep-triptych .tile-graphic {
+    height: 16px !important;
+    font-size: 11px !important;
+    margin: 0 0 4px !important;
+  }
+  #hero .sitrep-triptych .tile-title {
+    font-size: 7.5px !important;
+    letter-spacing: 1px !important;
+    margin-bottom: 4px !important;
+  }
+  #hero .sitrep-triptych .tile-list {
+    font-size: 7.5px !important;
+    line-height: 1.15 !important;
+  }
+  #hero .sitrep-copy .line {
+    line-height: 1.25 !important;
+  }
+  #hero .sitrep-demo-cascade .cascade-video .vid-frame {
+    max-width: 100% !important;
+  }
+}
+</style>
 <script type="application/ld+json">
 [
   {
@@ -784,15 +859,13 @@
 <div class="page-content terminal-copy sitrep-copy">
 <span class="line">the brief before the big idea.</span>
 <span class="line"></span>
-<span class="line">sitrep is our intelligence protocol. it turns research into a guiding line before anything gets filmed, edited, or launched.</span>
-<span class="line"></span>
-<span class="line">we ingest the room, synthesize the signal, then execute against the clearest story. that way the work has a reason to exist before it starts looking good.</span>
-<span class="line"></span>
+<span class="line">sitrep turns research into a guiding line before anything gets filmed, edited, or launched.</span>
+<span class="line">we ingest the room, find the signal, and execute against the clearest story.</span>
 </div>
-<div class="cascade sitrep-demo-cascade" data-expanded="false">
-<span aria-expanded="false" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">demo</span><span class="toggle-mark"></span></span>
+<div class="cascade sitrep-demo-cascade" data-expanded="true">
+<span aria-expanded="true" class="cascade-toggle" role="button" tabindex="0"><span class="prompt">&gt;</span><span class="cmd-action">show</span><span class="cmd-name">demo</span><span class="toggle-mark"></span></span>
 <div class="cascade-content"><div class="cascade-video"><div class="vid-frame">
-<iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1195773700?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="about:blank"></iframe>
+<iframe allow="autoplay; fullscreen; picture-in-picture" allowfullscreen="" data-src="https://player.vimeo.com/video/1195773700?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0" src="https://player.vimeo.com/video/1195773700?autoplay=1&amp;muted=1&amp;loop=1&amp;title=0&amp;byline=0&amp;portrait=0"></iframe>
 </div></div></div>
 </div>
 
