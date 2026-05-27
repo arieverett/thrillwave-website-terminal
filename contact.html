@@ -3288,5 +3288,83 @@
 })();
 </script>
 
+
+<script>
+/* twPromptColFix — mobile > column alignment, long-term fix.
+   The CSS ::before on .page-content.terminal-copy uses
+   content: attr(data-tw-prompt-col) on mobile. This script
+   measures each container's rendered height, computes the number
+   of > rows needed at the current line-height, and writes that
+   string to the attribute — so every visual row, including
+   naturally wrapped text lines, gets a > at the left margin.
+   Runs on load, resize, PJAX swaps (MutationObserver on
+   #terminal-body), and container height changes (ResizeObserver). */
+(function twPromptColFix(){
+  'use strict';
+  if (window.__twPromptColFix) return;
+  window.__twPromptColFix = true;
+
+  var ATTR = 'data-tw-prompt-col';
+  var rTimer = null;
+  var mTimer = null;
+
+  function isMobile() { return window.innerWidth <= 720; }
+
+  function updateEl(el) {
+    if (!isMobile()) { el.removeAttribute(ATTR); return; }
+    var lh = parseFloat(window.getComputedStyle(el).lineHeight) || 0;
+    var h  = el.getBoundingClientRect().height || 0;
+    if (!lh || !h) return;
+    var rows = Math.ceil(h / lh) + 4;
+    var col = [];
+    for (var i = 0; i < rows; i++) col.push('>');
+    el.setAttribute(ATTR, col.join('\n'));
+  }
+
+  function updateAll() {
+    document.querySelectorAll('.page-content.terminal-copy').forEach(updateEl);
+  }
+
+  /* ResizeObserver: re-fires whenever a container changes height
+     (reveals, PJAX loads, cascade expansions) */
+  var ro = window.ResizeObserver ? new ResizeObserver(function(entries) {
+    entries.forEach(function(e) { updateEl(e.target); });
+  }) : null;
+
+  function observeAll() {
+    if (!ro) return;
+    document.querySelectorAll('.page-content.terminal-copy').forEach(function(el) {
+      ro.observe(el);
+    });
+  }
+
+  /* MutationObserver on #terminal-body catches PJAX content swaps */
+  function bindMutation() {
+    var tb = document.getElementById('terminal-body');
+    if (!tb || !window.MutationObserver) return;
+    new MutationObserver(function() {
+      clearTimeout(mTimer);
+      mTimer = setTimeout(function() { updateAll(); observeAll(); }, 80);
+    }).observe(tb, { childList: true });
+  }
+
+  /* Window resize */
+  window.addEventListener('resize', function() {
+    clearTimeout(rTimer);
+    rTimer = setTimeout(updateAll, 120);
+  });
+
+  function init() { updateAll(); observeAll(); bindMutation(); }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  /* Public hook for any manual re-trigger needed */
+  window.twUpdatePrompts = updateAll;
+})();
+</script>
 </body>
 </html>

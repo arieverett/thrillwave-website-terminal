@@ -11859,30 +11859,33 @@ body.page-index #hero {
 }
 
 /* ============================================================
-   MOBILE PROMPT ALIGNMENT FIX
-   The shared ::before column drifts when a .line wraps to a
-   second row. Fix: hide the shared column, add an inline ::before
-   to each .line, and use a hanging-indent so wrapped text stays
-   under the text start rather than under the >.
-   Note: selector must match the specificity of the line 4996
-   rule (body:not(.booting) #terminal-body ...) which force-sets
-   text-indent: 0 — same specificity + later source order wins.
+   MOBILE PROMPT ALIGNMENT — LONG-TERM FIX
+   
+   On mobile, a .line element can wrap to multiple visual rows.
+   The original static ::before column (101 >) has one > per
+   line-height unit, so it DOES cover wrapped rows — but only if
+   the attribute-driven version is active (see twPromptColFix JS).
+   
+   JS measures each container's rendered height, computes exactly
+   how many > chars are needed (height / line-height + buffer),
+   and writes that string to data-tw-prompt-col. CSS reads it via
+   content: attr(), giving a > on every visual row including wraps.
+   Self-corrects on resize and after PJAX page loads.
    ============================================================ */
 @media (max-width: 720px) {
-  /* Hide the shared > column */
-  .page-content.terminal-copy::before {
+  /* Once JS has measured the container, use the dynamic column */
+  .page-content.terminal-copy[data-tw-prompt-col]::before {
+    content: attr(data-tw-prompt-col) !important;
+    display: block !important;
+  }
+  /* Remove per-line ::before injected by previous fix attempts */
+  .page-content.terminal-copy .line::before {
+    content: none !important;
     display: none !important;
   }
-  /* Match the high-specificity rule that sets text-indent: 0 */
+  /* Undo text-indent from previous fix attempt */
   body:not(.booting) #terminal-body .page-content.terminal-copy .line {
-    text-indent: -2.05ch !important;
-  }
-  /* Inline > sits in the padding gutter */
-  .page-content.terminal-copy .line::before {
-    content: '> ';
-    white-space: pre !important;
-    color: var(--tw-prompt) !important;
-    pointer-events: none !important;
+    text-indent: 0 !important;
   }
 }
 
