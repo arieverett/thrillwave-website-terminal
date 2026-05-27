@@ -1552,19 +1552,7 @@ body.menu-open .stage { gap: var(--gap); }
 }
 
 .terminal.main.is-loading::after {
-  content: '> loading next file...';
-  position: absolute;
-  left: 18px;
-  bottom: 16px;
-  z-index: 6;
-  color: var(--accent);
-  font-size: 11px;
-  letter-spacing: 1.2px;
-  background: rgba(0,0,0,0.86);
-  border: 1px solid var(--rule);
-  border-radius: 4px;
-  padding: 6px 8px;
-  animation: section-arrow-blink 0.9s steps(2, end) infinite;
+  display: none;
 }
 
 .terminal.side {
@@ -2864,12 +2852,12 @@ section.page > .next-link:last-child {
     pointer-events: auto;
   }
 
-  /* Give cascade rows a larger touch target on mobile. */
+  /* Give cascade rows consistent spacing on mobile — matches regular .line height. */
   .cascade-toggle {
     display: inline-flex;
     align-items: center;
-    min-height: 30px;
-    padding: 3px 0;
+    min-height: unset;
+    padding: 0;
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
