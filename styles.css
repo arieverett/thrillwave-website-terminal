@@ -11873,6 +11873,17 @@ body.page-index #hero {
    Self-corrects on resize and after PJAX page loads.
    ============================================================ */
 @media (max-width: 720px) {
+  /* ROOT CAUSE FIX: the global rule sets min-height: 1.58em on .line
+     but the container uses line-height: 1.52. That 0.06em gap multiplies
+     across every line, drifting the > column progressively off-screen.
+     Force both to 1.52 so every .line height == ::before row spacing. */
+  .page-content.terminal-copy .line {
+    min-height: 1.52em !important;
+    line-height: 1.52 !important;
+  }
+  .page-content.terminal-copy::before {
+    line-height: 1.52 !important;
+  }
   /* Once JS has measured the container, use the dynamic column */
   .page-content.terminal-copy[data-tw-prompt-col]::before {
     content: attr(data-tw-prompt-col) !important;
