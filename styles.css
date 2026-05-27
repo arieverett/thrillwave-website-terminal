@@ -11857,3 +11857,31 @@ body.page-index #hero {
     font-size: 6.8px !important;
   }
 }
+
+/* ============================================================
+   MOBILE PROMPT ALIGNMENT FIX
+   The shared ::before column on the container drifts when text
+   wraps on narrow screens. Switch to per-line ::before on mobile
+   so each > is always anchored to the top of its own line.
+   ============================================================ */
+@media (max-width: 720px) {
+  .page-content.terminal-copy {
+    padding-left: 0 !important;
+  }
+  .page-content.terminal-copy::before {
+    display: none !important;
+  }
+  .page-content.terminal-copy .line {
+    position: relative !important;
+    padding-left: 2.05ch !important;
+  }
+  .page-content.terminal-copy .line::before {
+    content: '>';
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--tw-prompt) !important;
+    pointer-events: none;
+    line-height: inherit;
+  }
+}
