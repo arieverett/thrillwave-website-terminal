@@ -11859,44 +11859,31 @@ body.page-index #hero {
 }
 
 /* ============================================================
-   MOBILE PROMPT ALIGNMENT — LONG-TERM FIX
-   
-   On mobile, a .line element can wrap to multiple visual rows.
-   The original static ::before column (101 >) has one > per
-   line-height unit, so it DOES cover wrapped rows — but only if
-   the attribute-driven version is active (see twPromptColFix JS).
-   
-   JS measures each container's rendered height, computes exactly
-   how many > chars are needed (height / line-height + buffer),
-   and writes that string to data-tw-prompt-col. CSS reads it via
-   content: attr(), giving a > on every visual row including wraps.
-   Self-corrects on resize and after PJAX page loads.
+   MOBILE PROMPT ALIGNMENT FIX
+   The shared ::before column on the container goes out of sync
+   when any .line wraps to a second visual row. Fix: hide the
+   shared column and use a hanging-indent on each .line so its
+   own inline ::before always sits in the left gutter — and
+   wrapped text auto-aligns under the text start, not the >.
    ============================================================ */
 @media (max-width: 720px) {
-  /* ROOT CAUSE FIX: the global rule sets min-height: 1.58em on .line
-     but the container uses line-height: 1.52. That 0.06em gap multiplies
-     across every line, drifting the > column progressively off-screen.
-     Force both to 1.52 so every .line height == ::before row spacing. */
-  .page-content.terminal-copy .line {
-    min-height: 1.52em !important;
-    line-height: 1.52 !important;
-  }
+  /* Hide the shared > column — each line handles its own */
   .page-content.terminal-copy::before {
-    line-height: 1.52 !important;
-  }
-  /* Once JS has measured the container, use the dynamic column */
-  .page-content.terminal-copy[data-tw-prompt-col]::before {
-    content: attr(data-tw-prompt-col) !important;
-    display: block !important;
-  }
-  /* Remove per-line ::before injected by previous fix attempts */
-  .page-content.terminal-copy .line::before {
-    content: none !important;
     display: none !important;
   }
-  /* Undo text-indent from previous fix attempt */
-  body:not(.booting) #terminal-body .page-content.terminal-copy .line {
-    text-indent: 0 !important;
+  /* text-indent pulls the FIRST line of each .line leftward into
+     the container's padding gutter; wrapped lines stay indented */
+  .page-content.terminal-copy .line {
+    display: block !important;
+    padding: 0 !important;
+    text-indent: -2.05ch !important;
+  }
+  /* Inline > sits in the gutter created by the hanging indent */
+  .page-content.terminal-copy .line::before {
+    content: '> ';
+    white-space: pre !important;
+    color: var(--tw-prompt) !important;
+    pointer-events: none !important;
   }
 }
 
@@ -11909,4 +11896,108 @@ body.page-index #hero {
 #team .team-caption::before {
   content: none !important;
   display: none !important;
+}
+
+/* ============================================================
+   TW MOBILE PROMPT RAIL FINAL FIX
+   Uses a measured DOM rail on mobile so prompt marks stay locked
+   to actual wrapped rows and never spill a stray > at the bottom.
+   ============================================================ */
+.tw-prompt-rail {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  #terminal-body {
+    --tw-mobile-copy-lh: 18px;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy),
+  #intro-post {
+    position: relative !important;
+    padding-left: 2.05ch !important;
+    line-height: var(--tw-mobile-copy-lh) !important;
+    white-space: normal !important;
+    overflow: hidden !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+    text-align: left !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy)::before,
+  #intro-post::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) > .tw-prompt-rail,
+  #intro-post > .tw-prompt-rail {
+    display: block !important;
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    z-index: 0 !important;
+    width: 1ch !important;
+    height: calc(var(--tw-rail-rows, 0) * var(--tw-mobile-copy-lh)) !important;
+    max-height: calc(var(--tw-rail-rows, 0) * var(--tw-mobile-copy-lh)) !important;
+    overflow: hidden !important;
+    white-space: pre !important;
+    font: inherit !important;
+    line-height: var(--tw-mobile-copy-lh) !important;
+    letter-spacing: inherit !important;
+    color: var(--tw-prompt, var(--fg)) !important;
+    pointer-events: none !important;
+    user-select: none !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) > :not(.tw-prompt-rail),
+  #intro-post > :not(.tw-prompt-rail) {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) .line {
+    display: block !important;
+    min-height: var(--tw-mobile-copy-lh) !important;
+    line-height: var(--tw-mobile-copy-lh) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    text-indent: 0 !important;
+    white-space: normal !important;
+    overflow-wrap: normal !important;
+    word-break: normal !important;
+    hyphens: none !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) .line::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) a,
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) button,
+  #terminal-body .page-content.terminal-copy:not(.tw-breakroom-copy) .cta-link {
+    font: inherit !important;
+    line-height: inherit !important;
+    vertical-align: baseline !important;
+  }
+
+  #terminal-body .cascade,
+  #terminal-body .cascade-toggle,
+  #terminal-body .cascade-content {
+    line-height: var(--tw-mobile-copy-lh) !important;
+  }
+}
+
+@media (max-width: 380px), (max-height: 680px) and (max-width: 720px) {
+  #terminal-body {
+    --tw-mobile-copy-lh: 17px;
+  }
+}
+
+@media (max-width: 720px) {
+  #intro-post {
+    white-space: pre-wrap !important;
+  }
 }
